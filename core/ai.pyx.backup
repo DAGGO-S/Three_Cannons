@@ -1,0 +1,513 @@
+# own_game/ai.py
+
+import cython
+import time
+import math
+from core.game_logic import GameState, CANNON, SOLDIER, EMPTY
+from core.evaluation_logic import evaluate_board
+
+# Cython imports
+from cython cimport Py_ssize_t
+
+ctypedef Py_ssize_t int
+ctypedef double float
+ctypedef bint bool
+
+# --- 置换表和相关常量 ---
+transposition_table = {}
+EXACT_SCORE = 0
+LOWER_BOUND = 1
+UPPER_BOUND = 2
+
+# --- 新增：辅助函数，用于走法排序 ---
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef list _get_ordered_moves(object state, int player_piece, tuple hash_move):
+    """
+    生成并排序所有合法走法。
+    注意：在Cython中，为可选参数提供默认值时，类型必须明确。
+    """
+    cdef list all_moves = []
+    cdef list captures = []
+    cdef list quiet_moves = []
+    cdef int opponent_piece = SOLDIER if player_piece == CANNON else CANNON
+    cdef int r, c
+    cdef tuple move, end_pos
+
+    for r in range(5):
+        for c in range(5):
+            if state.board[r][c] == player_piece:
+                for end_pos in state.get_valid_moves(r, c):
+                    move = ((r, c), end_pos)
+                    if state.board[end_pos[0]][end_pos[1]] == opponent_piece:
+                        captures.append(move)
+                    else:
+                        quiet_moves.append(move)
+
+    if hash_move:
+        if hash_move in captures: captures.remove(hash_move)
+        elif hash_move in quiet_moves: quiet_moves.remove(hash_move)
+        all_moves.append(hash_move)
+    
+    all_moves.extend(captures)
+    all_moves.extend(quiet_moves)
+    return all_moves
+
+# 【新增】动态自适应静默搜索函数
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef tuple _adaptive_quiescence_search(object state, float alpha, float beta, bint maximizing_player, int depth=0, bint use_threading=False, int thread_count=1, stop_event=None):
+    """
+    动态自适应静默搜索，根据局面激烈程度自动调整搜索深度。
+    平静局面搜索深度较浅，激烈局面搜索深度较深。
+    """
+    # 【新增优化】检查是否已经找到必胜/必败局面
+    # 如果alpha已经大于等于10000，说明已经找到必胜走法，无需继续搜索
+    if alpha >= 10000:
+        return alpha, None, []
+    # 如果beta已经小于等于-10000，说明已经找到必败局面，无需继续搜索
+    if beta <= -10000:
+        return beta, None, []
+        
+    cdef float stand_pat_score, evaluation
+    cdef int player_piece, opponent_piece, r, c
+    cdef tuple move, end_pos
+    cdef list capture_moves = []
+    cdef list threat_moves = []
+    cdef object new_state
+    cdef int tactical_moves_count
+    cdef int max_quiescence_depth
+    cdef float net_control_score
+    cdef list all_moves
+    
+    # 1. 首先进行一次静态评估，作为"原地不动"的参考分
+    stand_pat_score, score_details = evaluate_board(state, stop_event)
+
+    # 【新增优化】检查停止事件
+    if stop_event and stop_event.is_set():
+        return 0.0, None, []
+
+    # 【新增优化】检查静态评估是否已经达到必胜/必败
+    if abs(stand_pat_score) >= 10000:
+        return stand_pat_score, None, []
+
+    # 2. "Stand-pat" 剪枝：如果当前局面分数已经足够好/坏，直接返回
+    if maximizing_player:
+        if stand_pat_score >= beta:
+            return beta, None, []
+        alpha = max(alpha, stand_pat_score)
+    else:
+        if stand_pat_score <= alpha:
+            return alpha, None, []
+        beta = min(beta, stand_pat_score)
+
+    # 3. 生成吃子走法和威胁走法
+    player_piece = CANNON if maximizing_player else SOLDIER
+    opponent_piece = SOLDIER if player_piece == CANNON else CANNON
+    
+    # 3.1 生成吃子走法
+    for r in range(5):
+        for c in range(5):
+            if state.board[r][c] == player_piece:
+                for end_pos in state.get_valid_moves(r, c):
+                    if state.board[end_pos[0]][end_pos[1]] == opponent_piece:
+                        capture_moves.append(((r, c), end_pos))
+    
+    # 3.2 生成威胁走法（能够威胁对方重要位置的走法）
+    # 对于炮方，能够预瞄兵方的走法
+    # 对于兵方，能够接近炮方的走法
+    for r in range(5):
+        for c in range(5):
+            if state.board[r][c] == player_piece:
+                for end_pos in state.get_valid_moves(r, c):
+                    # 炮方的威胁走法：能够预瞄兵方
+                    if player_piece == CANNON:
+                        # 检查是否能够预瞄兵方
+                        if state.board[end_pos[0]][end_pos[1]] == EMPTY:
+                            # 检查预瞄位置是否能够威胁到兵方
+                            dr = end_pos[0] - r
+                            dc = end_pos[1] - c
+                            if abs(dr) <= 2 and abs(dc) <= 2:  # 炮的移动范围
+                                threat_r = end_pos[0] + dr
+                                threat_c = end_pos[1] + dc
+                                if (state.is_within_bounds(threat_r, threat_c) and 
+                                    state.board[threat_r][threat_c] == opponent_piece):
+                                    threat_moves.append(((r, c), end_pos))
+                    # 兵方的威胁走法：能够接近炮方
+                    else:
+                        # 检查是否能够接近炮方
+                        if state.board[end_pos[0]][end_pos[1]] == EMPTY:
+                            # 计算与最近炮方的距离
+                            min_dist = 5  # 初始最大距离
+                            for cr in range(5):
+                                for cc in range(5):
+                                    if state.board[cr][cc] == opponent_piece:
+                                        dist = abs(end_pos[0] - cr) + abs(end_pos[1] - cc)
+                                        min_dist = min(min_dist, dist)
+                            # 如果距离小于等于2，认为是威胁走法
+                            if min_dist <= 2:
+                                threat_moves.append(((r, c), end_pos))
+    
+    # 4. 评估局面激烈程度，决定搜索深度
+    tactical_moves_count = len(capture_moves) + len(threat_moves)
+    net_control_score = score_details.get("net_control_score", 0)
+    
+    # 根据局面激烈程度决定最大静默搜索深度
+    if tactical_moves_count >= 4 or abs(net_control_score) > 500:
+        # 激烈局面：深度限制为6
+        max_quiescence_depth = 6
+    elif tactical_moves_count >= 2 or abs(net_control_score) > 200:
+        # 中等激烈局面：深度限制为4
+        max_quiescence_depth = 4
+    else:
+        # 平静局面：深度限制为2
+        max_quiescence_depth = 2
+    
+    # 5. 合并所有战术走法，并按重要性排序
+    all_moves = []
+    # 吃子走法优先级最高
+    all_moves.extend(capture_moves)
+    # 威胁走法次之
+    all_moves.extend(threat_moves)
+    
+    # 6. 递归搜索战术走法
+    if maximizing_player:
+        for move in all_moves:
+            # 检查停止事件
+            if stop_event and stop_event.is_set():
+                break
+                
+            new_state = state.move_piece(move[0][0], move[0][1], move[1][0], move[1][1])
+            
+            # 如果还没有达到最大深度，继续递归搜索
+            if depth < max_quiescence_depth:
+                evaluation, _, _ = _adaptive_quiescence_search(new_state, alpha, beta, False, depth + 1, use_threading, thread_count)
+            else:
+                # 达到最大深度，只进行静态评估
+                evaluation, _ = evaluate_board(new_state, stop_event)
+                
+            alpha = max(alpha, evaluation)
+            if beta <= alpha:
+                return beta, None, [] # 剪枝
+        return alpha, None, []
+    else: # minimizing_player
+        for move in all_moves:
+            # 检查停止事件
+            if stop_event and stop_event.is_set():
+                break
+                
+            new_state = state.move_piece(move[0][0], move[0][1], move[1][0], move[1][1])
+            
+            # 如果还没有达到最大深度，继续递归搜索
+            if depth < max_quiescence_depth:
+                evaluation, _, _ = _adaptive_quiescence_search(new_state, alpha, beta, True, depth + 1, use_threading, thread_count)
+            else:
+                # 达到最大深度，只进行静态评估
+                evaluation, _ = evaluate_board(new_state, stop_event)
+                
+            beta = min(beta, evaluation)
+            if beta <= alpha:
+                return alpha, None, [] # 剪枝
+        return beta, None, []
+
+
+# 【新增】静默搜索函数
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef tuple _quiescence_search(object state, float alpha, float beta, bint maximizing_player, stop_event=None):
+    """
+    静默搜索，用于处理达到最大搜索深度后的战术局面。
+    只考虑吃子等非安静走法，直到局面稳定。
+    """
+    # 检查停止事件
+    if stop_event and stop_event.is_set():
+        return 0.0, None, []
+        
+    # 【新增优化】检查是否已经找到必胜/必败局面
+    # 如果alpha已经大于等于10000，说明已经找到必胜走法，无需继续搜索
+    if alpha >= 10000:
+        return alpha, None, []
+    # 如果beta已经小于等于-10000，说明已经找到必败局面，无需继续搜索
+    if beta <= -10000:
+        return beta, None, []
+        
+    cdef float stand_pat_score, evaluation
+    cdef int player_piece, opponent_piece, r, c
+    cdef tuple move, end_pos
+    cdef list capture_moves = []
+    cdef object new_state
+
+    # 1. 首先进行一次静态评估，作为"原地不动"的参考分
+    stand_pat_score, _ = evaluate_board(state, stop_event)
+    
+    # 【新增优化】检查静态评估是否已经达到必胜/必败
+    if stand_pat_score >= 10000:
+        return 10000, None, []
+    if stand_pat_score <= -10000:
+        return -10000, None, []
+
+    # 2. "Stand-pat" 剪枝：如果当前局面分数已经足够好/坏，直接返回
+    if maximizing_player:
+        if stand_pat_score >= beta:
+            return beta, None, []
+        alpha = max(alpha, stand_pat_score)
+    else:
+        if stand_pat_score <= alpha:
+            return alpha, None, []
+        beta = min(beta, stand_pat_score)
+
+    # 3. 只生成吃子走法
+    player_piece = CANNON if maximizing_player else SOLDIER
+    opponent_piece = SOLDIER if player_piece == CANNON else CANNON
+    for r in range(5):
+        for c in range(5):
+            if state.board[r][c] == player_piece:
+                for end_pos in state.get_valid_moves(r, c):
+                    if state.board[end_pos[0]][end_pos[1]] == opponent_piece:
+                        capture_moves.append(((r, c), end_pos))
+    
+    # 4. 递归搜索吃子走法
+    if maximizing_player:
+        for move in capture_moves:
+            # 检查停止事件
+            if stop_event and stop_event.is_set():
+                break
+                
+            new_state = state.move_piece(move[0][0], move[0][1], move[1][0], move[1][1])
+            evaluation, _, _ = _quiescence_search(new_state, alpha, beta, False, stop_event)
+            alpha = max(alpha, evaluation)
+            if beta <= alpha:
+                return beta, None, [] # 剪枝
+        return alpha, None, []
+    else: # minimizing_player
+        for move in capture_moves:
+            # 检查停止事件
+            if stop_event and stop_event.is_set():
+                break
+                
+            new_state = state.move_piece(move[0][0], move[0][1], move[1][0], move[1][1])
+            evaluation, _, _ = _quiescence_search(new_state, alpha, beta, True, stop_event)
+            beta = min(beta, evaluation)
+            if beta <= alpha:
+                return alpha, None, [] # 剪枝
+        return beta, None, []
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def find_best_move_iterative_deepening(state: GameState, settings: dict, is_maximizing: bool, progress_callback=None):
+    """
+    通过迭代加深搜索最佳走法。
+    这是AI思考的主入口。
+    """
+    # 不完全清空置换表，只清空过期的条目
+    global transposition_table
+    current_time = time.time()
+    
+    # 清空超过5分钟的旧条目
+    if len(transposition_table) > 10000:  # 如果置换表太大，清空所有
+        transposition_table.clear()
+    else:
+        # 只清空旧条目
+        keys_to_remove = []
+        for key, entry in transposition_table.items():
+            if "timestamp" in entry and current_time - entry["timestamp"] > 300:  # 5分钟
+                keys_to_remove.append(key)
+        
+        for key in keys_to_remove:
+            del transposition_table[key]
+    
+    start_time = time.time()
+    best_move_so_far = None
+    best_line_so_far = []
+    
+    cdef int max_depth = settings["depth"]
+    cdef float time_limit = settings["time_limit"]
+    cdef int depth
+    cdef bint use_threading = settings.get("use_threading", False)
+    cdef int thread_count = settings.get("thread_count", 1)
+    # 获取停止事件
+    stop_event = settings.get("stop_event", None)
+
+    for depth in range(1, max_depth + 1):
+        # 检查是否应该提前终止 (更精确的时间控制)
+        elapsed_time = time.time() - start_time
+        if depth > 1:
+            # 根据当前深度和时间使用情况，预估下一深度所需时间
+            # 使用指数增长模型，深度每增加1，时间约增加2-3倍
+            estimated_next_depth_time = elapsed_time * 2.5
+            remaining_time = time_limit - elapsed_time
+            
+            # 如果预估的下一深度时间超过剩余时间，则提前终止
+            if estimated_next_depth_time > remaining_time:
+                if progress_callback:
+                    print(f"时间限制，提前于深度 {depth} 终止搜索。")
+                break
+            
+            # 如果已经使用了80%的时间限制，也提前终止
+            if elapsed_time > time_limit * 0.8:
+                if progress_callback:
+                    print(f"时间使用达到80%，提前于深度 {depth} 终止搜索。")
+                break
+        
+        # 检查停止事件
+        if stop_event and stop_event.is_set():
+            if progress_callback:
+                print(f"接收到停止信号，终止搜索。")
+            break
+
+        score, move, line = _alpha_beta(state, depth, -math.inf, math.inf, is_maximizing, use_threading, thread_count, stop_event)
+        
+        # 迭代加深过程中，只有在时间允许的情况下才更新最佳走法
+        if time.time() - start_time < time_limit:
+            if move: # 确保搜索找到了一个合法的走法
+                best_move_so_far = move
+                best_line_so_far = line
+                if progress_callback:
+                    progress_callback(depth, score, move, line)
+        else:
+            if progress_callback:
+                 print(f"时间限制，完成深度 {depth-1} 的搜索。")
+            break # 如果当前深度超时，立即中断
+
+    return best_move_so_far
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef tuple _alpha_beta(object state, int depth, float alpha, float beta, bint maximizing_player, bint use_threading=False, int thread_count=1, stop_event=None):
+    # --- 【新增】三次重复和棋检测 ---
+    # 这是应该执行的第一个检查
+    if state.position_counts[state.hash] >= 4:
+        # 局面重复三次，判为和棋，返回中性分数 0
+        return 0.0, None, []
+    """
+    实现了置换表、走法排序和PVS优化的Alpha-Beta搜索算法。
+    """
+    cdef float original_alpha = alpha
+    cdef object hash_entry
+    cdef tuple best_move, move
+    cdef list best_line, line, ordered_moves
+    cdef int player_piece, i
+    cdef float max_eval, min_eval, evaluation, eval_score
+    
+    # --- 1. 查找置换表 ---
+    hash_entry = transposition_table.get(state.hash)
+    if hash_entry and hash_entry["depth"] >= depth:
+        if hash_entry["flag"] == EXACT_SCORE:
+            return hash_entry["score"], hash_entry["best_move"], [hash_entry["best_move"]]
+        elif hash_entry["flag"] == LOWER_BOUND:
+            alpha = max(alpha, hash_entry["score"])
+        elif hash_entry["flag"] == UPPER_BOUND:
+            beta = min(beta, hash_entry["score"])
+        if alpha >= beta:
+            return hash_entry["score"], hash_entry["best_move"], [hash_entry["best_move"]]
+
+    # --- 【核心修改】终止条件 ---
+    # 1. 优先检查是否是终局
+    if state.winner is not None:
+        return (10000 if state.winner == CANNON else -10000), None, []
+    # 6. 【核心优化】达到搜索深度，直接评估局面
+    if depth == 0:
+        # 直接使用evaluate_board评估局面
+        score, details = evaluate_board(state, stop_event)
+        if stop_event and stop_event.is_set():
+            return 0.0, None, []
+        return score, None, []
+    
+    # --- 3. 【新增优化】检查是否已经找到必胜/必败局面 ---
+    # 如果alpha已经大于等于10000，说明已经找到必胜走法，无需继续搜索
+    if alpha >= 10000:
+        return alpha, None, []
+    # 如果beta已经小于等于-10000，说明已经找到必败局面，无需继续搜索
+    if beta <= -10000:
+        return beta, None, []
+    
+    # --- 4. 【核心优化】获取排序后的走法列表 ---
+    player_piece = CANNON if maximizing_player else SOLDIER
+    hash_move = hash_entry.get("best_move") if hash_entry else None
+    ordered_moves = _get_ordered_moves(state, player_piece, hash_move)
+    
+    # 如果没有合法走法，则为输棋
+    if not ordered_moves:
+        return (-10000 if maximizing_player else 10000), None, []
+    
+    best_move = None
+    best_line = []
+    
+    # --- 5. 【核心优化】PVS (Principal Variation Search) 递归搜索 ---
+    if maximizing_player:
+        max_eval = -math.inf
+        for i, move in enumerate(ordered_moves):
+            # 检查停止事件
+            if stop_event and stop_event.is_set():
+                break
+                
+            new_state = state.move_piece(move[0][0], move[0][1], move[1][0], move[1][1])
+            
+            # PVS 逻辑: 第一个走法用全窗口，后续用零窗口试探
+            if i == 0:
+                evaluation, _, line = _alpha_beta(new_state, depth - 1, alpha, beta, False, use_threading, thread_count, stop_event)
+            else:
+                # 零窗口搜索
+                evaluation, _, line = _alpha_beta(new_state, depth - 1, alpha, alpha + 1, False, use_threading, thread_count, stop_event)
+                # 如果零窗口搜索失败 (结果比alpha好)，则需要用全窗口重搜
+                if alpha < evaluation < beta:
+                    evaluation, _, line = _alpha_beta(new_state, depth - 1, alpha, beta, False, use_threading, thread_count, stop_event)
+
+            if evaluation > max_eval:
+                max_eval = evaluation
+                best_move = move
+                best_line = [move] + line
+            
+            alpha = max(alpha, evaluation)
+            if beta <= alpha:
+                break # Alpha-Beta 剪枝
+        eval_score = max_eval
+    else: # minimizing_player
+        min_eval = math.inf
+        for i, move in enumerate(ordered_moves):
+            # 检查停止事件
+            if stop_event and stop_event.is_set():
+                break
+                
+            new_state = state.move_piece(move[0][0], move[0][1], move[1][0], move[1][1])
+            
+            # PVS 逻辑
+            if i == 0:
+                evaluation, _, line = _alpha_beta(new_state, depth - 1, alpha, beta, True, use_threading, thread_count, stop_event)
+            else:
+                # 零窗口搜索
+                evaluation, _, line = _alpha_beta(new_state, depth - 1, beta - 1, beta, True, use_threading, thread_count, stop_event)
+                # 如果零窗口搜索失败 (结果比beta差)，则需要用全窗口重搜
+                if alpha < evaluation < beta:
+                    evaluation, _, line = _alpha_beta(new_state, depth - 1, alpha, beta, True, use_threading, thread_count, stop_event)
+
+            if evaluation < min_eval:
+                min_eval = evaluation
+                best_move = move
+                best_line = [move] + line
+
+            beta = min(beta, evaluation)
+            if beta <= alpha:
+                break # Alpha-Beta 剪枝
+        eval_score = min_eval
+
+    # --- 6. 存储到置换表 ---
+    flag = EXACT_SCORE
+    if eval_score <= original_alpha:
+        flag = UPPER_BOUND
+    elif eval_score >= beta:
+        flag = LOWER_BOUND
+    
+    # 只存储有意义的最佳走法
+    if best_move:
+        transposition_table[state.hash] = {
+            "depth": depth, 
+            "score": eval_score, 
+            "flag": flag, 
+            "best_move": best_move,
+            "timestamp": time.time()  # 添加时间戳
+        }
+    
+    return eval_score, best_move, best_line
