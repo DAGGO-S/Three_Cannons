@@ -26,8 +26,7 @@ hasher = get_hasher()
 # 它将类实现为C结构体，但需要更严格的类型管理
 # 为了保持兼容性，我们暂时不使用它，但这是未来的一个优化方向
 class GameState:
-    # 【P6优化】增加 soldiers/cannons 集合，避免每次评估都扫描棋盘
-    __slots__ = ('board', 'current_player', 'winner', 'soldier_count', 'hash', 'soldiers', 'cannons')
+    __slots__ = ('board', 'current_player', 'winner', 'soldier_count', 'hash')
 
     def __init__(self, board=None, current_player=CANNON):
         cdef cint r, c, s_count
@@ -51,10 +50,6 @@ class GameState:
         
         # >>> 将列表转换为不可变的元组 <<<
         self.board = tuple(tuple(row) for row in self.board)
-        
-        # 【P6优化】初始化时构建 soldiers/cannons 集合
-        self.soldiers = frozenset((r, c) for r in range(BOARD_ROWS) for c in range(BOARD_COLS) if self.board[r][c] == SOLDIER)
-        self.cannons = frozenset((r, c) for r in range(BOARD_ROWS) for c in range(BOARD_COLS) if self.board[r][c] == CANNON)
         
         # 计算哈希值时需要使用列表
         board_for_hash = [list(row) for row in self.board]
@@ -83,14 +78,14 @@ class GameState:
         if piece == SOLDIER:
             for dr, dc in directions:
                 tr, tc = r + dr, c + dc
-                if self.is_within_bounds(tr,tc) and self.board[tr][tc] == EMPTY:
+                if 0 <= tr < 5 and 0 <= tc < 5 and self.board[tr][tc] == EMPTY:
                     moves.append((tr, tc))
 
         elif piece == CANNON:
             # 规则1: 普通移动
             for dr, dc in directions:
                 tr, tc = r + dr, c + dc
-                if self.is_within_bounds(tr,tc) and self.board[tr][tc] == EMPTY:
+                if 0 <= tr < 5 and 0 <= tc < 5 and self.board[tr][tc] == EMPTY:
                     moves.append((tr, tc))
             
             # 规则2: 隔空吃兵
@@ -98,8 +93,8 @@ class GameState:
                 jump_r, jump_c = r + dr, c + dc
                 target_r, target_c = r + 2 * dr, c + 2 * dc
                 
-                if (self.is_within_bounds(target_r, target_c) and 
-                    self.is_within_bounds(jump_r, jump_c) and
+                if (0 <= target_r < 5 and 0 <= target_c < 5 and 
+                    0 <= jump_r < 5 and 0 <= jump_c < 5 and
                     self.board[jump_r][jump_c] == EMPTY and  
                     self.board[target_r][target_c] == SOLDIER): 
                     moves.append((target_r, target_c))
@@ -131,23 +126,8 @@ class GameState:
         # 将修改后的列表转换回元组
         new_state.board = tuple(tuple(row) for row in new_board_list)
         
-        # 【P6优化】增量更新 soldiers/cannons 集合
-        cdef set new_soldiers = set(self.soldiers)
-        cdef set new_cannons = set(self.cannons)
-        
-        if piece == SOLDIER:
-            new_soldiers.discard((start_r, start_c))
-            new_soldiers.add((end_r, end_c))
-        elif piece == CANNON:
-            new_cannons.discard((start_r, start_c))
-            new_cannons.add((end_r, end_c))
-        
         if captured_piece == SOLDIER:
-            new_soldiers.discard((end_r, end_c))
             new_state.soldier_count -= 1
-        
-        new_state.soldiers = frozenset(new_soldiers)
-        new_state.cannons = frozenset(new_cannons)
         
         # 使用增量更新哈希值
         cdef ULL current_hash = self.hash
@@ -174,8 +154,6 @@ class GameState:
         new_state = self.__class__.__new__(self.__class__)
         new_state.board = self.board
         new_state.soldier_count = self.soldier_count
-        new_state.soldiers = self.soldiers
-        new_state.cannons = self.cannons
         new_state.current_player = SOLDIER if self.current_player == CANNON else CANNON
         new_state.hash = hasher.switch_turn_hash(self.hash)
         new_state.winner = self.winner  # 棋盘未变，胜负不变
@@ -188,12 +166,17 @@ class GameState:
             self.winner = CANNON
             return
 
-        cdef cint r, c
-        for r in range(BOARD_ROWS):
-            for c in range(BOARD_COLS):
+        # 【Phase2优化】轻量级检查：炮是否被困
+        # 炮只要有一个相邻空格就不会被困（因为可以普通移动到空格）
+        # 隔空吃兵的前提也是中间格为空，此时普通移动已可行
+        cdef cint r, c, tr, tc
+        for r in range(5):
+            for c in range(5):
                 if self.board[r][c] == CANNON:
-                    if self.get_valid_moves(r, c):
-                        self.winner = None
-                        return
+                    # 检查四个方向是否有相邻空格
+                    for tr, tc in ((r-1,c),(r+1,c),(r,c-1),(r,c+1)):
+                        if 0 <= tr < 5 and 0 <= tc < 5 and self.board[tr][tc] == EMPTY:
+                            self.winner = None
+                            return
         
         self.winner = SOLDIER

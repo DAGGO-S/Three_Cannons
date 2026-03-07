@@ -36,9 +36,6 @@ Three_Cannons/
 │       └── game_io.py       # save_game/load_game: JSON 棋谱读写
 ├── tests/                   # pytest 测试集
 ├── docs/                    # 项目文档 (架构、API、模块概览等)
-├── tuning/                  # 评估函数调参工具
-│   ├── annotator.py         # 人机协同标注 GUI
-│   └── optimizer.py         # 差分进化参数优化 (Rank Loss)
 └── data/game_history/       # 保存的棋谱文件 (JSON)
 ```
 
@@ -57,9 +54,11 @@ Three_Cannons/
 ### 核心约定
 
 1. **GameState 不可变**: `board` 字段为嵌套元组 `tuple[tuple[int]]`，`move_piece()` 返回新实例
-2. **和棋由 Model 管理**: `GameModel.position_counts` 通过 Zobrist 哈希计数判定三次重复
+2. **和棋由 Model 管理**: `GameModel.position_counts` 通过 Zobrist 哈希计数判定三次重复，吃子移动会清空计数器
 3. **AI 异步执行**: `AIEngine` 在独立线程运行，通过 `stop_event` 支持中断，中断时回调已搜索到的最佳走法
-4. **Cython 核心已编译**: `.pyd` 文件已预编译，修改 `.pyx` 后需运行 `python setup.py build_ext --inplace`
+4. **GUI 线程安全**: AI 计算在后台线程，GUI 更新需通过 `view.after()` 回到主线程
+5. **Cython 核心已编译**: `.pyd` 文件已预编译，修改 `.pyx` 后需运行 `python setup.py build_ext --inplace`
+6. **置换表重置**: 每次 AI 计算前调用 `clear_transposition_table()` 重置，避免旧数据干扰
 
 ### 棋子常量
 
@@ -79,14 +78,17 @@ python main.py
 # 编译 Cython 模块
 python setup.py build_ext --inplace
 
-# 运行测试
+# 运行所有测试
 python -m pytest tests/
 
-# 调参标注
-python tuning/annotator.py
+# 运行单个测试文件
+python -m pytest tests/test_game_logic.py
 
-# 参数优化
-python tuning/optimizer.py
+# 运行特定测试类
+python -m pytest tests/test_game_logic.py::TestGameState
+
+# 运行特定测试方法
+python -m pytest tests/test_game_logic.py::TestGameState::test_cannon_capture
 ```
 
 ## 开发注意事项

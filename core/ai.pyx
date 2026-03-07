@@ -5,7 +5,7 @@ import traceback
 import pickle # Added for persistence
 import os
 from core.game_logic import GameState, CANNON, SOLDIER, EMPTY
-from core.evaluation_logic import evaluate_board
+from core.evaluation_logic import evaluate_board, clear_evaluation_caches
 
 # Cython imports
 from cython cimport Py_ssize_t
@@ -15,22 +15,38 @@ ctypedef double float
 ctypedef bint bool
 
 # --- 置换表和相关常量 ---
-transposition_table = {}
+# 【Phase1优化】定长数组 + 哈希取模，消除 O(N) 清理
+cdef int TT_SIZE = 1 << 21  # 2,097,152 个槽位
+transposition_table = [None] * TT_SIZE
 EXACT_SCORE = 0
 LOWER_BOUND = 1
 UPPER_BOUND = 2
 
+# --- 性能统计 ---
+cdef unsigned long long _total_nodes_evaluated = 0
+
+def get_nodes_evaluated():
+    global _total_nodes_evaluated
+    return _total_nodes_evaluated
+
+def reset_nodes_evaluated():
+    global _total_nodes_evaluated
+    _total_nodes_evaluated = 0
+
 def clear_transposition_table():
     """清空置换表，由外部调用者（AIEngine）在每次新计算开始时调用。"""
     global transposition_table
-    transposition_table.clear()
+    transposition_table = [None] * TT_SIZE
 
 def save_transposition_table(filepath):
-    """保存置换表到文件"""
+    """保存置换表到文件（只序列化非空条目）"""
     global transposition_table
     try:
-        # 使用副本以避免线程安全问题 (dictionary changed size during iteration)
-        data_to_save = transposition_table.copy()
+        # 只保存非 None 条目，格式：{index: entry}
+        data_to_save = {}
+        for i in range(TT_SIZE):
+            if transposition_table[i] is not None:
+                data_to_save[i] = transposition_table[i]
         with open(filepath, 'wb') as f:
             pickle.dump(data_to_save, f)
         print(f"DEBUG: Saved {len(data_to_save)} entries to {filepath}")
@@ -48,7 +64,16 @@ def load_transposition_table(filepath):
         with open(filepath, 'rb') as f:
             data = pickle.load(f)
             if isinstance(data, dict):
-                transposition_table.update(data) # Merge instead of replace to be safer? Replace is prob fine.
+                # 兼容旧格式（key=hash, value=4-tuple）和新格式（key=index, value=5-tuple）
+                loaded_count = 0
+                for key, entry in data.items():
+                    # 旧格式 entry 只有 4 字段，需要补全 hash 字段
+                    if len(entry) == 4:
+                        # 旧格式：key 本身就是 hash
+                        entry = entry + (key,)
+                    idx = <int>(key % TT_SIZE)
+                    transposition_table[idx] = entry
+                    loaded_count += 1
                 print(f"DEBUG: Loaded {len(data)} entries from {filepath}")
             else:
                 print("Warning: Corrupt AI memory file.")
@@ -101,6 +126,9 @@ cdef tuple _quiescence_search(object state, float alpha, float beta, bint maximi
     带深度限制防止无限递归。
     """
     stop_event = settings.get("stop_event", None) if settings else None
+    
+    global _total_nodes_evaluated
+    _total_nodes_evaluated += 1
     
     cdef float stand_pat_score, evaluation
     cdef int player_piece, opponent_piece, r, c
@@ -169,17 +197,9 @@ def find_best_move_iterative_deepening(state: GameState, settings: dict, is_maxi
     通过迭代加深搜索最佳走法。
     这是AI思考的主入口。
     """
-    # 【P5优化】置换表清理：超过容量上限时，保留一半
-    global transposition_table
-    if len(transposition_table) > 2000000:
-        # 简单粗暴地切片保留后一半（假设后一半是较新的）
-        # Python 3.7+ 字典是有序的，items() 返回的是插入顺序
-        # 通过这种方式快速释放一半空间，并保留最近插入的节点
-        # 注意：这会引起一次全表扫描和重建，耗时约 0.1~0.2s，在长时考中可接受
-        new_size = len(transposition_table) // 2
-        items = list(transposition_table.items())
-        transposition_table = dict(items[new_size:])
-        # 显式触发垃圾回收是个好习惯，但这里交给 Python GC 即可
+    # 【Phase1优化】定长数组无需清理，旧条目自动被覆盖
+    # 【Phase4优化】清空评估缓存，防止无限增长和 hash 碰撞
+    clear_evaluation_caches()
     
     start_time = time.time()
     best_move_so_far = None
@@ -313,6 +333,9 @@ cdef tuple _alpha_beta(object state, int depth, float alpha, float beta, bint ma
     """
     stop_event = settings.get("stop_event", None)
     
+    global _total_nodes_evaluated
+    _total_nodes_evaluated += 1
+    
     cdef float original_alpha = alpha
     cdef object hash_entry
     cdef tuple best_move, move
@@ -321,12 +344,15 @@ cdef tuple _alpha_beta(object state, int depth, float alpha, float beta, bint ma
     cdef float max_eval, min_eval, evaluation, eval_score
     cdef bint is_capture_move  # P4: LMR 判断是否吃子
     cdef int reduction  # P4: LMR 减层数
+    cdef int store_index  # Phase1: 置换表存储位置
     
     # --- 1. 查找置换表 ---
-    # 【P5优化】置换表改用 tuple: (score, depth, flag, best_move)
-    hash_entry = transposition_table.get(state.hash)
-    if hash_entry and hash_entry[1] >= depth:  # [1] = depth
-        tt_score, tt_depth, tt_flag, tt_move = hash_entry
+    # 【Phase1优化】定长数组 + 哈希取模 + full hash 校验
+    cdef unsigned long long state_hash = state.hash
+    cdef int tt_index = <int>(state_hash % TT_SIZE)
+    hash_entry = transposition_table[tt_index]
+    if hash_entry and hash_entry[4] == state_hash and hash_entry[1] >= depth:  # [4]=hash, [1]=depth
+        tt_score, tt_depth, tt_flag, tt_move, _ = hash_entry
         if tt_flag == EXACT_SCORE:
             return tt_score, tt_move, [tt_move]
         elif tt_flag == LOWER_BOUND:
@@ -366,7 +392,8 @@ cdef tuple _alpha_beta(object state, int depth, float alpha, float beta, bint ma
     
     # --- 5. 获取排序后的走法列表 ---
     player_piece = CANNON if maximizing_player else SOLDIER
-    hash_move = hash_entry[3] if hash_entry else None  # [3] = best_move
+    # 只有当 hash_entry 校验通过时才使用 hash_move
+    hash_move = hash_entry[3] if (hash_entry and hash_entry[4] == state_hash) else None  # [3]=best_move, [4]=hash
     ordered_moves = _get_ordered_moves(state, player_piece, hash_move)
     
     if not ordered_moves:
@@ -446,10 +473,11 @@ cdef tuple _alpha_beta(object state, int depth, float alpha, float beta, bint ma
     elif eval_score >= beta:
         flag = LOWER_BOUND
     
-    # 【P5优化】置换表存 tuple，优先保存搜索深度更深的结果
+    # 【Phase1优化】定长数组存储，优先保存搜索深度更深的结果
     if best_move:
-        existing_entry = transposition_table.get(state.hash)
+        store_index = <int>(state.hash % TT_SIZE)
+        existing_entry = transposition_table[store_index]
         if existing_entry is None or existing_entry[1] <= depth:
-            transposition_table[state.hash] = (eval_score, depth, flag, best_move)
+            transposition_table[store_index] = (eval_score, depth, flag, best_move, state.hash)
     
     return eval_score, best_move, best_line

@@ -16,14 +16,14 @@ class TestGameState(unittest.TestCase):
         print("测试默认初始化...")
         state = GameState()
         
-        # 验证棋盘布局是否正确
-        expected_board = [
+        # 验证棋盘布局是否正确（board 存储为 tuple-of-tuples）
+        expected_board = tuple(tuple(row) for row in [
             [1,1,1,1,1],
             [1,1,1,1,1],
             [1,1,1,1,1],
             [0,0,0,0,0],
             [0,2,2,2,0]
-        ]
+        ])
         self.assertEqual(state.board, expected_board)
         
         # 验证当前玩家是否为CANNON
@@ -46,8 +46,8 @@ class TestGameState(unittest.TestCase):
         ]
         state = GameState(board=custom_board)
         
-        # 验证棋盘是否正确设置
-        self.assertEqual(state.board, custom_board)
+        # 验证棋盘是否正确设置（board 存储为 tuple-of-tuples）
+        self.assertEqual(state.board, tuple(tuple(row) for row in custom_board))
         
         # 验证士兵数量是否正确计算
         self.assertEqual(state.soldier_count, 1)
@@ -292,7 +292,7 @@ class TestGameState(unittest.TestCase):
             
             # 验证哈希值计算仍然正常工作
             # 通过计算新状态的哈希值并确保它是一个整数
-            new_hash = hasher.compute_hash(state.board, state.current_player)
+            new_hash = hasher.compute_hash([list(row) for row in state.board], state.current_player)
             self.assertIsInstance(new_hash, int, 
                                   f"哈希表在第{i}步后被破坏：计算出的哈希值不是整数: {new_hash} (类型: {type(new_hash)})")
         

@@ -10,11 +10,21 @@ ctypedef Py_ssize_t int
 ctypedef double float
 
 # --- 缓存机制 ---
-# 创建LRU缓存来存储计算结果
+# 创建缓存来存储计算结果
 cdef dict _material_score_cache = {}
 cdef dict _soldier_scores_cache = {}
 cdef dict _cannon_forbidden_zone_cache = {}
 cdef dict _control_zone_bfs_cache = {}
+
+# 【Phase4优化】导出缓存清理函数，防止无限增长和 hash 碰撞
+def clear_evaluation_caches():
+    """清空所有评估缓存。应在每次搜索开始前调用。"""
+    global _material_score_cache, _soldier_scores_cache
+    global _cannon_forbidden_zone_cache, _control_zone_bfs_cache
+    _material_score_cache.clear()
+    _soldier_scores_cache.clear()
+    _cannon_forbidden_zone_cache.clear()
+    _control_zone_bfs_cache.clear()
 
 # --- 坐标映射与表定义 ---
 
@@ -129,8 +139,8 @@ def _calculate_cannon_forbidden_zone(object state, set cannons) -> set:
         for dr, dc in directions:
             pos1 = (r_start + dr, c_start + dc)
             pos2 = (r_start + 2*dr, c_start + 2*dc)
-            if (state.is_within_bounds(pos1[0], pos1[1]) and 
-                state.is_within_bounds(pos2[0], pos2[1]) and
+            if (0 <= pos1[0] < 5 and 0 <= pos1[1] < 5 and 
+                0 <= pos2[0] < 5 and 0 <= pos2[1] < 5 and
                 state.board[pos1[0]][pos1[1]] == EMPTY and 
                 state.board[pos2[0]][pos2[1]] == EMPTY):
                 pre_aim_squares.add(pos2)
@@ -173,7 +183,7 @@ def _calculate_control_zone_bfs(object state, set starting_points, set forbidden
             new_pos = (nr, nc)
             
             # 检查邻居是否满足扩展条件
-            if (state.is_within_bounds(nr, nc) and         # 1. 在棋盘内
+            if (0 <= nr < 5 and 0 <= nc < 5 and         # 1. 在棋盘内
                 state.board[nr][nc] == EMPTY and           # 2. 是一个空格子
                 new_pos not in forbidden_zone and         # 3. 不在禁区内
                 new_pos not in visited):                  # 4. 之前没有访问过
@@ -197,9 +207,16 @@ def evaluate_board(object state, dict settings=None):
         score = 10000 if state.winner == CANNON else -10000
         return score, {"total": score, "reason": "Terminal Node"}
 
-    # 【P6优化】直接使用 GameState 维护的集合，免去 25 格扫描
-    cdef set soldiers = set(state.soldiers)
-    cdef set cannons = set(state.cannons)
+    # 【Phase2优化】直接遍历 5×5 board 构建 set（比 frozenset→set 转换更快）
+    cdef set soldiers = set()
+    cdef set cannons = set()
+    cdef int sr, sc
+    for sr in range(5):
+        for sc in range(5):
+            if state.board[sr][sc] == SOLDIER:
+                soldiers.add((sr, sc))
+            elif state.board[sr][sc] == CANNON:
+                cannons.add((sr, sc))
     
     # --- 1. 计算兵方各项分数 ---
     position_score, proximity_score = _calculate_soldier_scores(state, soldiers, cannons, settings)
