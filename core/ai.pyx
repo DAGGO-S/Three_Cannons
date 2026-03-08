@@ -1,3 +1,4 @@
+# cython: profile=True
 import cython
 import time
 import math
@@ -5,6 +6,7 @@ import traceback
 import pickle # Added for persistence
 import os
 from core.game_logic import GameState, CANNON, SOLDIER, EMPTY
+from core.game_logic cimport GameState as CGameState  # C 级直接访问 board_c
 from core.evaluation_logic import evaluate_board, clear_evaluation_caches
 
 # Cython imports
@@ -83,7 +85,7 @@ def load_transposition_table(filepath):
 # --- 辅助函数：走法排序 ---
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef list _get_ordered_moves(object state, int player_piece, tuple hash_move):
+cdef list _get_ordered_moves(CGameState state, int player_piece, tuple hash_move):
     """
     生成并排序所有合法走法。
     排序优先级：hash_move > 吃子 > 安静走法
@@ -97,13 +99,13 @@ cdef list _get_ordered_moves(object state, int player_piece, tuple hash_move):
 
     for r in range(5):
         for c in range(5):
-            if state.board[r][c] == player_piece:
+            if state.board_c[r * 5 + c] == player_piece:
                 for end_pos in state.get_valid_moves(r, c):
                     move = ((r, c), end_pos)
                     # 【P7优化】生成时跳过 hash_move，避免后续 O(n) 的 list.remove
                     if move == hash_move:
                         continue
-                    if state.board[end_pos[0]][end_pos[1]] == opponent_piece:
+                    if state.board_c[end_pos[0] * 5 + end_pos[1]] == opponent_piece:
                         captures.append(move)
                     else:
                         quiet_moves.append(move)
@@ -120,7 +122,7 @@ cdef int MAX_QS_DEPTH = 8
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef tuple _quiescence_search(object state, float alpha, float beta, bint maximizing_player, object settings=None, int qs_depth=0):
+cdef tuple _quiescence_search(CGameState state, float alpha, float beta, bint maximizing_player, object settings=None, int qs_depth=0):
     """
     静默搜索：只搜索吃子走法，直到局面安静后做静态评估。
     带深度限制防止无限递归。
@@ -162,9 +164,9 @@ cdef tuple _quiescence_search(object state, float alpha, float beta, bint maximi
     
     for r in range(5):
         for c in range(5):
-            if state.board[r][c] == player_piece:
+            if state.board_c[r * 5 + c] == player_piece:
                 for end_pos in state.get_valid_moves(r, c):
-                    if state.board[end_pos[0]][end_pos[1]] == opponent_piece:
+                    if state.board_c[end_pos[0] * 5 + end_pos[1]] == opponent_piece:
                         capture_moves.append(((r, c), end_pos))
     
     # 4. 递归搜索吃子走法
@@ -192,7 +194,7 @@ cdef tuple _quiescence_search(object state, float alpha, float beta, bint maximi
 # --- 迭代加深搜索主入口 ---
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def find_best_move_iterative_deepening(state: GameState, settings: dict, is_maximizing: bool, progress_callback=None):
+def find_best_move_iterative_deepening(CGameState state, dict settings, bint is_maximizing, object progress_callback=None):
     """
     通过迭代加深搜索最佳走法。
     这是AI思考的主入口。
@@ -327,7 +329,7 @@ def find_best_move_iterative_deepening(state: GameState, settings: dict, is_maxi
 # --- Alpha-Beta + PVS + NMP + LMR ---
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef tuple _alpha_beta(object state, int depth, float alpha, float beta, bint maximizing_player, object settings):
+cdef tuple _alpha_beta(CGameState state, int depth, float alpha, float beta, bint maximizing_player, object settings):
     """
     实现了置换表、PVS、空着剪枝(NMP)、晚走缩减(LMR)的Alpha-Beta搜索。
     """
@@ -363,7 +365,7 @@ cdef tuple _alpha_beta(object state, int depth, float alpha, float beta, bint ma
             return tt_score, tt_move, [tt_move]
 
     # --- 2. 终止条件 ---
-    if state.winner is not None:
+    if state.winner != -1:
         return (10000 if state.winner == CANNON else -10000), None, []
     
     # 【P0优化】达到搜索深度，进入静默搜索
@@ -412,7 +414,7 @@ cdef tuple _alpha_beta(object state, int depth, float alpha, float beta, bint ma
             new_state = state.move_piece(move[0][0], move[0][1], move[1][0], move[1][1])
             
             # 【P4优化】后期非吃子走法做浅搜索
-            is_capture_move = (state.board[move[1][0]][move[1][1]] != EMPTY)
+            is_capture_move = (state.board_c[move[1][0] * 5 + move[1][1]] != EMPTY)
             reduction = 0
             if i >= 5 and depth >= 3 and not is_capture_move:
                 reduction = 1
@@ -444,7 +446,7 @@ cdef tuple _alpha_beta(object state, int depth, float alpha, float beta, bint ma
             new_state = state.move_piece(move[0][0], move[0][1], move[1][0], move[1][1])
             
             # PVS + LMR
-            is_capture_move = (state.board[move[1][0]][move[1][1]] != EMPTY)
+            is_capture_move = (state.board_c[move[1][0] * 5 + move[1][1]] != EMPTY)
             reduction = 0
             if i >= 5 and depth >= 3 and not is_capture_move:
                 reduction = 1

@@ -54,7 +54,7 @@ class GameOrchestrator:
         if self.ai.is_calculating():
             return
             
-        if self.model.game_state.winner is not None:
+        if self.model.game_state.winner != -1:
             return
 
         if self.config.is_ai_turn(self.model.game_state.current_player):
@@ -87,7 +87,7 @@ class GameOrchestrator:
         self.update_view()  # 每次点击都刷新UI
 
         if move_successful:
-            if self.model.game_state.winner is not None:
+            if self.model.game_state.winner != -1:
                 self.view.show_winner(self.model.game_state.winner)
             else:
                 self.check_for_ai_turn()  # 只有在成功走棋后才检查AI回合
@@ -203,7 +203,7 @@ class GameOrchestrator:
             self.view.render(self.model)
 
             # 检查游戏是否已经结束
-            if self.model.game_state.winner is not None:
+            if self.model.game_state.winner != -1:
                 # 游戏结束后，进行最后一次完整的UI状态更新
                 self.update_view()
                 self.view.show_winner(self.model.game_state.winner)
@@ -246,7 +246,7 @@ class GameOrchestrator:
 
     def check_for_ai_turn(self):
         """检查当前是否轮到AI行动，如果是，则自动触发AI计算。"""
-        if self.model.game_state.winner is not None:
+        if self.model.game_state.winner != -1:
             # 游戏结束时，如果之前有获胜信息，可以不再重复显示
             # self.view.show_winner(self.model.game_state.winner)
             return

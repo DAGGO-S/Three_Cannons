@@ -1,5 +1,7 @@
+# cython: profile=True
 import collections
 from core.game_logic import GameState, CANNON, SOLDIER, EMPTY
+from core.game_logic cimport GameState as CGameState  # C 级直接访问 board_c
 
 # Cython imports
 import cython
@@ -82,7 +84,7 @@ def get_material_score(int soldier_count, dict settings=None) -> int:
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def _calculate_soldier_scores(object state, set soldiers, set cannons, dict settings=None) -> tuple:
+def _calculate_soldier_scores(CGameState state, set soldiers, set cannons, dict settings=None) -> tuple:
     """计算独立的兵方分数项 (位置分 和 贴炮分)"""
     cdef int proximity_weight = settings["WEIGHT_SOLDIER_PROXIMITY"] if settings else DEFAULT_SETTINGS["WEIGHT_SOLDIER_PROXIMITY"]
     cdef list pos_table = settings.get("SOLDIER_POSITION_TABLE") if settings else None
@@ -110,7 +112,7 @@ def _calculate_soldier_scores(object state, set soldiers, set cannons, dict sett
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def _calculate_cannon_forbidden_zone(object state, set cannons) -> set:
+def _calculate_cannon_forbidden_zone(CGameState state, set cannons) -> set:
     """一次性计算所有被炮攻击或预瞄的格子 (炮方禁区) - 带缓存优化"""
     global _cannon_forbidden_zone_cache
     
@@ -141,8 +143,8 @@ def _calculate_cannon_forbidden_zone(object state, set cannons) -> set:
             pos2 = (r_start + 2*dr, c_start + 2*dc)
             if (0 <= pos1[0] < 5 and 0 <= pos1[1] < 5 and 
                 0 <= pos2[0] < 5 and 0 <= pos2[1] < 5 and
-                state.board[pos1[0]][pos1[1]] == EMPTY and 
-                state.board[pos2[0]][pos2[1]] == EMPTY):
+                state.board_c[pos1[0] * 5 + pos1[1]] == EMPTY and 
+                state.board_c[pos2[0] * 5 + pos2[1]] == EMPTY):
                 pre_aim_squares.add(pos2)
     
     # 合并结果并缓存
@@ -154,7 +156,7 @@ def _calculate_cannon_forbidden_zone(object state, set cannons) -> set:
 # --- 【逻辑已修正】BFS现在从给定的安全起点开始 ---
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def _calculate_control_zone_bfs(object state, set starting_points, set forbidden_zone) -> set:
+def _calculate_control_zone_bfs(CGameState state, set starting_points, set forbidden_zone) -> set:
     """使用BFS计算控制区域 - 带缓存优化"""
     global _control_zone_bfs_cache
     
@@ -184,7 +186,7 @@ def _calculate_control_zone_bfs(object state, set starting_points, set forbidden
             
             # 检查邻居是否满足扩展条件
             if (0 <= nr < 5 and 0 <= nc < 5 and         # 1. 在棋盘内
-                state.board[nr][nc] == EMPTY and           # 2. 是一个空格子
+                state.board_c[nr * 5 + nc] == EMPTY and           # 2. 是一个空格子
                 new_pos not in forbidden_zone and         # 3. 不在禁区内
                 new_pos not in visited):                  # 4. 之前没有访问过
                 
@@ -198,12 +200,12 @@ def _calculate_control_zone_bfs(object state, set starting_points, set forbidden
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def evaluate_board(object state, dict settings=None):
+def evaluate_board(CGameState state, dict settings=None):
     """V10 最终版评估函数：基于安全的兵源进行BFS精确计算 - 带缓存优化"""
     cdef int score, position_score, proximity_score, soldier_total_score, material_score
     cdef int net_control_count, net_control_score, total_score
     
-    if state.winner is not None:
+    if state.winner != -1:
         score = 10000 if state.winner == CANNON else -10000
         return score, {"total": score, "reason": "Terminal Node"}
 
@@ -213,9 +215,9 @@ def evaluate_board(object state, dict settings=None):
     cdef int sr, sc
     for sr in range(5):
         for sc in range(5):
-            if state.board[sr][sc] == SOLDIER:
+            if state.board_c[sr * 5 + sc] == SOLDIER:
                 soldiers.add((sr, sc))
-            elif state.board[sr][sc] == CANNON:
+            elif state.board_c[sr * 5 + sc] == CANNON:
                 cannons.add((sr, sc))
     
     # --- 1. 计算兵方各项分数 ---

@@ -30,7 +30,7 @@ extensions = [
 
 # 编译扩展
 setup(
-    ext_modules=cythonize(extensions, compiler_directives={'language_level': "3"}),
+    ext_modules=cythonize(extensions, compiler_directives={'language_level': "3", 'profile': True}),
     zip_safe=False,
 )
 

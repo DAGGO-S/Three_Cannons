@@ -99,3 +99,5 @@ python -m pytest tests/test_game_logic.py::TestGameState::test_cannon_capture
 - **GUI 线程安全**: AI 计算在后台线程，GUI 更新需通过 `view.after()` 回到主线程
 - **置换表**: 每次 AI 计算前调用 `clear_transposition_table()` 重置
 - **评估函数缓存**: `evaluation_logic.pyx` 使用 `_cannon_forbidden_zone_cache` 和 `_control_zone_bfs_cache`，跨调用复用
+- **性能剖析第一性原理**: 性能重构必须对代码进行 `cProfile` 结合 `cython: profile=True` 的全量实测。严禁依赖脱离真实情况的微基准测试，C 编译器的死代码消除易产生虚报。
+- **Zero Allocation 铁律**: 在 AI 计算核心热路径中，**绝对禁止**产生 Python 动态对象分配（`list`, `tuple`, `set`, `deque`）。代之以纯 C 数组、静态结构体指针或位运算。

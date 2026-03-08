@@ -21,11 +21,6 @@ PIECE_TO_INDEX = {EMPTY: -1, SOLDIER: 0, CANNON: 1}
 cdef class ZobristHasher:
     """优化的Zobrist哈希计算器 - Cython版本"""
     
-    # 使用Python列表存储哈希表
-    cdef object table
-    cdef unsigned long long turn_key
-    cdef int rows, cols
-    
     def __init__(self, tuple board_size=(5, 5), int num_piece_types=2):
         """
         初始化Zobrist Hashing表。
@@ -40,12 +35,57 @@ cdef class ZobristHasher:
                        for _ in range(self.cols)] for _ in range(self.rows)]
         
         # 填充随机数
+        cdef unsigned long long val
         for r in range(self.rows):
             for c in range(self.cols):
                 for p in range(num_piece_types):
-                    self.table[r][c][p] = random.getrandbits(64)
+                    val = random.getrandbits(64)
+                    self.table[r][c][p] = val
+                    self.table_c[r * 5 + c][p] = val
         
         self.turn_key = random.getrandbits(64)
+        
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef unsigned long long c_compute_hash(self, int[25] board_c, int current_player):
+        cdef unsigned long long h = 0
+        cdef int i
+        for i in range(25):
+            if board_c[i] == SOLDIER:
+                h ^= self.table_c[i][0]
+            elif board_c[i] == CANNON:
+                h ^= self.table_c[i][1]
+        
+        if current_player == CANNON:
+            h ^= self.turn_key
+        return h
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef unsigned long long c_update_hash(self, unsigned long long old_hash, int start_r, int start_c, int end_r, int end_c, int piece_type, int current_player):
+        cdef unsigned long long new_hash = old_hash
+        cdef int start_idx = start_r * 5 + start_c
+        cdef int end_idx = end_r * 5 + end_c
+        cdef int piece_index = 0 if piece_type == SOLDIER else 1
+        
+        new_hash ^= self.table_c[start_idx][piece_index]
+        new_hash ^= self.table_c[end_idx][piece_index]
+        
+        if current_player == CANNON:
+            new_hash ^= self.turn_key
+        return new_hash
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef unsigned long long c_remove_piece_hash(self, unsigned long long old_hash, int r, int c, int piece_type):
+        cdef int idx = r * 5 + c
+        cdef int piece_index = 0 if piece_type == SOLDIER else 1
+        return old_hash ^ self.table_c[idx][piece_index]
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef unsigned long long c_switch_turn_hash(self, unsigned long long old_hash):
+        return old_hash ^ self.turn_key
     
     @cython.boundscheck(False)
     @cython.wraparound(False)

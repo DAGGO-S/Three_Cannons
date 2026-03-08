@@ -421,7 +421,7 @@ class GameGUI(tk.Tk):
         
         # --- 阶段四：处理游戏结束的最终状态覆盖 ---
         
-        if model.game_state.winner is not None:
+        if model.game_state.winner != -1:
             # 游戏结束后，禁用计算和保存
             self.btn_calculate.config(state=tk.DISABLED)
             self.save_game_btn.config(state=tk.DISABLED)
