@@ -2,36 +2,31 @@
 ================================================================================
 🔥 真实的引擎内部性能剖析 (Top 35 纯函数内部耗时) 🔥
 ================================================================================
-         2954240 function calls (2527813 primitive calls) in 2.852 seconds
+         2004060 function calls (1179021 primitive calls) in 1.226 seconds
 
    Ordered by: internal time
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-124579/100212    0.518    0.000    1.749    0.000 core/ai.pyx:123(_quiescence_search)
-   123457    0.441    0.000    0.441    0.000 core/evaluation_logic.pyx:157(_calculate_control_zone_bfs)
-   123457    0.338    0.000    1.476    0.000 core/evaluation_logic.pyx:201(evaluate_board)
-  1097862    0.316    0.000    0.316    0.000 core/game_logic.pyx:96(get_valid_moves)
-   123457    0.289    0.000    0.289    0.000 core/evaluation_logic.pyx:85(_calculate_soldier_scores)
-   123457    0.284    0.000    0.399    0.000 core/evaluation_logic.pyx:113(_calculate_cannon_forbidden_zone)
-259685/101    0.281    0.000    0.004    0.000 core/ai.pyx:330(_alpha_beta)
-355632/213159    0.213    0.000    0.091    0.000 core/game_logic.pyx:138(move_piece)
-    62252    0.127    0.000    0.250    0.000 core/ai.pyx:86(_get_ordered_moves)
-   436852    0.028    0.000    0.028    0.000 C:\Python313\Lib\threading.py:605(is_set)
-   123457    0.011    0.000    0.011    0.000 core/evaluation_logic.pyx:73(get_material_score)
-        1    0.004    0.004    0.004    0.004 core/ai.pyx:38(clear_transposition_table)
-       28    0.003    0.000    0.003    0.000 {built-in method builtins.print}
-       12    0.000    0.000    0.002    0.000 Z:\2-Lixinjie\temp_note\test\Three_Cannons\scripts\bench_fixed_depth.py:58(progress_callback)
+   220298    0.386    0.000    0.386    0.000 core/evaluation_logic.pyx:111(c_evaluate_board)
+700944/412372    0.347    0.000    0.159    0.000 core/game_logic.pyx:232(c_move_piece)
+536560/97    0.333    0.000    0.001    0.000 core/ai.pyx:317(_alpha_beta)
+   133768    0.125    0.000    0.125    0.000 core/game_logic.pyx:264(c_get_ordered_moves)
+   412396    0.025    0.000    0.025    0.000 C:\Python313\Lib\threading.py:605(is_set)
+       28    0.005    0.000    0.005    0.000 {built-in method builtins.print}
+        1    0.004    0.004    0.004    0.004 core/ai.pyx:39(clear_transposition_table)
+       12    0.000    0.000    0.001    0.000 Z:\2-Lixinjie\temp_note\test\Three_Cannons\scripts\bench_fixed_depth.py:58(progress_callback)
       2/1    0.000    0.000    0.001    0.001 Z:\2-Lixinjie\temp_note\test\Three_Cannons\scripts\bench_fixed_depth.py:33(run_benchmark)
-      2/1    0.000    0.000    0.000    0.000 core/ai.pyx:195(find_best_move_iterative_deepening)
+      2/1    0.000    0.000    0.000    0.000 core/ai.pyx:165(find_best_move_iterative_deepening)
       2/1    0.000    0.000    0.000    0.000 core/game_logic.pyx:47(__init__)
         1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
        14    0.000    0.000    0.000    0.000 {built-in method time.time}
         1    0.000    0.000    0.000    0.000 C:\Python313\Lib\threading.py:281(__init__)
        12    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
         1    0.000    0.000    0.000    0.000 C:\Python313\Lib\threading.py:592(__init__)
-       12    0.000    0.000    0.000    0.000 core/ai.pyx:30(get_nodes_evaluated)
-        1    0.000    0.000    0.000    0.000 core/evaluation_logic.pyx:22(clear_evaluation_caches)
+       12    0.000    0.000    0.000    0.000 core/ai.pyx:31(get_nodes_evaluated)
+      1/0    0.000    0.000    0.000          core/game_logic.pyx:210(_check_winner)
         3    0.000    0.000    0.000    0.000 {built-in method builtins.hasattr}
-        1    0.000    0.000    0.000    0.000 core/ai.pyx:34(reset_nodes_evaluated)
+        1    0.000    0.000    0.000    0.000 core/evaluation_logic.pyx:22(clear_evaluation_caches)
+        1    0.000    0.000    0.000    0.000 core/ai.pyx:35(reset_nodes_evaluated)
 
 

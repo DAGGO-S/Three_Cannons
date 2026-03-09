@@ -60,15 +60,149 @@ DEFAULT_SETTINGS = {
 # 内部快捷访问（默认值）
 cdef int _precomputed_soldier_position_scores[5][5]
 
+# --- 纯 C 加速所需的数据表 ---
+cdef unsigned int _neighbor_masks[25]
+cdef int _net_map_c[30]
+cdef int _base_material_scores_c[16]
+cdef bint _is_initialized = False
+
 def _init_precomputed_tables(table=None):
     if table is None:
         table = DEFAULT_SETTINGS["SOLDIER_POSITION_TABLE"]
-    cdef int r, c
+    cdef int r, c, i, dr, dc, nr, nc
     for r in range(5):
         for c in range(5):
             _precomputed_soldier_position_scores[r][c] = table[r][c]
+            
+    global _is_initialized
+    if _is_initialized:
+        return
+    _is_initialized = True
+    
+    # Init neighbor masks
+    for i in range(25):
+        _neighbor_masks[i] = 0
+        r = i // 5
+        c = i % 5
+        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            nr = r + dr
+            nc = c + dc
+            if 0 <= nr < 5 and 0 <= nc < 5:
+                _neighbor_masks[i] |= (1 << (nr * 5 + nc))
+                
+    # Init material (1-15 兵)
+    cdef list m_scores = [0, 1600, 1400, 1200, 1000, 700, 500, 300, 100, 0, -100, -150, -200, -250, -300, -350]
+    for i in range(16):
+        _base_material_scores_c[i] = m_scores[i]
+        
+    # Init net map
+    for i in range(30):
+        _net_map_c[i] = 200
+    _net_map_c[0] = -1000
+    _net_map_c[1] = -500
+    _net_map_c[2] = -100
+    _net_map_c[3] = 0
+    _net_map_c[4] = 80
+    _net_map_c[5] = 200
 
 _init_precomputed_tables()
+
+# ----------- 纯 C 版极速评估函数 (Zero Allocation) -----------
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef int c_evaluate_board(CGameState state) noexcept:
+    if state.winner != -1:
+        return 10000 if state.winner == CANNON else -10000
+        
+    cdef unsigned int soldiers_mask = 0
+    cdef unsigned int cannons_mask = 0
+    cdef unsigned int empty_mask = 0
+    cdef int i, val, r, c, dr, dc
+    cdef int position_score = 0
+    cdef int proximity_score = 0
+    
+    # 1. 一次遍历生成所有掩码和基础分数
+    for i in range(25):
+        val = state.board_c[i]
+        if val == SOLDIER:
+            soldiers_mask |= (1 << i)
+            position_score += _precomputed_soldier_position_scores[i // 5][i % 5]
+            
+            r = i // 5
+            c = i % 5
+            if r > 0 and state.board_c[i - 5] == CANNON:
+                proximity_score -= 30
+            elif r < 4 and state.board_c[i + 5] == CANNON:
+                proximity_score -= 30
+            elif c > 0 and state.board_c[i - 1] == CANNON:
+                proximity_score -= 30
+            elif c < 4 and state.board_c[i + 1] == CANNON:
+                proximity_score -= 30
+                
+        elif val == CANNON:
+            cannons_mask |= (1 << i)
+        else:
+            empty_mask |= (1 << i)
+            
+    # 2. 炮方禁区掩码 (攻击格子+预瞄格子)
+    cdef unsigned int forbidden_mask = 0
+    for i in range(25):
+        if state.board_c[i] == CANNON:
+            r = i // 5
+            c = i % 5
+            if r - 2 >= 0 and state.board_c[i - 5] == EMPTY:
+                if state.board_c[i - 10] != CANNON:  # SOLDIER(攻击) or EMPTY(预瞄)
+                    forbidden_mask |= (1 << (i - 10))
+            if r + 2 < 5 and state.board_c[i + 5] == EMPTY:
+                if state.board_c[i + 10] != CANNON:
+                    forbidden_mask |= (1 << (i + 10))
+            if c - 2 >= 0 and state.board_c[i - 1] == EMPTY:
+                if state.board_c[i - 2] != CANNON:
+                    forbidden_mask |= (1 << (i - 2))
+            if c + 2 < 5 and state.board_c[i + 1] == EMPTY:
+                if state.board_c[i + 2] != CANNON:
+                    forbidden_mask |= (1 << (i + 2))
+                    
+    # 3. 控制区 BFS 计算（极致位移操作，不依赖堆分配内存队列）
+    cdef unsigned int safe_soldiers_mask = soldiers_mask & (~forbidden_mask)
+    cdef unsigned int visited_mask = safe_soldiers_mask
+    cdef unsigned int queue_mask = safe_soldiers_mask
+    cdef unsigned int new_queue_mask = 0
+    cdef int j
+
+    while queue_mask:
+        new_queue_mask = 0
+        for j in range(25):
+            if queue_mask & (1 << j):
+                new_queue_mask |= _neighbor_masks[j]
+        
+        new_queue_mask &= empty_mask           # 只向空格蔓延
+        new_queue_mask &= (~forbidden_mask)    # 不能进入禁区
+        new_queue_mask &= (~visited_mask)      # 不能是已访问过的
+        
+        visited_mask |= new_queue_mask
+        queue_mask = new_queue_mask
+        
+    # 4. 统计比特位数（Kernighan 算法） -> 兵方安全区总格数
+    cdef int bit_count = 0
+    cdef unsigned int temp = visited_mask
+    while temp:
+        temp &= (temp - 1)
+        bit_count += 1
+        
+    cdef int net_control_count = 22 - bit_count  # 25总格子 - 3炮 - 兵方安全
+    cdef int net_control_score = 200
+    if 0 <= net_control_count <= 5:
+        net_control_score = _net_map_c[net_control_count]
+        
+    # 5. 返回综合总分
+    cdef int material_score = 0
+    cdef int sc = state.soldier_count
+    if 1 <= sc <= 15:
+        material_score = _base_material_scores_c[sc]
+        
+    return net_control_score + position_score + proximity_score + material_score
+
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -201,64 +335,6 @@ def _calculate_control_zone_bfs(CGameState state, set starting_points, set forbi
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def evaluate_board(CGameState state, dict settings=None):
-    """V10 最终版评估函数：基于安全的兵源进行BFS精确计算 - 带缓存优化"""
-    cdef int score, position_score, proximity_score, soldier_total_score, material_score
-    cdef int net_control_count, net_control_score, total_score
-    
-    if state.winner != -1:
-        score = 10000 if state.winner == CANNON else -10000
-        return score, {"total": score, "reason": "Terminal Node"}
-
-    # 【Phase2优化】直接遍历 5×5 board 构建 set（比 frozenset→set 转换更快）
-    cdef set soldiers = set()
-    cdef set cannons = set()
-    cdef int sr, sc
-    for sr in range(5):
-        for sc in range(5):
-            if state.board_c[sr * 5 + sc] == SOLDIER:
-                soldiers.add((sr, sc))
-            elif state.board_c[sr * 5 + sc] == CANNON:
-                cannons.add((sr, sc))
-    
-    # --- 1. 计算兵方各项分数 ---
-    position_score, proximity_score = _calculate_soldier_scores(state, soldiers, cannons, settings)
-    soldier_total_score = position_score + proximity_score
-    
-    # --- 2. 计算兵力数量分 ---
-    material_score = get_material_score(state.soldier_count, settings)
-
-    # --- 3. 【核心逻辑修正】基于安全的兵源计算净控制区 ---
-    # a. 一次性计算出所有炮方威胁的格子
-    cannon_forbidden_zone = _calculate_cannon_forbidden_zone(state, cannons)
-    
-    # b. 【新增】从所有兵中，筛选出位置安全的兵
-    cdef set safe_soldiers = soldiers - cannon_forbidden_zone
-    
-    # c. 【已修改】使用安全的兵作为BFS的起点，找到所有能安全控制的区域
-    pure_soldier_zone = _calculate_control_zone_bfs(state, safe_soldiers, cannon_forbidden_zone)
-    
-    # d. 计算炮方净控制的格子数
-    # 总格子25 - 炮数3 - 兵方安全区大小 = 炮方净控制区大小
-    net_control_count = 25 - 3 - len(pure_soldier_zone)
-    
-    # e. 查表得到最终净控制分
-    cdef dict net_map = settings["WEIGHT_NET_MAP"] if settings else DEFAULT_SETTINGS["WEIGHT_NET_MAP"]
-    cdef int max_net = settings["MAX_NET_CONTROL_SCORE"] if settings else DEFAULT_SETTINGS["MAX_NET_CONTROL_SCORE"]
-    net_control_score = net_map.get(net_control_count, max_net)
-    
-    # --- 4. 最终融合公式 (炮方视角) ---
-    total_score = net_control_score + soldier_total_score + material_score
-
-    # --- 5. 返回结构清晰的评估详情 ---
-    cdef dict score_details = {
-        "total_score": total_score,
-        "net_control_score": net_control_score,
-        "soldier_scores": {
-            "position": position_score,
-            "proximity": proximity_score,
-            "total": soldier_total_score
-        },
-        "material_score": material_score,
-        "net_control_count": net_control_count
-    }
-    return total_score, score_details
+    """供外界和向后兼容的评估函数封装层。核心计算已下沉至 C 级 c_evaluate_board"""
+    cdef int score = c_evaluate_board(state)
+    return score, {"total_score": score, "reason": "Fast C Eval Details Omitted"}

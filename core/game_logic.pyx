@@ -225,3 +225,114 @@ cdef class GameState:
                             return
 
         self.winner = SOLDIER
+
+    # ------------------------------------------------------------------
+    # 【Phase 2 重构】纯 C 原生走棋 (零分配返回值)
+    # ------------------------------------------------------------------
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef GameState c_move_piece(self, int start_idx, int end_idx) noexcept:
+        cdef int piece = self.board_c[start_idx]
+        cdef int captured_piece = self.board_c[end_idx]
+        
+        cdef GameState new_state = GameState.__new__(GameState)
+        memcpy(new_state.board_c, self.board_c, 25 * sizeof(int))
+        
+        new_state.board_c[end_idx]   = piece
+        new_state.board_c[start_idx] = EMPTY
+        
+        new_state.soldier_count = self.soldier_count
+        if captured_piece == SOLDIER:
+            new_state.soldier_count -= 1
+            
+        cdef unsigned long long h = self.hash
+        h = hasher.c_update_hash(h, start_idx // 5, start_idx % 5, end_idx // 5, end_idx % 5, piece, self.current_player)
+        if captured_piece != EMPTY:
+            h = hasher.c_remove_piece_hash(h, end_idx // 5, end_idx % 5, captured_piece)
+        h = hasher.c_switch_turn_hash(h)
+        new_state.hash = h
+        
+        new_state.current_player = SOLDIER if self.current_player == CANNON else CANNON
+        new_state.winner = NO_WINNER
+        new_state._check_winner()
+        
+        return new_state
+
+# ------------------------------------------------------------------
+# 【Phase 2 重构】纯 C 原生可排序走法生成 (零堆分配)
+# ------------------------------------------------------------------
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef int c_get_ordered_moves(GameState state, int player_piece, int hash_move, int* out_moves) noexcept:
+    """
+    生成所有合法走法，直接写入预分配的 C 数组 out_moves 中。
+    走法编码规则: move_encoded = (start_idx << 8) | end_idx
+    返回生成的走法总数。排序：hash_move > 吃子 > 安静走子。
+    """
+    cdef int num_moves = 0
+    cdef int captures[64]
+    cdef int num_captures = 0
+    cdef int quiets[64]
+    cdef int num_quiets = 0
+    cdef int i, r, c, start_idx, end_idx, dr, dc, nr, nc, jump_idx
+    cdef int move_encoded
+    
+    # 1. 如果有 hash_move，先放置于首位
+    if hash_move != -1:
+        out_moves[num_moves] = hash_move
+        num_moves += 1
+        
+    for start_idx in range(25):
+        if state.board_c[start_idx] == player_piece:
+            r = start_idx // 5
+            c = start_idx % 5
+            
+            if player_piece == SOLDIER:
+                for dr, dc in [(0,1), (0,-1), (1,0), (-1,0)]:
+                    nr = r + dr
+                    nc = c + dc
+                    if 0 <= nr < 5 and 0 <= nc < 5:
+                        end_idx = nr * 5 + nc
+                        if state.board_c[end_idx] == EMPTY:
+                            move_encoded = (start_idx << 8) | end_idx
+                            if move_encoded == hash_move:
+                                continue
+                            quiets[num_quiets] = move_encoded
+                            num_quiets += 1
+            else: # CANNON
+                for dr, dc in [(0,1), (0,-1), (1,0), (-1,0)]:
+                    nr = r + dr
+                    nc = c + dc
+                    if 0 <= nr < 5 and 0 <= nc < 5:
+                        end_idx = nr * 5 + nc
+                        if state.board_c[end_idx] == EMPTY:
+                            move_encoded = (start_idx << 8) | end_idx
+                            if move_encoded == hash_move:
+                                continue
+                            quiets[num_quiets] = move_encoded
+                            num_quiets += 1
+                            
+                    # 取 Jump 吃子
+                    nr = r + 2*dr
+                    nc = c + 2*dc
+                    if 0 <= nr < 5 and 0 <= nc < 5:
+                        jump_idx = (r + dr) * 5 + (c + dc)
+                        if state.board_c[jump_idx] == EMPTY:
+                            end_idx = nr * 5 + nc
+                            if state.board_c[end_idx] == SOLDIER:
+                                move_encoded = (start_idx << 8) | end_idx
+                                if move_encoded == hash_move:
+                                    continue
+                                captures[num_captures] = move_encoded
+                                num_captures += 1
+                                
+    # 追加 Captures
+    for i in range(num_captures):
+        out_moves[num_moves] = captures[i]
+        num_moves += 1
+    # 追加 Quiets
+    for i in range(num_quiets):
+        out_moves[num_moves] = quiets[i]
+        num_moves += 1
+        
+    return num_moves

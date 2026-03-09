@@ -62,12 +62,12 @@ Three_Cannons/
 
 ### 棋子常量
 
-| 常量      | 值  | 含义     |
-| --------- | --- | -------- |
-| `EMPTY`   | 0   | 空位     |
-| `SOLDIER` | 1   | 兵       |
-| `CANNON`  | 2   | 炮       |
-| `DRAW`    | 3   | 和棋状态 |
+| 常量        | 值 | 含义     |
+| ----------- | -- | -------- |
+| `EMPTY`   | 0  | 空位     |
+| `SOLDIER` | 1  | 兵       |
+| `CANNON`  | 2  | 炮       |
+| `DRAW`    | 3  | 和棋状态 |
 
 ## 常用命令
 
@@ -91,10 +91,22 @@ python -m pytest tests/test_game_logic.py::TestGameState
 python -m pytest tests/test_game_logic.py::TestGameState::test_cannon_capture
 ```
 
+## 开发工作流与绝对铁律
+
+> 坚持第一性原理的SKILL流程，事实为本。
+
+1. **结构化流程严控**：
+   - 必须严格遵循 **“构思方案 → 提请审核 → 分解为具体任务”** 的开发顺序。
+   - 在大规模改动前，**必须建立还原点**，确保随时回退。
+2. **基准验证底线**：
+   - 在执行任何激进的安全优化后，第一要务是让用户**运行主程序手动对弈或执行跑盘测试**，确保核心智力和游戏规则不被破坏。
+3. **禁止主动运行**：
+   - AI **严禁主动运行或越权执行** 任何测试脚本、编译脚本甚至主程序。除非用户主动提出自动化执行。
+   - 撰写程序或提供命令，并请用户自行执行。你运行就卡死。
+
 ## 开发注意事项
 
-- **不要直接运行代码**: 运行是用户自己的事情，助手不应替用户执行
-- **修改 `.pyx` 后**: 必须重新编译 Cython 才能生效，提醒用户运行 `python setup.py build_ext --inplace`
+- **修改 `.pyx` 后**: 必须重新编译 Cython 才能生效，提供命令给用户运行 `python setup.py build_ext --inplace`
 - **棋盘坐标**: 行列从 0 开始，棋盘大小为 `BOARD_ROWS=5 × BOARD_COLS=5`
 - **GUI 线程安全**: AI 计算在后台线程，GUI 更新需通过 `view.after()` 回到主线程
 - **置换表**: 每次 AI 计算前调用 `clear_transposition_table()` 重置

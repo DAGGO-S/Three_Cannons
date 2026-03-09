@@ -36,5 +36,38 @@ ncalls  tottime  percall  cumtime  percall filename:lineno(function)
 
 ## Conclusion 结论
 为达成 1,000,000 NPS 目标，必须要在评估与走法生成这两个高频执行的热路径上实现零堆内存分配（Zero Allocation）：  
-1. **评估函数扁平化**：移除所有依赖内置结构(`set`, `deque`)的检索算法，采用一维标志数组或位运算符（Bitwise operation）对棋盘防线及火力范围进行标记。
+1. **评估函数扁平化**：移除所有依赖内置结构(`set`, `deque`)的检索算法，采用一维标志数组或位运算符（Bitwise operation）对棋盘防线及火力范围进行标记。同时为了获取不受干扰的观测对照极限，首次重构应前置性切断静默搜索（QS）。
 2. **走法生成静态化**：所有走法生成逻辑不可采用 `return list` 的形式。应要求函数接收预先申请好的 C 级别结构体数组指针，并在内部直接执行数据赋值。
+
+---
+
+## 2. 2026-03-09 Phase 1 纯 C 化评估基准胜利
+在彻底剥离了 `evaluate_board` 内的 `set` 和 `deque`，并重写为 32-bit 位域 (Bitmask) 核算后（且如计划屏蔽了 QS），NPS 从 141,769 跃升至惊人的 **379,485 NPS**（提升约 2.67 倍）！
+
+新的 cProfile 数据呈现了全新的瓶颈版图：
+```text
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+635997/105    0.453    0.000    0.001    0.000 core/ai.pyx:331(_alpha_beta)
+837146/490859 0.434    0.000    0.177    0.000 core/game_logic.pyx:138(move_piece)
+   267013    0.412    0.000    0.412    0.000 core/evaluation_logic.pyx:111(c_evaluate_board)
+   156021    0.259    0.000    0.513    0.000 core/ai.pyx:87(_get_ordered_moves)
+  1173653    0.254    0.000    0.254    0.000 core/game_logic.pyx:96(get_valid_moves)
+```
+
+## 3. 2026-03-09 Phase 2 剥离走法抛解后的定盘
+通过引入 `c_get_ordered_moves`，向预先申请的 16-bit 掩码栈数组中写入数据，彻底废弃了原先返回 `tuple` 列表的操作：
+NPS 测试最高探至 **470,745 NPS**！
+
+最新前5名开销函数追踪定格：
+```text
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   220298    0.386    0.000    0.386    0.000 core/evaluation_logic.pyx:111(c_evaluate_board)
+700944/412372 0.347    0.000    0.159    0.000 core/game_logic.pyx:232(c_move_piece)
+536560/97    0.333    0.000    0.001    0.000 core/ai.pyx:317(_alpha_beta)
+   133768    0.125    0.000    0.125    0.000 core/game_logic.pyx:264(c_get_ordered_moves)
+```
+
+**解析：** 
+由于彻底消灭了 Python 层走法对象的产生，昔日排在榜单前列占 500多毫秒的走法生成双煞已经被压缩到了极致的 **0.125 秒**！这意味着走法生成的时间被生生削去了近乎 **80%**！
+
+目前横亘在通往 1,000,000 NPS 极限路上唯一的路障，是排行第二名的 `c_move_piece`。它虽然完成了 `memcpy` 化，但其深处的 `GameState.__new__(GameState)` 对象申请，成为了现存唯一的 Python 对象构造操作！只要执行 **Make/Unmake 原位状态回溯**，这 0.347 秒的绝大部分开销将灰飞烟灭！
