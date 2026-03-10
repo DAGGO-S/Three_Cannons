@@ -1,4 +1,4 @@
-# cython: profile=True
+# cython: profile=False
 import collections
 from core.game_logic import GameState, CANNON, SOLDIER, EMPTY
 from core.game_logic cimport GameState as CGameState  # C 级直接访问 board_c
@@ -11,22 +11,11 @@ from libc.stdlib cimport malloc, free
 ctypedef Py_ssize_t int
 ctypedef double float
 
-# --- 缓存机制 ---
-# 创建缓存来存储计算结果
-cdef dict _material_score_cache = {}
-cdef dict _soldier_scores_cache = {}
-cdef dict _cannon_forbidden_zone_cache = {}
-cdef dict _control_zone_bfs_cache = {}
-
-# 【Phase4优化】导出缓存清理函数，防止无限增长和 hash 碰撞
+# --- 预配置清理机制 ---
+# 【Phase4优化】导出缓存清理函数，目前大部分核心评估已无需缓存，保留空壳防止外部报错
 def clear_evaluation_caches():
-    """清空所有评估缓存。应在每次搜索开始前调用。"""
-    global _material_score_cache, _soldier_scores_cache
-    global _cannon_forbidden_zone_cache, _control_zone_bfs_cache
-    _material_score_cache.clear()
-    _soldier_scores_cache.clear()
-    _cannon_forbidden_zone_cache.clear()
-    _control_zone_bfs_cache.clear()
+    """清理遗留缓存钩子"""
+    pass
 
 # --- 坐标映射与表定义 ---
 
@@ -216,120 +205,7 @@ def get_material_score(int soldier_count, dict settings=None) -> int:
         return scores[soldier_count - 1]
     return 0
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
-def _calculate_soldier_scores(CGameState state, set soldiers, set cannons, dict settings=None) -> tuple:
-    """计算独立的兵方分数项 (位置分 和 贴炮分)"""
-    cdef int proximity_weight = settings["WEIGHT_SOLDIER_PROXIMITY"] if settings else DEFAULT_SETTINGS["WEIGHT_SOLDIER_PROXIMITY"]
-    cdef list pos_table = settings.get("SOLDIER_POSITION_TABLE") if settings else None
-    
-    cdef int position_score = 0
-    cdef int r, c
-    if pos_table:
-        for r, c in soldiers:
-            position_score += pos_table[r][c]
-    else:
-        for r, c in soldiers:
-            position_score += _precomputed_soldier_position_scores[r][c]
-    
-    cdef int score_proximity = 0
-    cdef int r_soldier, c_soldier, dr, dc
-    for r_soldier, c_soldier in soldiers:
-        # 【P8优化】手写循环替代 any() 生成器，Cython 可优化为 C 代码
-        for dr, dc in [(0,1), (0,-1), (1,0), (-1,0)]:
-            if (r_soldier + dr, c_soldier + dc) in cannons:
-                score_proximity += proximity_weight
-                break
-            
-    return (position_score, score_proximity)
-
-
-@cython.boundscheck(False)
-@cython.wraparound(False)
-def _calculate_cannon_forbidden_zone(CGameState state, set cannons) -> set:
-    """一次性计算所有被炮攻击或预瞄的格子 (炮方禁区) - 带缓存优化"""
-    global _cannon_forbidden_zone_cache
-    
-    # 【P1优化】缓存键直接用 Zobrist hash，免去 frozenset + str(board) 的开销
-    cdef unsigned long long cache_key = state.hash
-    
-    # 检查缓存
-    if cache_key in _cannon_forbidden_zone_cache:
-        return _cannon_forbidden_zone_cache[cache_key].copy()  # 返回副本避免外部修改
-    
-    # 计算新值
-    cdef set attack_squares = set()
-    cdef set pre_aim_squares = set()
-    cdef list directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-    cdef int r_start, c_start, r_end, c_end, dr, dc
-    cdef tuple pos1, pos2, end_pos
-    
-    for r_start, c_start in cannons:
-        # 获取有效移动并处理攻击方格
-        valid_moves = state.get_valid_moves(r_start, c_start)
-        for r_end, c_end in valid_moves:
-            if abs(r_start - r_end) == 2 or abs(c_start - c_end) == 2:
-                attack_squares.add((r_end, c_end))
-        
-        # 处理预瞄方格
-        for dr, dc in directions:
-            pos1 = (r_start + dr, c_start + dc)
-            pos2 = (r_start + 2*dr, c_start + 2*dc)
-            if (0 <= pos1[0] < 5 and 0 <= pos1[1] < 5 and 
-                0 <= pos2[0] < 5 and 0 <= pos2[1] < 5 and
-                state.board_c[pos1[0] * 5 + pos1[1]] == EMPTY and 
-                state.board_c[pos2[0] * 5 + pos2[1]] == EMPTY):
-                pre_aim_squares.add(pos2)
-    
-    # 合并结果并缓存
-    result = attack_squares.union(pre_aim_squares)
-    _cannon_forbidden_zone_cache[cache_key] = result.copy()  # 缓存副本
-    return result
-
-
-# --- 【逻辑已修正】BFS现在从给定的安全起点开始 ---
-@cython.boundscheck(False)
-@cython.wraparound(False)
-def _calculate_control_zone_bfs(CGameState state, set starting_points, set forbidden_zone) -> set:
-    """使用BFS计算控制区域 - 带缓存优化"""
-    global _control_zone_bfs_cache
-    
-    # 【P1优化】缓存键直接用 Zobrist hash
-    cdef unsigned long long cache_key = state.hash
-    
-    # 检查缓存
-    if cache_key in _control_zone_bfs_cache:
-        return _control_zone_bfs_cache[cache_key].copy()  # 返回副本避免外部修改
-    
-    # 计算新值
-    # 队列的初始值为所有安全的起始点 (水源)
-    queue = collections.deque(starting_points)
-    # visited集合记录所有已访问的、安全的格子，初始也只包含安全的起始点
-    cdef set visited = starting_points.copy()
-    
-    cdef int r, c, dr, dc, nr, nc
-    cdef tuple new_pos
-    
-    while queue:
-        r, c = queue.popleft()
-        
-        # 探索当前格子的四个邻居
-        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-            nr, nc = r + dr, c + dc
-            new_pos = (nr, nc)
-            
-            # 检查邻居是否满足扩展条件
-            if (0 <= nr < 5 and 0 <= nc < 5 and         # 1. 在棋盘内
-                state.board_c[nr * 5 + nc] == EMPTY and           # 2. 是一个空格子
-                new_pos not in forbidden_zone and         # 3. 不在禁区内
-                new_pos not in visited):                  # 4. 之前没有访问过
-                
-                visited.add(new_pos)
-                queue.append(new_pos)
-    
-    # 缓存结果
-    _control_zone_bfs_cache[cache_key] = visited.copy()  # 缓存副本
-    return visited
+# 所有的纯 Python 集合/BFS 对象申请逻辑已彻底被位板运算 c_evaluate_board 取代并移除
 
 
 @cython.boundscheck(False)

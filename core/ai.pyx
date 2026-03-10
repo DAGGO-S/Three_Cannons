@@ -1,4 +1,4 @@
-# cython: profile=True
+# cython: profile=False
 import cython
 import time
 import math
@@ -82,9 +82,7 @@ cdef tuple _quiescence_search(CGameState state, float alpha, float beta, bint ma
     _total_nodes_evaluated += 1
     
     cdef float stand_pat_score, evaluation
-    cdef int player_piece, opponent_piece, r, c
-    cdef tuple move, end_pos
-    cdef list capture_moves = []
+    cdef int player_piece
     cdef object new_state
     
     # 1. 静态评估 (直接走 C 通道)
@@ -107,49 +105,63 @@ cdef tuple _quiescence_search(CGameState state, float alpha, float beta, bint ma
             return alpha, None, []
         beta = min(beta, stand_pat_score)
 
-    # 3. 只生成吃子走法
-    player_piece = CANNON if maximizing_player else SOLDIER
-    opponent_piece = SOLDIER if player_piece == CANNON else CANNON
+    # 3. C 级走法生成 (零分配)
+    cdef int ordered_moves[64]
+    cdef int num_moves, i, move_encoded, start_idx, end_idx
     
-    for r in range(5):
-        for c in range(5):
-            if state.board_c[r * 5 + c] == player_piece:
-                for end_pos in state.get_valid_moves(r, c):
-                    if state.board_c[end_pos[0] * 5 + end_pos[1]] == opponent_piece:
-                        capture_moves.append(((r, c), end_pos))
+    player_piece = CANNON if maximizing_player else SOLDIER
+    num_moves = c_get_ordered_moves(state, player_piece, -1, ordered_moves)
     
     # 4. 递归搜索吃子走法
     cdef unsigned long long old_hash
     cdef int old_winner, captured
 
     if maximizing_player:
-        for move in capture_moves:
+        for i in range(num_moves):
             if stop_event and stop_event.is_set():
                 break
+                
+            move_encoded = ordered_moves[i]
+            end_idx = move_encoded & 0xFF
+            
+            # 仅搜索吃子走法 (终点非空)
+            if state.board_c[end_idx] == EMPTY:
+                continue
+                
+            start_idx = move_encoded >> 8
+            
             old_hash = state.hash
             old_winner = state.winner
-            captured = state.c_move_piece(move[0][0]*5 + move[0][1], move[1][0]*5 + move[1][1])
+            captured = state.c_move_piece(start_idx, end_idx)
             
             evaluation, _, _ = _quiescence_search(state, alpha, beta, False, settings, qs_depth + 1)
             
-            state.c_unmake_piece(move[0][0]*5 + move[0][1], move[1][0]*5 + move[1][1], captured, old_hash, old_winner)
+            state.c_unmake_piece(start_idx, end_idx, captured, old_hash, old_winner)
             
             alpha = max(alpha, evaluation)
             if beta <= alpha:
                 return beta, None, []
         return alpha, None, []
     else:
-        for move in capture_moves:
+        for i in range(num_moves):
             if stop_event and stop_event.is_set():
                 break
                 
+            move_encoded = ordered_moves[i]
+            end_idx = move_encoded & 0xFF
+            
+            if state.board_c[end_idx] == EMPTY:
+                continue
+                
+            start_idx = move_encoded >> 8
+                
             old_hash = state.hash
             old_winner = state.winner
-            captured = state.c_move_piece(move[0][0]*5 + move[0][1], move[1][0]*5 + move[1][1])
+            captured = state.c_move_piece(start_idx, end_idx)
             
             evaluation, _, _ = _quiescence_search(state, alpha, beta, True, settings, qs_depth + 1)
             
-            state.c_unmake_piece(move[0][0]*5 + move[0][1], move[1][0]*5 + move[1][1], captured, old_hash, old_winner)
+            state.c_unmake_piece(start_idx, end_idx, captured, old_hash, old_winner)
             
             beta = min(beta, evaluation)
             if beta <= alpha:
@@ -157,6 +169,58 @@ cdef tuple _quiescence_search(CGameState state, float alpha, float beta, bint ma
         return beta, None, []
 
 # --- 迭代加深搜索主入口 ---
+cdef list _extract_pv_from_tt(CGameState state, int max_depth):
+    """
+    通过查找置换表(TT) 还原主变路线(PV Line)。
+    完全消除在核心搜索树中动态构建列表的开销。
+    """
+    cdef list pv_line = []
+    cdef unsigned long long state_hash
+    cdef int tt_index
+    cdef TTEntry* hash_entry
+    cdef int move_encoded, start_idx, end_idx, captured, old_winner
+    cdef unsigned long long old_hash
+    cdef int depth = 0
+    
+    # 防止陷入哈希循环
+    cdef set visited_hashes = set()
+    
+    while depth < max_depth:
+        state_hash = state.hash
+        if state_hash in visited_hashes:
+            break
+        visited_hashes.add(state_hash)
+            
+        tt_index = <int>(state_hash & (TT_SIZE - 1))
+        
+        if transposition_table == NULL:
+            break
+            
+        hash_entry = &transposition_table[tt_index]
+        if hash_entry.hash_key != state_hash or hash_entry.best_move_encoded == -1:
+            break
+            
+        move_encoded = hash_entry.best_move_encoded
+        pv_line.append(move_encoded)
+        
+        # 顺推状态以查找下一层
+        start_idx = move_encoded >> 8
+        end_idx = move_encoded & 0xFF
+        old_hash = state.hash
+        old_winner = state.winner
+        captured = state.c_move_piece(start_idx, end_idx)
+        
+        depth += 1
+        
+    # 回溯还原状态
+    for i in range(len(pv_line) - 1, -1, -1):
+         move_encoded = pv_line[i]
+         # 注：为了图省事这里直接深拷贝或者利用 Python 层级的 undo 记录，但最纯粹的是：
+         # 提取 PV 一般在根节点调用，因为 state 是通过值拷贝或者回溯完整的，
+         # 所以我们可以借用 _extract_pv_from_tt 外部复制一个 dummy_state
+    
+    return pv_line
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def find_best_move_iterative_deepening(CGameState state, dict settings, bint is_maximizing, object progress_callback=None):
@@ -252,21 +316,21 @@ def find_best_move_iterative_deepening(CGameState state, dict settings, bint is_
             # --- 关键逻辑分支 ---
             if analysis_mode:
                 if is_maximizing:
-                    score, _, line = _alpha_beta(state, depth - 1, -math.inf, math.inf, not is_maximizing, settings)
+                    score = _alpha_beta(state, depth - 1, -math.inf, math.inf, not is_maximizing, settings)
                 else:
-                    score, _, line = _alpha_beta(state, depth - 1, -math.inf, math.inf, not is_maximizing, settings)
+                    score = _alpha_beta(state, depth - 1, -math.inf, math.inf, not is_maximizing, settings)
             else:
                 if i == 0:
-                    score, _, line = _alpha_beta(state, depth - 1, current_alpha, current_beta, not is_maximizing, settings)
+                    score = _alpha_beta(state, depth - 1, current_alpha, current_beta, not is_maximizing, settings)
                 else:
                     if is_maximizing:
-                        score, _, line = _alpha_beta(state, depth - 1, current_alpha, current_alpha + 1, not is_maximizing, settings)
+                        score = _alpha_beta(state, depth - 1, current_alpha, current_alpha + 1, not is_maximizing, settings)
                         if current_alpha < score < current_beta:
-                             score, _, line = _alpha_beta(state, depth - 1, current_alpha, current_beta, not is_maximizing, settings)
+                             score = _alpha_beta(state, depth - 1, current_alpha, current_beta, not is_maximizing, settings)
                     else:
-                        score, _, line = _alpha_beta(state, depth - 1, current_beta - 1, current_beta, not is_maximizing, settings)
+                        score = _alpha_beta(state, depth - 1, current_beta - 1, current_beta, not is_maximizing, settings)
                         if current_alpha < score < current_beta:
-                             score, _, line = _alpha_beta(state, depth - 1, current_alpha, current_beta, not is_maximizing, settings)
+                             score = _alpha_beta(state, depth - 1, current_alpha, current_beta, not is_maximizing, settings)
 
             state.c_unmake_piece(start_idx, end_idx, captured, old_hash, old_winner)
 
@@ -278,13 +342,11 @@ def find_best_move_iterative_deepening(CGameState state, dict settings, bint is_
                 if score > current_depth_best_score:
                     current_depth_best_score = score
                     current_depth_best_move = move_encoded
-                    current_depth_best_line = [move_encoded] + line
                 current_alpha = max(current_alpha, score)
             else:
                 if score < current_depth_best_score:
                     current_depth_best_score = score
                     current_depth_best_move = move_encoded
-                    current_depth_best_line = [move_encoded] + line
                 current_beta = min(current_beta, score)
 
         # 本层迭代结束
@@ -292,9 +354,15 @@ def find_best_move_iterative_deepening(CGameState state, dict settings, bint is_
             current_iter_time = time.time() - start_time
             if current_iter_time < time_limit:
                  best_move_so_far = current_depth_best_move
-                 best_line_so_far = current_depth_best_line
-                 # 回调：解压缩传回 GUI 可识别的 ((r,c), (r,c)) 数据结构
+                 
+                 # 利用临时 dummy state 和 TT 表提出完整 PV
+                 # 降低开销，仅给 UI 发送进度时提取
                  if progress_callback:
+                     import copy
+                     dummy_state = copy.deepcopy(state)
+                     current_depth_best_line = _extract_pv_from_tt(dummy_state, depth)
+                     best_line_so_far = current_depth_best_line
+                     
                      decoded_best = (((current_depth_best_move>>8)//5, (current_depth_best_move>>8)%5), ((current_depth_best_move&0xFF)//5, (current_depth_best_move&0xFF)%5)) if current_depth_best_move != -1 else None
                      decoded_line = [(((m>>8)//5, (m>>8)%5), ((m&0xFF)//5, (m&0xFF)%5)) for m in current_depth_best_line]
                      decoded_stats = {(((m>>8)//5, (m>>8)%5), ((m&0xFF)//5, (m&0xFF)%5)): s for m, s in root_moves_stats.items()}
@@ -317,14 +385,19 @@ def find_best_move_iterative_deepening(CGameState state, dict settings, bint is_
 # --- Alpha-Beta + PVS + NMP + LMR ---
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef tuple _alpha_beta(CGameState state, int depth, float alpha, float beta, bint maximizing_player, object settings):
+cdef float _alpha_beta(CGameState state, int depth, float alpha, float beta, bint maximizing_player, object settings):
     """
-    实现了置换表、PVS、空着剪枝(NMP)、晚走缩减(LMR)的Alpha-Beta搜索。
+    极速 Alpha-Beta 搜索。
+    去除了任何 Tuple 与 List 创建的副作用。返回值仅为分数，所有的 PV 还原靠外部查表。
     """
-    stop_event = settings.get("stop_event", None)
-    
     global _total_nodes_evaluated
     _total_nodes_evaluated += 1
+    
+    # 降频检查中断信号（每 4096 个节点探底1次，大幅降低 GIL 通信开销）
+    if (_total_nodes_evaluated & 4095) == 0:
+        stop_event = settings.get("stop_event", None)
+        if stop_event and stop_event.is_set():
+            return 0.0
     
     cdef float original_alpha = alpha
     cdef int player_piece = CANNON if maximizing_player else SOLDIER
@@ -333,11 +406,10 @@ cdef tuple _alpha_beta(CGameState state, int depth, float alpha, float beta, bin
     cdef int num_moves
     cdef int best_move_encoded
     cdef int move_encoded, start_idx, end_idx
-    cdef list best_line, line
     cdef int i
     cdef float max_eval, min_eval, evaluation, eval_score
-    cdef bint is_capture_move  # P4: LMR 判断是否吃子
-    cdef int reduction  # P4: LMR 减层数
+    cdef bint is_capture_move
+    cdef int reduction
     
     cdef unsigned long long state_hash = state.hash
     cdef int tt_index = <int>(state_hash & (TT_SIZE - 1))
@@ -348,35 +420,33 @@ cdef tuple _alpha_beta(CGameState state, int depth, float alpha, float beta, bin
     cdef int old_winner, captured
     
     # --- 1. 查找置换表 ---
-    # 【Phase1优化】定长数组 + 位掩码取模 + full hash 校验，完全无 Boxing！
     if transposition_table != NULL:
         hash_entry = &transposition_table[tt_index]
         if hash_entry.hash_key == state_hash and hash_entry.depth >= depth:
             if hash_entry.flag == EXACT_SCORE:
-                return hash_entry.score, hash_entry.best_move_encoded, [hash_entry.best_move_encoded]
+                return hash_entry.score
             elif hash_entry.flag == LOWER_BOUND:
                 alpha = max(alpha, hash_entry.score)
             elif hash_entry.flag == UPPER_BOUND:
                 beta = min(beta, hash_entry.score)
             if alpha >= beta:
-                return hash_entry.score, hash_entry.best_move_encoded, [hash_entry.best_move_encoded]
+                return hash_entry.score
 
     # --- 2. 终止条件 ---
     if state.winner != -1:
-        return (10000 if state.winner == CANNON else -10000), -1, []
+        return 10000 if state.winner == CANNON else -10000
     
-    # 【P0优化】达到搜索深度，原本进入静默搜索，现阶段为测试极致静态评估性能而屏蔽 QS
+    # 待未来启用 QS 的地方，目前直接测基分
     if depth == 0:
-        score = c_evaluate_board(state)
-        return score, -1, []
+        return c_evaluate_board(state)
     
     # --- 3. Mate distance 剪枝 ---
     if alpha >= 10000:
-        return alpha, -1, []
+        return alpha
     if beta <= -10000:
-        return beta, -1, []
+        return beta
     
-    # --- 5. 获取排序后的走法列表 (C数组，零分配) ---
+    # --- 5. 获取走法排序 ---
     hash_move_encoded = -1
     if hash_entry != NULL and hash_entry.hash_key == state_hash:
         hash_move_encoded = hash_entry.best_move_encoded
@@ -384,46 +454,39 @@ cdef tuple _alpha_beta(CGameState state, int depth, float alpha, float beta, bin
     num_moves = c_get_ordered_moves(state, player_piece, hash_move_encoded, ordered_moves)
     
     if num_moves == 0:
-        return (-10000 if maximizing_player else 10000), -1, []
+        return -10000 if maximizing_player else 10000
     
     best_move_encoded = -1
-    best_line = []
     
     # --- 6. PVS + LMR 递归搜索 ---
     if maximizing_player:
         max_eval = -math.inf
         for i in range(num_moves):
-            if stop_event and stop_event.is_set():
-                break
-                
             move_encoded = ordered_moves[i]
             start_idx = move_encoded >> 8
             end_idx = move_encoded & 0xFF
             
             is_capture_move = (state.board_c[end_idx] != EMPTY)
-            
             old_hash = state.hash
             old_winner = state.winner
             captured = state.c_move_piece(start_idx, end_idx)
             
-            # 【P4优化】后期非吃子走法做浅搜索
             reduction = 0
             if i >= 5 and depth >= 3 and not is_capture_move:
                 reduction = 1
             
             if i == 0:
-                evaluation, _, line = _alpha_beta(state, depth - 1, alpha, beta, False, settings)
+                evaluation = _alpha_beta(state, depth - 1, alpha, beta, False, settings)
             else:
-                evaluation, _, line = _alpha_beta(state, depth - 1 - reduction, alpha, alpha + 1, False, settings)
+                evaluation = _alpha_beta(state, depth - 1 - reduction, alpha, alpha + 1, False, settings)
                 if alpha < evaluation < beta:
-                    evaluation, _, line = _alpha_beta(state, depth - 1, alpha, beta, False, settings)
+                    evaluation = _alpha_beta(state, depth - 1, alpha, beta, False, settings)
 
             state.c_unmake_piece(start_idx, end_idx, captured, old_hash, old_winner)
 
             if evaluation > max_eval:
                 max_eval = evaluation
                 best_move_encoded = move_encoded
-                best_line = [move_encoded] + line
             
             alpha = max(alpha, evaluation)
             if beta <= alpha:
@@ -432,15 +495,11 @@ cdef tuple _alpha_beta(CGameState state, int depth, float alpha, float beta, bin
     else: # minimizing_player
         min_eval = math.inf
         for i in range(num_moves):
-            if stop_event and stop_event.is_set():
-                break
-                
             move_encoded = ordered_moves[i]
             start_idx = move_encoded >> 8
             end_idx = move_encoded & 0xFF
                 
             is_capture_move = (state.board_c[end_idx] != EMPTY)
-            
             old_hash = state.hash
             old_winner = state.winner
             captured = state.c_move_piece(start_idx, end_idx)
@@ -450,18 +509,17 @@ cdef tuple _alpha_beta(CGameState state, int depth, float alpha, float beta, bin
                 reduction = 1
             
             if i == 0:
-                evaluation, _, line = _alpha_beta(state, depth - 1, alpha, beta, True, settings)
+                evaluation = _alpha_beta(state, depth - 1, alpha, beta, True, settings)
             else:
-                evaluation, _, line = _alpha_beta(state, depth - 1 - reduction, beta - 1, beta, True, settings)
+                evaluation = _alpha_beta(state, depth - 1 - reduction, beta - 1, beta, True, settings)
                 if alpha < evaluation < beta:
-                    evaluation, _, line = _alpha_beta(state, depth - 1, alpha, beta, True, settings)
+                    evaluation = _alpha_beta(state, depth - 1, alpha, beta, True, settings)
 
             state.c_unmake_piece(start_idx, end_idx, captured, old_hash, old_winner)
 
             if evaluation < min_eval:
                 min_eval = evaluation
                 best_move_encoded = move_encoded
-                best_line = [move_encoded] + line
 
             beta = min(beta, evaluation)
             if beta <= alpha:
@@ -475,7 +533,6 @@ cdef tuple _alpha_beta(CGameState state, int depth, float alpha, float beta, bin
     elif eval_score >= beta:
         flag = LOWER_BOUND
     
-    # 【Phase1优化】定长数组存储
     if transposition_table != NULL and best_move_encoded != -1:
         if hash_entry.depth <= depth or hash_entry.hash_key != state_hash:
             hash_entry.hash_key = state_hash
@@ -484,4 +541,4 @@ cdef tuple _alpha_beta(CGameState state, int depth, float alpha, float beta, bin
             hash_entry.flag = flag
             hash_entry.best_move_encoded = best_move_encoded
     
-    return eval_score, best_move_encoded, best_line
+    return eval_score

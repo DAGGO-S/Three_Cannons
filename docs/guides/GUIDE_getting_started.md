@@ -151,8 +151,9 @@ python setup.py build_ext --inplace
 
 ---
 
-## 相关文档
+## 文档导航区
 
-- [模块概览](REF_modules_overview.md) - 代码结构
-- [架构设计](REF_architecture.md) - 技术架构
-- [API 接口](REF_api_interfaces.md) - 开发参考
+- **对于玩家**: 若有和局或跳吃等规则疑问，请参阅 `docs/ref/REF_game_rules.md` (游戏规则)。
+- **对于二次开发/接手 AI**:
+  - `docs/ref/REF_architecture.md`: 涵盖全盘 MVC 解耦架构与数据流动向图，了解顶层设计。
+  - `docs/ref/REF_api_interfaces.md`: 包含核心系统 API 签名及数据对接范式。

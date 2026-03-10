@@ -1,7 +1,7 @@
 # own_game/game_logic.pyx
 # 【Phase3B】GameState 全面重构为 cdef class + C int[25] 数组
 
-# cython: profile=True
+# cython: profile=False
 from core.zobrist_hashing cimport ZobristHasher
 from core.zobrist_hashing import get_hasher, PIECE_TO_INDEX
 from libc.string cimport memcpy
@@ -89,6 +89,75 @@ cdef class GameState:
     def __reduce__(self):
         board_2d = [[self.board_c[r*5+c] for c in range(5)] for r in range(5)]
         return (GameState, (board_2d, self.current_player))
+
+    # ------------------------------------------------------------------
+    # FEN (Forsyth-Edwards Notation) 字符串支持
+    # ------------------------------------------------------------------
+    @classmethod
+    def from_fen(cls, str fen):
+        """从 FEN 字符串加载局面，格式示例: 'SSSSS/SSSSS/SSSSS/5/C1C1C S'"""
+        parts = fen.split(' ')
+        if len(parts) != 2:
+            raise ValueError(f"Invalid FEN format: {fen}")
+            
+        board_str, player_str = parts
+        
+        # 预构二维数组
+        cdef list board_2d = [[0]*5 for _ in range(5)]
+        cdef int r = 0
+        cdef int c = 0
+        cdef int count, i
+        
+        for char in board_str:
+            if char == '/':
+                r += 1
+                c = 0
+            elif char == 'C':
+                board_2d[r][c] = CANNON
+                c += 1
+            elif char == 'S':
+                board_2d[r][c] = SOLDIER
+                c += 1
+            elif char.isdigit():
+                count = int(char)
+                for i in range(count):
+                    board_2d[r][c] = EMPTY
+                    c += 1
+            else:
+                raise ValueError(f"Invalid FEN character: {char}")
+                
+        cdef int current_player = CANNON if player_str == 'C' else SOLDIER
+        return cls(board=board_2d, current_player=current_player)
+
+    def to_fen(self):
+        """将当前局面序列化为 FEN 字符串"""
+        cdef int r, c, piece, empty_count
+        cdef list fen_rows = []
+        cdef str row_str
+        
+        for r in range(5):
+            row_str = ""
+            empty_count = 0
+            for c in range(5):
+                piece = self.board_c[r * 5 + c]
+                if piece == EMPTY:
+                    empty_count += 1
+                else:
+                    if empty_count > 0:
+                        row_str += str(empty_count)
+                        empty_count = 0
+                    if piece == CANNON:
+                        row_str += 'C'
+                    elif piece == SOLDIER:
+                        row_str += 'S'
+            if empty_count > 0:
+                row_str += str(empty_count)
+            fen_rows.append(row_str)
+            
+        board_part = "/".join(fen_rows)
+        player_part = 'C' if self.current_player == CANNON else 'S'
+        
+        return f"{board_part} {player_part}"
 
     # ------------------------------------------------------------------
     # 走法生成

@@ -1,8 +1,0 @@
-# 项目进展流水 (Progress Log)
-
-| 时间                       | 事件 / 进度                                                                                                                                                                                                                        | 相关文件                                     |
-| :------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------- |
-| **Session 1 (2026/03/09)** | 启动 File-Based Planning。引入真实的 CProfile 数据测算，定位出影响 100万 NPS 冲击的最大毒瘤是 `evaluate_board` 内部的高阶数据类型分配 (`collections.deque`, `set`)，以及由 `get_valid_moves` 巨量抛出的 List 与 Tuple。            | `docs/findings.md`                           |
-| **Session 2 (2026/03/09)** | 决定实施“切断 QS（静默搜索），完全纯 C 化 evaluate_board 的打法”，重新将 planning-with-files 移入 docs 目录方便浏览。                                                                                                              | `docs/task_plan.md`, `CLAUDE.md`             |
-| **Session 3 (2026/03/09)** | 完成 Phase 1 & 2 的纯 C 化改造（评估函数去对象分配、走法生成传入 C 数组），NPS 成功爆发至 ~470k。经过评估，由于 Make/Unmake 风险过高且性能已达标，决定暂缓 1M NPS 的极限追求，转而着手恢复 QS（静默搜索）与更高优的启发式算法。    | `docs/PROJECT_STATUS.md`, `docs/findings.md` |
-| **Session 4 (2026/03/10)** | 对照 Zero-Allocation 重构引发的强只读边界（Tuple 机制）及目录级解耦（`src/`）造成的副作用，进行排雷修复。修复共计 37 个 `pytest` 用例（涉及 `game_io`, `mode_switching` 等外围拦截），达成 100% Pass 绿灯。标志 Task_01 彻底闭环。 | `tests/`, `src/io/game_io.py`                |

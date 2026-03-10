@@ -35,60 +35,61 @@ graph LR
 
 ## 核心设计哲学
 
-| 原则 | 说明 | 应用 |
-|:---|:---|:---|
-| **单一职责 (SRP)** | 每个类只做一件事 | `AIEngine` 只负责 AI 计算 |
-| **松耦合** | 模块间通过接口通信 | 组件通过回调函数交互 |
-| **数据驱动** | 单一事实来源 | `GameModel` 是唯一数据源 |
-| **异步设计** | 耗时操作不阻塞 UI | AI 计算在后台线程进行 |
-| **单向数据流** | Model → Controller → View | 禁止 View 直接修改 Model |
+| 原则               | 说明                      | 应用                      |
+| :----------------- | :------------------------ | :------------------------ |
+| **单一职责 (SRP)** | 每个类只做一件事          | `AIEngine` 只负责 AI 计算 |
+| **松耦合**         | 模块间通过接口通信        | 组件通过回调函数交互      |
+| **数据驱动**       | 单一事实来源              | `GameModel` 是唯一数据源  |
+| **异步设计**       | 耗时操作不阻塞 UI         | AI 计算在后台线程进行     |
+| **单向数据流**     | Model → Controller → View | 禁止 View 直接修改 Model  |
 
 ---
 
 ## 分层职责
 
-### 视图层 (View)
+### 视图层 (View: `src/view/`)
 
-**文件**: `gui.py`, `settings_dialog.py`
+**文件**: `main_window.py`, `dialogs.py` (原 `gui.py`, `settings_dialog.py`)
 
 **职责**:
-- 根据 Model 数据渲染 UI
-- 将用户输入事件**无逻辑地**转发给 Orchestrator
-- 不包含任何业务逻辑
+- 根据 Model 数据渲染 UI 界面。
+- 捕获用户鼠标/键盘事件并**无逻辑地**转发给 Orchestrator。
 
-**关键特性**:
-- "哑巴"视图：只负责显示和转发
-- 通过 `bind_event_handlers()` 接收事件处理器
-- 通过 `render(model)` 刷新界面
+**核心机制**:
+- 绝对的"哑巴"视图：不包含任何业务判断，不保存任何对局数据。
+- 依赖于顶层调用 `render(model)` 被动刷新。
 
-### 控制层 (Controller)
+### 控制层 (Controller: `src/controller/` & `src/ai/`)
 
-**文件**: `orchestrator.py`, `ai_engine.py`
+**文件**: `orchestrator.py`, `engine.py` (AI)
 
 #### GameOrchestrator
+整个 MVC 的中枢路由，负责：
+- 接收 View 派发的生事件。
+- 调校和验证状态后，写入 GameModel。
+- 根据模式切换（人机配置）调度 AI 或阻断操作。
+- 状态落地后主动呼叫 View 刷新。
 
-应用的"大脑"，负责：
-- 接收 View 的事件
-- 调用 Model 更新数据
-- 调用 AIEngine 进行计算
-- 通知 View 刷新
+#### AIEngine (`engine.py`)
+独立守护线程隔离管理器，负责：
+- 在不阻塞 GUI (`main_loop`) 的前提下发起底层 Cython 搜索求解。
+- 使用 `stop_event` 中断搜索树。
+- 通过 Thread-safe 的 Callbacks 将每层搜索进度通知给主视图。
 
-#### AIEngine
+### 模型层 (Model: `src/model/`)
 
-AI 计算管理器，负责：
-- 异步执行 AI 搜索
-- 通过回调返回结果和进度
-- 响应停止请求
-
-### 模型层 (Model)
-
-**文件**: `game_model.py`, `game_config.py`
+**文件**: `game_model.py`, `config.py`
 
 **职责**:
-- 维护游戏数据
-- 执行走法
-- 管理历史记录
-- 检测和棋
+- `game_model.py`: 充当“唯一数据来源”(Single Source of Truth)，持有一局游戏的生命周期大局，包含历史记录集合、选中状态。
+- `config.py`: 维护当前游戏全局设置（对战阵营、黑白名单、搜索深度阀值）。
+
+**边界判定**:
+- 任何人、任何模块对棋盘的篡改必须经由 `GameModel` 发出。且其对外界的 UI 及 AI 行为机制零感知。
+
+### 底层算法层 (Core: `core/*.pyx`)
+**核心组件**: `game_logic.pyx`(状态机与校验), `ai.pyx`(博弈树), `evaluation_logic.pyx` (启发评估)
+此层采取 Extreme C 化设计（Zero-Allocation）。在每次向其推入 `GameState` 数据时即被降维打散为 C 数组。它脱离 MVC 之上，仅为高算力的黑盒。
 
 **关键特性**:
 - 完全独立，对 UI 和 AI 无感知
@@ -183,8 +184,7 @@ sequenceDiagram
 
 ---
 
-## 相关文档
+## 参考文献与接口阅读指引
 
-- [模块概览](REF_modules_overview.md) - 模块列表和依赖
-- [API 接口](REF_api_interfaces.md) - 详细接口说明
-- [快速入门](GUIDE_getting_started.md) - 使用指南
+- **[API 交互契约](REF_api_interfaces.md)**: 对于新接手开发工作或外部调用的 Agent，请重点查阅此表。它涵盖了上述所有跨层调用的详细方法签名、入参出参与生命周期管理示例。
+- **[极速优化档案](REF_Zero_Allocation_Optimization.md)**: 若需修改 `core/` 下的 C 源码，请先查阅底层的零分配硬性约束。
