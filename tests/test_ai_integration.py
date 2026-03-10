@@ -8,7 +8,7 @@ import threading
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from ai_engine import AIEngine
+from src.ai.engine import AIEngine
 from core.game_logic import GameState
 
 class TestAiFullIntegration(unittest.TestCase):
@@ -29,7 +29,7 @@ class TestAiFullIntegration(unittest.TestCase):
         error_in_thread = None
         
         # 准备一个能捕获异常的回调
-        def on_complete_callback(best_move):
+        def on_complete_callback(best_move, stats=None):
             nonlocal error_in_thread
             # 这是一个简化的检查，真实代码中错误处理在worker内部
             # 但如果worker完全崩溃，这个回调可能不会被调用

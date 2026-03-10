@@ -182,19 +182,7 @@ def load_game() -> Optional[Tuple[GameState, List[Tuple[Tuple[int, int], Tuple[i
         moves = data['moves']
         
         # 创建初始状态
-        initial_state = GameState()
-        initial_state.board = initial_board
-        initial_state.current_player = current_player
-        # 重新计算士兵数量
-        soldier_count = 0
-        for row in initial_board:
-            for cell in row:
-                if cell == 1:  # SOLDIER
-                    soldier_count += 1
-        initial_state.soldier_count = soldier_count
-        # 重新检查胜负状态
-        initial_state._check_winner()
-        
+        initial_state = GameState(board=initial_board, current_player=current_player)
         # 返回元组
         return (initial_state, moves)
         

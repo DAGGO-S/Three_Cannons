@@ -8,9 +8,9 @@ from unittest.mock import MagicMock, call, patch
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from orchestrator import GameOrchestrator
-from game_model import GameModel
-from ai_engine import AIEngine
+from src.controller.orchestrator import GameOrchestrator
+from src.model.game_model import GameModel
+from src.ai.engine import AIEngine
 from core.game_logic import GameState
 
 class TestOrchestratorReplay(unittest.TestCase):  # 可以是一个新类 

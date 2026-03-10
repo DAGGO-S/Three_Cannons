@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_model import GameModel
+from src.model.game_model import GameModel
 from core.game_logic import GameState, CANNON, SOLDIER, EMPTY
 
 class TestGameModel(unittest.TestCase):

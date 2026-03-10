@@ -7,9 +7,9 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import tkinter as tk
-from game_model import GameModel
-from gui import GameGUI
-from orchestrator import GameOrchestrator
+from src.model.game_model import GameModel
+from src.view.main_window import GameGUI
+from src.controller.orchestrator import GameOrchestrator
 
 # 创建一个简单的AI引擎模拟类
 class MockAIEngine:

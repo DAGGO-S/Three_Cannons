@@ -6,10 +6,10 @@ import os
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from game_model import GameModel
-from orchestrator import GameOrchestrator
-from ai_engine import AIEngine
-from game_config import GameConfig
+from src.model.game_model import GameModel
+from src.controller.orchestrator import GameOrchestrator
+from src.ai.engine import AIEngine
+from src.model.config import GameConfig
 from core.game_logic import GameState
 
 
@@ -27,6 +27,7 @@ class TestModeSwitching(unittest.TestCase):
         # 创建AI引擎和配置
         self.ai_engine = AIEngine()
         self.config = GameConfig()
+        self.config.update({"cannon_player": "Human", "soldier_player": "Human"})
         
         # 创建Orchestrator，传入真实的model和模拟的view
         self.orchestrator = GameOrchestrator(self.model, self.mock_view, self.ai_engine, self.config)
@@ -69,8 +70,8 @@ class TestModeSwitching(unittest.TestCase):
         
         # Act: 模拟玩家在复盘时，走一步合法的兵棋
         # 在 S1 状态下，兵(2,1) 可以移动到空格 (1,1)
-        self.orchestrator.on_canvas_click(2, 0) # 选兵 (2,1)
-        self.orchestrator.on_canvas_click(1, 0) # >>> 修正！走子到合法的空格 (1,1) <<<
+        self.orchestrator.on_canvas_click(2, 0) # 选兵 (2,0)
+        self.orchestrator.on_canvas_click(3, 0) # >>> 修正！走子到合法的空格 (3,0) <<<
         
         # Assert: 验证走完新棋后切换到对战模式
         self.assertFalse(self.orchestrator.model.is_replay_mode)
@@ -85,7 +86,7 @@ class TestModeSwitching(unittest.TestCase):
 
         # Arrange: 确认初始状态下，悔棋按钮是禁用的
         # 我们需要访问按钮对象本身，所以我们用一个真实的 view
-        from gui import GameGUI
+        from src.view.main_window import GameGUI
         with patch('tkinter.Tk'): # 避免创建真实窗口
             real_view = GameGUI(self.model)
         orchestrator = GameOrchestrator(self.model, real_view, self.ai_engine, self.config)

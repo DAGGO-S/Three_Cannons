@@ -12,9 +12,9 @@ import os
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
-from game_model import GameModel
-from gui import GameGUI
-from orchestrator import GameOrchestrator
+from src.model.game_model import GameModel
+from src.view.main_window import GameGUI
+from src.controller.orchestrator import GameOrchestrator
 
 class MockAIEngine:
     """模拟AI引擎"""

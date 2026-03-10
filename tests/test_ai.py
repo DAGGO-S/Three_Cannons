@@ -13,7 +13,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.game_logic import GameState
-from ai_engine import AIEngine
+from src.ai.engine import AIEngine
 
 def on_complete_callback(best_move):
     """AI计算完成后的回调函数"""

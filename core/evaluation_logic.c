@@ -1601,7 +1601,8 @@ struct __pyx_obj_4core_10game_logic_GameState {
 
 struct __pyx_vtabstruct_4core_10game_logic_GameState {
   void (*_check_winner)(struct __pyx_obj_4core_10game_logic_GameState *);
-  struct __pyx_obj_4core_10game_logic_GameState *(*c_move_piece)(struct __pyx_obj_4core_10game_logic_GameState *, int, int);
+  int (*c_move_piece)(struct __pyx_obj_4core_10game_logic_GameState *, int, int);
+  void (*c_unmake_piece)(struct __pyx_obj_4core_10game_logic_GameState *, int, int, int, unsigned PY_LONG_LONG, int);
 };
 static struct __pyx_vtabstruct_4core_10game_logic_GameState *__pyx_vtabptr_4core_10game_logic_GameState;
 /* #### Code section: utility_code_proto ### */

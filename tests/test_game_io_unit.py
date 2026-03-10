@@ -7,9 +7,9 @@ from unittest.mock import patch, mock_open, MagicMock
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_io import save_game, load_game
+from src.io.game_io import save_game, load_game
 from core.game_logic import GameState, CANNON, SOLDIER, EMPTY
-from game_model import GameModel
+from src.model.game_model import GameModel
 
 class TestGameIO(unittest.TestCase):
     """测试GameIO模块的核心功能"""
@@ -25,9 +25,10 @@ class TestGameIO(unittest.TestCase):
         state1 = GameState()
         state2 = GameState()
         # 修改state2的棋盘以模拟移动
-        state2.board = [row[:] for row in state1.board]
-        state2.board[4][1] = EMPTY  # 移动炮
-        state2.board[2][1] = CANNON
+        custom_board = [list(row) for row in state1.board]
+        custom_board[4][1] = EMPTY  # 移动炮
+        custom_board[2][1] = CANNON
+        state2 = GameState(board=custom_board)
         self.test_model.move_history = [state1, state2]
         
         # 创建一些测试走法

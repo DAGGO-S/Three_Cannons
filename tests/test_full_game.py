@@ -11,9 +11,9 @@ import os
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_model import GameModel
+from src.model.game_model import GameModel
 from core.game_logic import GameState, CANNON, SOLDIER, EMPTY
-from game_io import _find_move_between_states
+from src.io.game_io import _find_move_between_states
 
 def test_full_game():
     """测试完整的游戏流程"""

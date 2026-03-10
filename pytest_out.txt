@@ -1,0 +1,132 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-8.4.2, pluggy-1.6.0
+rootdir: Z:\2-Lixinjie\temp_note\test\Three_Cannons
+plugins: anyio-4.12.0
+collected 14 items / 11 errors
+
+=================================== ERRORS ====================================
+______________________ ERROR collecting tests/test_ai.py ______________________
+ImportError while importing test module 'Z:\2-Lixinjie\temp_note\test\Three_Cannons\tests\test_ai.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_ai.py:16: in <module>
+    from ai_engine import AIEngine
+E   ModuleNotFoundError: No module named 'ai_engine'
+________________ ERROR collecting tests/test_ai_engine_unit.py ________________
+ImportError while importing test module 'Z:\2-Lixinjie\temp_note\test\Three_Cannons\tests\test_ai_engine_unit.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_ai_engine_unit.py:12: in <module>
+    from ai_engine import AIEngine
+E   ModuleNotFoundError: No module named 'ai_engine'
+________________ ERROR collecting tests/test_ai_integration.py ________________
+ImportError while importing test module 'Z:\2-Lixinjie\temp_note\test\Three_Cannons\tests\test_ai_integration.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_ai_integration.py:11: in <module>
+    from ai_engine import AIEngine
+E   ModuleNotFoundError: No module named 'ai_engine'
+__________________ ERROR collecting tests/test_full_game.py ___________________
+ImportError while importing test module 'Z:\2-Lixinjie\temp_note\test\Three_Cannons\tests\test_full_game.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_full_game.py:14: in <module>
+    from game_model import GameModel
+E   ModuleNotFoundError: No module named 'game_model'
+_____________________ ERROR collecting tests/test_game.py _____________________
+ImportError while importing test module 'Z:\2-Lixinjie\temp_note\test\Three_Cannons\tests\test_game.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Z:\2-Lixinjie\桌面临时笔记\test\own_game2\test_code\test_game.py:15: in <module>
+    ???
+E   ModuleNotFoundError: No module named 'game_model'
+_________________ ERROR collecting tests/test_game_io_unit.py _________________
+ImportError while importing test module 'Z:\2-Lixinjie\temp_note\test\Three_Cannons\tests\test_game_io_unit.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_game_io_unit.py:10: in <module>
+    from game_io import save_game, load_game
+E   ModuleNotFoundError: No module named 'game_io'
+__________________ ERROR collecting tests/test_game_model.py __________________
+ImportError while importing test module 'Z:\2-Lixinjie\temp_note\test\Three_Cannons\tests\test_game_model.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_game_model.py:9: in <module>
+    from game_model import GameModel
+E   ModuleNotFoundError: No module named 'game_model'
+__________________ ERROR collecting tests/test_load_game.py ___________________
+ImportError while importing test module 'Z:\2-Lixinjie\temp_note\test\Three_Cannons\tests\test_load_game.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_load_game.py:14: in <module>
+    from game_io import load_game
+E   ModuleNotFoundError: No module named 'game_io'
+________________ ERROR collecting tests/test_mode_switching.py ________________
+ImportError while importing test module 'Z:\2-Lixinjie\temp_note\test\Three_Cannons\tests\test_mode_switching.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Z:\2-Lixinjie\桌面临时笔记\test\own_game2\test_code\test_mode_switching.py:9: in <module>
+    ???
+E   ModuleNotFoundError: No module named 'game_model'
+_________________ ERROR collecting tests/test_orchestrator.py _________________
+ImportError while importing test module 'Z:\2-Lixinjie\temp_note\test\Three_Cannons\tests\test_orchestrator.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Z:\2-Lixinjie\桌面临时笔记\test\own_game2\test_code\test_orchestrator.py:10: in <module>
+    ???
+E   ModuleNotFoundError: No module named 'game_model'
+_____________ ERROR collecting tests/test_orchestrator_replay.py ______________
+ImportError while importing test module 'Z:\2-Lixinjie\temp_note\test\Three_Cannons\tests\test_orchestrator_replay.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Z:\2-Lixinjie\桌面临时笔记\test\own_game2\test_code\test_orchestrator_replay.py:11: in <module>
+    ???
+E   ModuleNotFoundError: No module named 'orchestrator'
+=========================== short test summary info ===========================
+ERROR tests/test_ai.py
+ERROR tests/test_ai_engine_unit.py
+ERROR tests/test_ai_integration.py
+ERROR tests/test_full_game.py
+ERROR tests/test_game.py
+ERROR tests/test_game_io_unit.py
+ERROR tests/test_game_model.py
+ERROR tests/test_load_game.py
+ERROR tests/test_mode_switching.py
+ERROR tests/test_orchestrator.py
+ERROR tests/test_orchestrator_replay.py
+!!!!!!!!!!!!!!!!!! Interrupted: 11 errors during collection !!!!!!!!!!!!!!!!!!!
+============================= 11 errors in 0.17s ==============================
+

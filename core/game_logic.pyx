@@ -231,32 +231,43 @@ cdef class GameState:
     # ------------------------------------------------------------------
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef GameState c_move_piece(self, int start_idx, int end_idx) noexcept:
+    cdef int c_move_piece(self, int start_idx, int end_idx) noexcept:
         cdef int piece = self.board_c[start_idx]
         cdef int captured_piece = self.board_c[end_idx]
         
-        cdef GameState new_state = GameState.__new__(GameState)
-        memcpy(new_state.board_c, self.board_c, 25 * sizeof(int))
+        self.board_c[end_idx]   = piece
+        self.board_c[start_idx] = EMPTY
         
-        new_state.board_c[end_idx]   = piece
-        new_state.board_c[start_idx] = EMPTY
-        
-        new_state.soldier_count = self.soldier_count
         if captured_piece == SOLDIER:
-            new_state.soldier_count -= 1
+            self.soldier_count -= 1
             
         cdef unsigned long long h = self.hash
         h = hasher.c_update_hash(h, start_idx // 5, start_idx % 5, end_idx // 5, end_idx % 5, piece, self.current_player)
         if captured_piece != EMPTY:
             h = hasher.c_remove_piece_hash(h, end_idx // 5, end_idx % 5, captured_piece)
         h = hasher.c_switch_turn_hash(h)
-        new_state.hash = h
+        self.hash = h
         
-        new_state.current_player = SOLDIER if self.current_player == CANNON else CANNON
-        new_state.winner = NO_WINNER
-        new_state._check_winner()
+        self.current_player = SOLDIER if self.current_player == CANNON else CANNON
+        self.winner = NO_WINNER
+        self._check_winner()
         
-        return new_state
+        return captured_piece
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef void c_unmake_piece(self, int start_idx, int end_idx, int captured_piece, unsigned long long old_hash, int old_winner) noexcept:
+        cdef int piece = self.board_c[end_idx]
+        
+        self.board_c[start_idx] = piece
+        self.board_c[end_idx]   = captured_piece
+        
+        if captured_piece == SOLDIER:
+            self.soldier_count += 1
+            
+        self.hash = old_hash
+        self.winner = old_winner
+        self.current_player = SOLDIER if self.current_player == CANNON else CANNON
 
 # ------------------------------------------------------------------
 # 【Phase 2 重构】纯 C 原生可排序走法生成 (零堆分配)
