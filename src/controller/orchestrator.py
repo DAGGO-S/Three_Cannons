@@ -30,7 +30,8 @@ class GameOrchestrator:
             on_last_move=self.on_last_move,
             on_save_game=self.on_save_game,
             on_load_game=self.on_load_game,
-            on_open_settings=self.on_open_settings
+            on_open_settings=self.on_open_settings,
+            on_open_editor=self.open_editor
         )
         self.update_view()
 
@@ -38,6 +39,29 @@ class GameOrchestrator:
         """处理窗口关闭事件"""
         save_transposition_table('ai_memory.pkl')
         self.view.destroy()
+
+    def open_editor(self):
+        """挂载前端的可视化 FEN 编辑器"""
+        from src.view.editor_dialog import EditorDialog
+        from core.game_logic import GameState
+        
+        def on_confirm(fen_str):
+            try:
+                state = GameState.from_fen(fen_str)
+                self.model.reset()
+                self.model.game_state = state
+                self.model.move_history = [state]
+                self.model.position_counts.clear()
+                self.model.position_counts[state.hash] = 1
+                
+                # 终止任何可能运行的代码计算
+                self.ai.stop_calculation() 
+                self.update_view()
+                self.check_for_ai_turn()
+            except Exception:
+                pass # 报错已被 Dialog 前端承接展示
+                
+        EditorDialog(self.view, self.model.game_state, on_confirm)
 
     def update_view(self):
         """通知View使用Model的最新数据进行刷新"""

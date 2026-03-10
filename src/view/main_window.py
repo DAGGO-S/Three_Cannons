@@ -141,6 +141,8 @@ class GameGUI(tk.Tk):
         self.game_menu.add_command(label="新游戏")  # 先创建，不绑定command
         self.game_menu.add_separator()
         self.game_menu.add_command(label="设置")  # 先创建
+        self.game_menu.add_command(label="操作说明") # 占位
+        self.game_menu.add_command(label="残局编辑器 (FEN)") # 先创建
         self.game_menu.add_separator()
         self.game_menu.add_command(label="退出", command=self.quit)
         
@@ -226,6 +228,8 @@ class GameGUI(tk.Tk):
             self.game_menu.entryconfig("新游戏", command=handlers['on_new_game'])
         if 'on_open_settings' in handlers:
             self.game_menu.entryconfig("设置", command=handlers['on_open_settings'])
+        if 'on_open_editor' in handlers:
+            self.game_menu.entryconfig("残局编辑器 (FEN)", command=handlers['on_open_editor'])
         
         # 确保复盘按钮被正确绑定
         if 'on_first_move' in handlers:

@@ -5,8 +5,8 @@ class TestFENSupport:
     """微观测试防线第一关：FEN 互转的绝对闭环验证"""
 
     def test_fen_initial_board(self):
-        # 测试三炮十五兵标准开盘图
-        fen = "SSSSS/SSSSS/SSSSS/5/C1C1C S"
+        # 测试三炮十五兵标准开盘图，小写为规范编码
+        fen = "sssss/sssss/sssss/5/c1c1c s"
         state = GameState.from_fen(fen)
         
         assert state.current_player == SOLDIER
@@ -16,8 +16,8 @@ class TestFENSupport:
         assert state.to_fen() == fen
 
     def test_fen_midgame(self):
-        # 稀疏残局：只有三个兵和两个炮
-        fen = "S4/1S3/4S/1C3/4C C"
+        # 稀疏残局：只有三个兵和两个炮，小写为规范编码
+        fen = "s4/1s3/4s/1c3/4c c"
         state = GameState.from_fen(fen)
         
         assert state.current_player == CANNON
@@ -32,7 +32,7 @@ class TestFENSupport:
 
     def test_fen_invalid_character(self):
         with pytest.raises(ValueError, match="Invalid FEN character"):
-            GameState.from_fen("SSSSS/X/SSSSS/5/C1C1C S")
+            GameState.from_fen("sssss/x/sssss/5/c1c1c s")
 
     def test_baseline_eval(self):
         """

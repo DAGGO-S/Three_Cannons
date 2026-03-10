@@ -1,0 +1,13 @@
+{"fen": "4s/ss3/sss2/csss1/c1cs1 c", "eval": -1545.0, "game_outcome": 0.0}
+{"fen": "4s/ss3/sss2/csss1/1ccs1 s", "eval": -1045.0, "game_outcome": 0.0}
+{"fen": "5/ss2s/sss2/csss1/1ccs1 c", "eval": -1045.0, "game_outcome": 0.0}
+{"fen": "5/ss2s/sss2/csss1/c1cs1 s", "eval": -1545.0, "game_outcome": 0.0}
+{"fen": "5/ss2s/sss2/c1ss1/cscs1 c", "eval": -1000.0, "game_outcome": 0.0}
+{"fen": "5/ss2s/sss2/2cs1/cscs1 s", "eval": -440.0, "game_outcome": 0.0}
+{"fen": "5/ss2s/s1s2/1scs1/cscs1 c", "eval": -890.0, "game_outcome": 0.0}
+{"fen": "5/ss2s/c1s2/1scs1/1scs1 s", "eval": -415.0, "game_outcome": 0.0}
+{"fen": "5/s3s/css2/1scs1/1scs1 c", "eval": -885.0, "game_outcome": 0.0}
+{"fen": "5/s3s/1ss2/cscs1/1scs1 s", "eval": -825.0, "game_outcome": 0.0}
+{"fen": "5/4s/sss2/cscs1/1scs1 c", "eval": -1360.0, "game_outcome": 0.0}
+{"fen": "5/4s/sss2/1scs1/cscs1 s", "eval": -830.0, "game_outcome": 0.0}
+{"fen": "5/4s/1ss2/sscs1/cscs1 c", "eval": -10000.0, "game_outcome": 0.0}

@@ -54,6 +54,10 @@ class GameModel:
         if self.position_counts[self.game_state.hash] >= 3: 
             # GameModel 负责设置和棋状态 
             self.game_state.winner = DRAW 
+
+        if self.game_state.winner != -1:
+            from src.io.game_io import auto_save_game_end
+            auto_save_game_end(self)
             
         return True 
  

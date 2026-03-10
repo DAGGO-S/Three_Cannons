@@ -74,10 +74,10 @@ def save_game(model: GameModel) -> str:
     5. 构建要保存的字典 `game_data`，其结构必须如下：
        {
          "metadata": {
-           "save_time": "YYYY-MM-DD HH:MM:SS"
+           "save_time": "YYYY-MM-DD HH:MM:SS",
+           "format": "fen_v1"
          },
-         "initial_board": initial_state.board,
-         "current_player": initial_state.current_player,
+         "initial_fen": initial_state.to_fen(),
          "moves": moves
        }
     6. 调用 `filedialog.asksaveasfilename` 弹出"另存为"对话框，获取用户选择的文件路径 `filepath`。
@@ -108,13 +108,13 @@ def save_game(model: GameModel) -> str:
         if move:
             moves.append(move)
     
-    # 构建要保存的数据，符合指定的JSON格式
+    # 构建要保存的数据，符合指定的 FEN 简化格式
     game_data = {
         "metadata": {
-            "save_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "save_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "format": "fen_v1"
         },
-        "initial_board": initial_state.board,
-        "current_player": initial_state.current_player,
+        "initial_fen": initial_state.to_fen(),
         "moves": moves
     }
     
@@ -149,10 +149,10 @@ def load_game() -> Optional[Tuple[GameState, List[Tuple[Tuple[int, int], Tuple[i
     3. 使用 `try...except` 块来读取和解析文件：
        a. `with open(filepath, 'r', encoding='utf-8') as f:`
        b. `data = json.load(f)`
-    4. 验证 `data` 字典是否包含必须的键: `'initial_board'`, `'current_player'`, `'moves'`。
-       - 如果有任何一个键缺失，则抛出 `ValueError("棋谱文件格式不正确")`。
-    5. 从 `data` 中提取 `initial_board`, `current_player`, `moves`。
-    6. 创建一个新的 `GameState` 实例 `initial_state`，使用 `initial_board` 和 `current_player`进行初始化。
+    4. 验证 `data` 字典是否包含必须的键: `'initial_fen'`, `'moves'`。
+       - 如果有任何一个键缺失，则考虑是否兼容旧版或直接抛出 `ValueError("棋谱文件格式不正确")`。
+    5. 从 `data` 中提取 `initial_fen`, `moves`。
+    6. 使用 `GameState.from_fen(initial_fen)` 创建初始状态。
     7. 返回元组 `(initial_state, moves)`。
     8. 在 `except` 块中捕获 `FileNotFoundError`, `json.JSONDecodeError`, `ValueError` 等异常。在发生任何错误时，都应（可选地打印错误日志后）返回 `None`。
     """
@@ -170,22 +170,72 @@ def load_game() -> Optional[Tuple[GameState, List[Tuple[Tuple[int, int], Tuple[i
         with open(filepath, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
-        # 验证必需的键
-        required_keys = ['initial_board', 'current_player', 'moves']
-        for key in required_keys:
-            if key not in data:
+        # 验证必需的键并兼容旧版
+        if 'initial_fen' in data:
+            if 'moves' not in data:
                 raise ValueError("棋谱文件格式不正确")
+            initial_state = GameState.from_fen(data['initial_fen'])
+            moves = data['moves']
+        else:
+            required_keys = ['initial_board', 'current_player', 'moves']
+            for key in required_keys:
+                if key not in data:
+                    raise ValueError("棋谱文件格式不正确")
+            initial_board = data['initial_board']
+            current_player = data['current_player']
+            moves = data['moves']
+            initial_state = GameState(board=initial_board, current_player=current_player)
         
-        # 提取数据
-        initial_board = data['initial_board']
-        current_player = data['current_player']
-        moves = data['moves']
-        
-        # 创建初始状态
-        initial_state = GameState(board=initial_board, current_player=current_player)
         # 返回元组
         return (initial_state, moves)
         
-    except (FileNotFoundError, json.JSONDecodeError, ValueError) as e:
+    except (FileNotFoundError, json.JSONDecodeError, ValueError, KeyError) as e:
         # 发生错误时返回None
         return None
+
+def export_as_jsonl(history: List[GameState], winner: int, filepath: str) -> None:
+    """
+    将一局棋局未托/中间/终局的全量局面写入 JSONL 文件。
+
+    字段规范：
+      - fen        : 标准 FEN 字符串，表示该局面
+      - eval       : 静态评估分，炮方视角正方向
+      - game_outcome: 这一局的最终归属（回溯性标签）
+                     1.0 = 炮方赢  |  0.0 = 兵方赢  |  0.5 = 和棋
+                     与局面进行中否无关，全局内所有局面共享同一値。
+    """
+    from core.game_logic import CANNON, SOLDIER, DRAW
+    from core.evaluation_logic import evaluate_board
+
+    if winner == CANNON:
+        outcome = 1.0
+    elif winner == SOLDIER:
+        outcome = 0.0
+    else:
+        outcome = 0.5
+
+    lines = []
+    for state in history:
+        eval_result = evaluate_board(state)
+        eval_score = float(eval_result[0] if isinstance(eval_result, tuple) else eval_result)
+
+        lines.append(json.dumps({
+            "fen": state.to_fen(),
+            "eval": eval_score,
+            "game_outcome": outcome
+        }))
+
+    with open(filepath, 'a', encoding='utf-8') as f:
+        f.write('\n'.join(lines) + '\n')
+
+def auto_save_game_end(model: GameModel) -> None:
+    """被 GameModel 钩子调用，在检测到终局时自动落盘 JSONL 历史"""
+    import os
+    if model.game_state.winner == -1 or len(model.move_history) <= 1:
+        return
+    
+    save_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data', 'game_history', 'auto_save')
+    os.makedirs(save_dir, exist_ok=True)
+    filename = f"autosave_{datetime.datetime.now().strftime('%Y%m%d')}.jsonl"
+    filepath = os.path.join(save_dir, filename)
+    export_as_jsonl(model.move_history, model.game_state.winner, filepath)

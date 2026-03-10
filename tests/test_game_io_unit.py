@@ -64,8 +64,8 @@ class TestGameIO(unittest.TestCase):
         # 验证game_data结构和内容（符合新的JSON格式）
         self.assertIn('metadata', game_data)
         self.assertIn('save_time', game_data['metadata'])
-        self.assertIn('initial_board', game_data)
-        self.assertIn('current_player', game_data)
+        self.assertIn('initial_fen', game_data)
+        self.assertIn('moves', game_data)
         self.assertIn('moves', game_data)
         self.assertEqual(len(game_data['moves']), 1)  # 应该有一个移动
     
@@ -98,7 +98,7 @@ class TestGameIO(unittest.TestCase):
         self.assertEqual(result, "没有走法，无法保存棋谱。")
     
     @patch('tkinter.filedialog.askopenfilename')
-    @patch('builtins.open', new_callable=mock_open, read_data='{"metadata": {"save_time": "2025-01-01 12:00:00"}, "initial_board": [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 2, 0, 0]], "current_player": 1, "moves": [[[0, 0], [1, 1]]]}')
+    @patch('builtins.open', new_callable=mock_open, read_data='{"metadata": {"save_time": "2025-01-01 12:00:00"}, "initial_fen": "sssss/sssss/sssss/5/1ccc1 c", "moves": [[[0, 0], [1, 1]]]}')
     def test_load_game_success(self, mock_file, mock_filedialog):
         """测试成功加载游戏"""
         # 模拟filedialog.askopenfilename返回一个虚拟路径
@@ -132,7 +132,7 @@ class TestGameIO(unittest.TestCase):
         self.assertIsNone(result)
     
     @patch('tkinter.filedialog.askopenfilename')
-    @patch('builtins.open', new_callable=mock_open, read_data='{"metadata": {"save_time": "2025-01-01 12:00:00"}, "initial_board": [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 2, 0, 0]], "current_player": 1}')
+    @patch('builtins.open', new_callable=mock_open, read_data='{"metadata": {"save_time": "2025-01-01 12:00:00"}, "initial_fen": "sssss/sssss/sssss/5/1ccc1 c"}')
     def test_load_game_missing_keys(self, mock_file, mock_filedialog):
         """测试加载失败 - 缺少键"""
         print("测试加载失败 - 缺少键...")

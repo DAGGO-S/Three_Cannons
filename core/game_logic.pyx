@@ -95,7 +95,7 @@ cdef class GameState:
     # ------------------------------------------------------------------
     @classmethod
     def from_fen(cls, str fen):
-        """从 FEN 字符串加载局面，格式示例: 'SSSSS/SSSSS/SSSSS/5/C1C1C S'"""
+        """从 FEN 字符串加载局面，格式示例: 'sssss/sssss/sssss/5/1ccc1 c'"""
         parts = fen.split(' ')
         if len(parts) != 2:
             raise ValueError(f"Invalid FEN format: {fen}")
@@ -112,10 +112,10 @@ cdef class GameState:
             if char == '/':
                 r += 1
                 c = 0
-            elif char == 'C':
+            elif char == 'c' or char == 'C':
                 board_2d[r][c] = CANNON
                 c += 1
-            elif char == 'S':
+            elif char == 's' or char == 'S':
                 board_2d[r][c] = SOLDIER
                 c += 1
             elif char.isdigit():
@@ -126,7 +126,7 @@ cdef class GameState:
             else:
                 raise ValueError(f"Invalid FEN character: {char}")
                 
-        cdef int current_player = CANNON if player_str == 'C' else SOLDIER
+        cdef int current_player = CANNON if player_str.lower() == 'c' else SOLDIER
         return cls(board=board_2d, current_player=current_player)
 
     def to_fen(self):
@@ -147,15 +147,15 @@ cdef class GameState:
                         row_str += str(empty_count)
                         empty_count = 0
                     if piece == CANNON:
-                        row_str += 'C'
+                        row_str += 'c'
                     elif piece == SOLDIER:
-                        row_str += 'S'
+                        row_str += 's'
             if empty_count > 0:
                 row_str += str(empty_count)
             fen_rows.append(row_str)
             
         board_part = "/".join(fen_rows)
-        player_part = 'C' if self.current_player == CANNON else 'S'
+        player_part = 'c' if self.current_player == CANNON else 's'
         
         return f"{board_part} {player_part}"
 
