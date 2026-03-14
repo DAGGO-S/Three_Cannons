@@ -35,7 +35,13 @@ cdef class ZobristHasher:
                        for _ in range(self.cols)] for _ in range(self.rows)]
         
         # 填充随机数
+        # 【重要修复】必须固定随机数种子，否则无法持久化到磁盘或者供其它进程使用
         cdef unsigned long long val
+        
+        # 保存当前状态，设置固定种子生成确定性表，随后还原，避免污染全局随机数生成
+        state_backup = random.getstate()
+        random.seed(123456789)
+        
         for r in range(self.rows):
             for c in range(self.cols):
                 for p in range(num_piece_types):
@@ -44,6 +50,7 @@ cdef class ZobristHasher:
                     self.table_c[r * 5 + c][p] = val
         
         self.turn_key = random.getrandbits(64)
+        random.setstate(state_backup)
         
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -62,7 +69,7 @@ cdef class ZobristHasher:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef unsigned long long c_update_hash(self, unsigned long long old_hash, int start_r, int start_c, int end_r, int end_c, int piece_type, int current_player):
+    cdef unsigned long long c_update_hash(self, unsigned long long old_hash, int start_r, int start_c, int end_r, int end_c, int piece_type):
         cdef unsigned long long new_hash = old_hash
         cdef int start_idx = start_r * 5 + start_c
         cdef int end_idx = end_r * 5 + end_c
@@ -71,8 +78,6 @@ cdef class ZobristHasher:
         new_hash ^= self.table_c[start_idx][piece_index]
         new_hash ^= self.table_c[end_idx][piece_index]
         
-        if current_player == CANNON:
-            new_hash ^= self.turn_key
         return new_hash
 
     @cython.boundscheck(False)
@@ -108,7 +113,7 @@ cdef class ZobristHasher:
     
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    def update_hash(self, unsigned long long old_hash, tuple move, int piece_type, int current_player):
+    def update_hash(self, unsigned long long old_hash, tuple move, int piece_type):
         """
         增量更新哈希值，比从头计算更快
         move: (from_row, from_col, to_row, to_col)
@@ -127,10 +132,6 @@ cdef class ZobristHasher:
         # 添加到新位置
         new_hash ^= self.table[to_row][to_col][piece_index]
         
-        # 如果是炮方回合，需要考虑回合键
-        if current_player == CANNON:
-            new_hash ^= self.turn_key
-            
         return new_hash
     
     @cython.boundscheck(False)

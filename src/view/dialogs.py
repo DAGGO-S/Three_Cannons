@@ -25,9 +25,9 @@ class SettingsDialog(tk.Toplevel):
         ai_frame = ttk.LabelFrame(self, text="AI 强度设置")
         ai_frame.pack(padx=10, pady=5, fill="x")
         
-        ttk.Label(ai_frame, text="最大深度 (2-15):").grid(row=0, column=0, sticky="w", padx=5, pady=2)
+        ttk.Label(ai_frame, text="最大深度 (2-20):").grid(row=0, column=0, sticky="w", padx=5, pady=2)
         self.depth_var = tk.IntVar(value=int(current_settings["depth"]), master=self)
-        ttk.Spinbox(ai_frame, from_=2, to=15, textvariable=self.depth_var, width=5).grid(row=0, column=1, sticky="w")
+        ttk.Spinbox(ai_frame, from_=2, to=20, textvariable=self.depth_var, width=5).grid(row=0, column=1, sticky="w")
 
         ttk.Label(ai_frame, text="最长思考时间 (秒):").grid(row=0, column=2, sticky="w", padx=5, pady=2)
         self.time_limit_var = tk.DoubleVar(value=float(current_settings["time_limit"]), master=self)

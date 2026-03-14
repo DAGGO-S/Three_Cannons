@@ -62,6 +62,32 @@ def load_transposition_table(filepath):
     """加载置换表（暂不读取 C 级别指针内存块）"""
     pass
 
+# --- 残局表 (Tablebases) ---
+cdef dict tablebase_cache = {}
+cdef bint tb_loaded = False
+
+def init_tablebases():
+    global tablebase_cache, tb_loaded
+    if tb_loaded:
+        return
+        
+    tb_loaded = True
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    tb_dir = os.path.join(root, 'data', 'tablebase')
+    if not os.path.exists(tb_dir):
+        return
+        
+    loaded_files = 0
+    for f in os.listdir(tb_dir):
+        if f.endswith('.pkl'):
+            with open(os.path.join(tb_dir, f), 'rb') as fp:
+                data = pickle.load(fp)
+                tablebase_cache.update(data)
+                loaded_files += 1
+                
+    if loaded_files > 0:
+        print(f"[*] 成功挂载 {loaded_files} 个残局库文件，内存预热 {len(tablebase_cache)} 个终极必胜节点。")
+
 from core.game_logic cimport c_get_ordered_moves
 
 # --- 内部 C 级辅助函数（无需 _get_ordered_moves 了，直接用底层的 c_get_ordered_moves）---
@@ -231,6 +257,7 @@ def find_best_move_iterative_deepening(CGameState state, dict settings, bint is_
     # 【Phase1优化】定长数组无需清理，旧条目自动被覆盖
     # 【Phase4优化】清空评估缓存，防止无限增长和 hash 碰撞
     clear_evaluation_caches()
+    init_tablebases()
     
     start_time = time.time()
     best_move_so_far = None
@@ -260,6 +287,66 @@ def find_best_move_iterative_deepening(CGameState state, dict settings, bint is_
     # 用于存储根节点每个子走法的最佳分数 {move: score}
     # 这样可以在GUI上显示每个走法的评价
     root_moves_stats = {} 
+
+    # ====================================================================
+    # ★★★ Tablebase 直接选子（绕过 Alpha-Beta 的分数扁平化缺陷）★★★
+    # 当根节点在残局库覆盖区时，不走 Alpha-Beta，直接 1-ply 查表选最优 DTM。
+    # 这保证了每一步都向真正的绝杀方向推进，DTM 单调递减。
+    # ====================================================================
+    if state.soldier_count <= 3 and tablebase_cache:
+        if state.hash in tablebase_cache:
+            num_moves = c_get_ordered_moves(state, player_piece, -1, ordered_moves_c)
+            
+            tb_best_move_enc = -1
+            tb_best_score = -999999.0 if is_maximizing else 999999.0
+            tb_stats = {}
+            
+            for i in range(num_moves):
+                move_encoded = ordered_moves_c[i]
+                start_idx = move_encoded >> 8
+                end_idx = move_encoded & 0xFF
+                
+                old_hash = state.hash
+                old_winner = state.winner
+                captured = state.c_move_piece(start_idx, end_idx)
+                
+                child_score = 0.0
+                if state.winner != -1:
+                    child_score = 10000.0 if state.winner == CANNON else -10000.0
+                elif state.hash in tablebase_cache:
+                    tb_entry = tablebase_cache[state.hash]
+                    tb_val = tb_entry[0]
+                    tb_dtm = tb_entry[1]
+                    if tb_val == 1:
+                        child_score = 10000.0 - (1.0 * state.soldier_count * 100) - (1.0 * tb_dtm)
+                    elif tb_val == -1:
+                        child_score = -10000.0 + (1.0 * state.soldier_count * 100) + (1.0 * tb_dtm)
+                else:
+                    child_score = 1.0 * c_evaluate_board(state)
+                
+                state.c_unmake_piece(start_idx, end_idx, captured, old_hash, old_winner)
+                
+                tb_stats[move_encoded] = child_score
+                
+                if is_maximizing:
+                    if child_score > tb_best_score:
+                        tb_best_score = child_score
+                        tb_best_move_enc = move_encoded
+                else:
+                    if child_score < tb_best_score:
+                        tb_best_score = child_score
+                        tb_best_move_enc = move_encoded
+            
+            if tb_best_move_enc != -1:
+                m = tb_best_move_enc
+                final_move = (((m>>8)//5, (m>>8)%5), ((m&0xFF)//5, (m&0xFF)%5))
+                
+                if progress_callback:
+                    decoded_stats = {(((mv>>8)//5, (mv>>8)%5), ((mv&0xFF)//5, (mv&0xFF)%5)): s for mv, s in tb_stats.items()}
+                    progress_callback(1, tb_best_score, final_move, [final_move], decoded_stats)
+                
+                return final_move
+    # ====================================================================
 
     for depth in range(1, max_depth + 1):
         # 检查是否应该提前终止 (更精确的时间控制)
@@ -435,6 +522,22 @@ cdef float _alpha_beta(CGameState state, int depth, float alpha, float beta, bin
     # --- 2. 终止条件 ---
     if state.winner != -1:
         return 10000 if state.winner == CANNON else -10000
+        
+    # --- 2.5 残局库短路拦截 (Tablebase Probing) ---
+    cdef tuple tb_entry
+    cdef int val = 0
+    cdef int dtm = 0
+    if state.soldier_count <= 3:
+        if state_hash in tablebase_cache:
+            tb_entry = tablebase_cache[state_hash]
+            val = tb_entry[0]  # TB_CANNON_WIN = 1, TB_SOLDIER_WIN = -1
+            dtm = tb_entry[1]
+            if val == 1:
+                return 10000 - (state.soldier_count * 100) - dtm
+            elif val == -1:
+                return -10000 - (state.soldier_count * 100) + dtm
+            else:
+                return 0
     
     # 待未来启用 QS 的地方，目前直接测基分
     if depth == 0:

@@ -30,6 +30,18 @@ from core.game_logic import GameState, CANNON, SOLDIER, DRAW, EMPTY
 from core.evaluation_logic import evaluate_board
 from core.ai import find_best_move_iterative_deepening, clear_transposition_table
 
+# ── 默认配置（直接在这里改，无需记命令行参数）──────────────────────────────
+CONFIG = {
+    "games":         10000,   # 目标局数
+    "depth_cannon":  6,       # 炮方搜索深度（建议 >= 兵方 以减小先天劣势）
+    "depth_soldier": 6,       # 兵方搜索深度
+    "epsilon":       0.15,    # 随机走棋概率（0=纯 AI，1=纯随机）
+    "output":        "data/selfplay/run1.jsonl",  # 固定输出文件，支持断点续跑
+    "max_moves":     150,     # 单局最大步数，超出按和棋处理
+}
+# ────────────────────────────────────────────────────────────────────────────
+
+
 # ── 断点文件 ─────────────────────────────────────────────────────────────────
 
 CHECKPOINT_SUFFIX = ".checkpoint.json"
@@ -96,14 +108,24 @@ def ai_choose_move(state, depth, epsilon, pos_counts):
     return move if move else random.choice(all_moves)
 
 
-def play_one_game(depth_cannon, depth_soldier, epsilon, max_moves=200):
+def play_one_game(depth_cannon, depth_soldier, epsilon, max_moves=150):
+    """
+    进行一局自对弈。max_moves 超出按和棋处理。
+    胜负判定由引擎 GameState._check_winner() 统一负责。
+    """
     state = GameState()
     history = [state]
     pos_counts = collections.Counter()
     pos_counts[state.hash] += 1
 
     for _ in range(max_moves):
+        # 如果引擎自然结束
         if state.winner != -1:
+            break
+            
+        # 训练加速：兵数量 <= 4 视为炮方已获胜（残局裁定）
+        if state.soldier_count <= 4:
+            state.winner = CANNON
             break
 
         # 根据当前行棋方选择深度
@@ -159,26 +181,21 @@ def main():
   断点续距   : python scripts/self_play_generator.py --output data/selfplay/run1.jsonl
         """
     )
-    parser.add_argument('--games',         type=int,   default=10000, help='目标总局数 (默认 10000)')
-    parser.add_argument('--depth-cannon',  type=int,   default=8,     help='炮方搜索深度 (默认 8)')
-    parser.add_argument('--depth-soldier', type=int,   default=6,     help='兵方搜索深度 (默认 6)')
-    parser.add_argument('--epsilon',       type=float, default=0.15,  help='随机走棋概率 (默认 0.15)')
-    parser.add_argument('--output',        type=str,   default='',    help='输出 JSONL 路径（不指定则自动生成）')
+    parser.add_argument('--games',         type=int,   default=CONFIG["games"],         help=f'目标总局数 (默认 {CONFIG["games"]})')
+    parser.add_argument('--depth-cannon',  type=int,   default=CONFIG["depth_cannon"],  help=f'炮方搜索深度 (默认 {CONFIG["depth_cannon"]})')
+    parser.add_argument('--depth-soldier', type=int,   default=CONFIG["depth_soldier"], help=f'兵方搜索深度 (默认 {CONFIG["depth_soldier"]})')
+    parser.add_argument('--epsilon',       type=float, default=CONFIG["epsilon"],       help=f'随机走棋概率 (默认 {CONFIG["epsilon"]})')
+    parser.add_argument('--output',        type=str,   default=CONFIG["output"],        help=f'输出 JSONL 路径 (默认 {CONFIG["output"]})')
     args = parser.parse_args()
 
     dc = args.depth_cannon
     ds = args.depth_soldier
 
-    # 输出路径
-    if args.output:
-        out_path = args.output
-        os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
-    else:
-        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        out_dir = os.path.join(root, 'data', 'selfplay')
-        os.makedirs(out_dir, exist_ok=True)
-        stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        out_path = os.path.join(out_dir, f'selfplay_{stamp}.jsonl')
+    # 输出路径：相对路径以项目根目录为基准
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    out_path = args.output if os.path.isabs(args.output) else os.path.join(root, args.output)
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+
 
     # 断点续跑
     cp = load_checkpoint(out_path)
@@ -201,7 +218,10 @@ def main():
 
     for game_idx in range(start_game, args.games + 1):
         t0 = time.time()
-        history, winner = play_one_game(dc, ds, args.epsilon)
+        history, winner = play_one_game(
+            dc, ds, args.epsilon,
+            max_moves=CONFIG["max_moves"]
+        )
         elapsed = time.time() - t0
 
         export_game_to_jsonl(history, winner, out_path)

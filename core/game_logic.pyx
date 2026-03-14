@@ -249,7 +249,7 @@ cdef class GameState:
 
         # 增量更新哈希（无 Python 调用的纯 C XOR）
         cdef unsigned long long h = self.hash
-        h = hasher.c_update_hash(h, start_r, start_c, end_r, end_c, piece, self.current_player)
+        h = hasher.c_update_hash(h, start_r, start_c, end_r, end_c, piece)
         if captured_piece != EMPTY:
             h = hasher.c_remove_piece_hash(h, end_r, end_c, captured_piece)
         h = hasher.c_switch_turn_hash(h)
@@ -274,12 +274,59 @@ cdef class GameState:
         return new_state
 
     # ------------------------------------------------------------------
+    # 对称性支持 (D4 对称群)
+    # ------------------------------------------------------------------
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    def get_canonical_hash(self):
+        """
+        计算状态的规范化哈希值。
+        规范化定义为 8 个对称变换（4个旋转 + 4个镜像）中哈希值的最小值。
+        """
+        cdef unsigned long long min_h = self.hash
+        cdef int[25] sym_board
+        cdef int r, c, i
+        cdef unsigned long long cur_h
+        
+        # 预定义 8 种对称变换的索引映射 (5x5)
+        # 1. 原始: (r, c) -> r*5 + c
+        # 2. 水平翻转: (r, c) -> r*5 + (4-c)
+        # 3. 垂直翻转: (r, c) -> (4-r)*5 + c
+        # 4. 旋转 180: (r, c) -> (4-r)*5 + (4-c)
+        # 5. 转置 (主对角线镜像): (r, c) -> c*5 + r
+        # 6. 副对角线镜像: (r, c) -> (4-c)*5 + (4-r)
+        # 7. 旋转 90 (顺时针): (r, c) -> c*5 + (4-r)
+        # 8. 旋转 270 (顺时针): (r, c) -> (4-c)*5 + r
+        
+        # 对应变换列表
+        cdef int transforms[7][25]
+        for r in range(5):
+            for c in range(5):
+                i = r * 5 + c
+                transforms[0][r*5 + (4-c)] = i # H Flip
+                transforms[1][(4-r)*5 + c] = i # V Flip
+                transforms[2][(4-r)*5 + (4-c)] = i # 180
+                transforms[3][c*5 + r] = i # Transpose
+                transforms[4][(4-c)*5 + (4-r)] = i # Anti-Diagonal Flip
+                transforms[5][c*5 + (4-r)] = i # 90
+                transforms[6][(4-c)*5 + r] = i # 270
+        
+        for k in range(7):
+            for i in range(25):
+                sym_board[i] = self.board_c[transforms[k][i]]
+            cur_h = hasher.c_compute_hash(sym_board, self.current_player)
+            if cur_h < min_h:
+                min_h = cur_h
+                
+        return min_h
+
+    # ------------------------------------------------------------------
     # 胜负判断
     # ------------------------------------------------------------------
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cdef void _check_winner(self):
-        if self.soldier_count == 0:
+        if self.soldier_count == 0:  # 还原为真实规则：兵数量降至0时炮方才获胜
             self.winner = CANNON
             return
 
@@ -311,7 +358,7 @@ cdef class GameState:
             self.soldier_count -= 1
             
         cdef unsigned long long h = self.hash
-        h = hasher.c_update_hash(h, start_idx // 5, start_idx % 5, end_idx // 5, end_idx % 5, piece, self.current_player)
+        h = hasher.c_update_hash(h, start_idx // 5, start_idx % 5, end_idx // 5, end_idx % 5, piece)
         if captured_piece != EMPTY:
             h = hasher.c_remove_piece_hash(h, end_idx // 5, end_idx % 5, captured_piece)
         h = hasher.c_switch_turn_hash(h)
