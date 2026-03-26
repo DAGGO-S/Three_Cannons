@@ -12,8 +12,8 @@ import time
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.game_logic import GameState
-from src.ai.engine import AIEngine
+from core.game_logic import GameState, CANNON, EMPTY, SOLDIER
+from core.search_manager import find_best_move_iterative_deepening, clear_transposition_table
 
 def on_complete_callback(best_move):
     """AI计算完成后的回调函数"""

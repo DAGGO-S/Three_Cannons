@@ -5,9 +5,12 @@ class GameConfig:
         self.data = {
             "cannon_player": "Human",  # "Human" 或 "AI"
             "soldier_player": "AI",    # "Human" 或 "AI"
-            "depth": 8,
-            "time_limit": 15.0
-            # ... 未来可以添加更多配置
+            "depth": 12,
+            "time_limit": 15.0,
+            "depth": 12,
+            "time_limit": 15.0,
+            "threads": 12,
+            "use_tablebase": True  # 是否启用残局库预查
         }
     
     def get_all(self):

@@ -1,3 +1,0 @@
-from core.game_logic cimport GameState as CGameState
-
-cdef int c_evaluate_board(CGameState state) noexcept

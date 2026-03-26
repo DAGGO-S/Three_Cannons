@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, scrolledtext
 from core.game_logic import GameState, CANNON, SOLDIER, EMPTY
 
 CELL_SIZE = 80
@@ -9,12 +9,13 @@ BOARD_COLS = 5
 BOARD_ROWS = 5
 
 class EditorDialog(tk.Toplevel):
-    def __init__(self, parent, current_state: GameState, on_confirm_callback):
+    def __init__(self, parent, current_state: GameState, on_confirm_callback, on_tb_solve_callback=None):
         super().__init__(parent)
         self.title("残局编辑器 (FEN)")
         self.resizable(False, False)
         
         self.on_confirm_callback = on_confirm_callback
+        self.on_tb_solve_callback = on_tb_solve_callback
         
         # Internal state
         self.board = [list(row) for row in current_state.board]
@@ -65,6 +66,10 @@ class EditorDialog(tk.Toplevel):
         ttk.Button(btn_frame, text="清空棋盘", command=self._clear_board).pack(fill="x", pady=2)
         ttk.Button(btn_frame, text="标准初始状态", command=self._reset_board).pack(fill="x", pady=2)
         
+        if self.on_tb_solve_callback:
+            self.btn_tb = ttk.Button(btn_frame, text="残局库求解 (CTI)", command=self._on_tb_solve)
+            self.btn_tb.pack(fill="x", pady=2)
+        
         # FEN Section
         fen_frame = ttk.LabelFrame(self, text="FEN 实时同步区 (支持粘贴导入)")
         fen_frame.pack(side="top", fill="x", padx=10, pady=5)
@@ -75,7 +80,15 @@ class EditorDialog(tk.Toplevel):
         ttk.Button(fen_frame, text="应用 FEN", command=self._apply_fen).pack(side="left", padx=5)
         
         # Confirm
-        ttk.Button(self, text=">> 验证并带入主棋盘 <<", command=self._on_confirm).pack(side="bottom", pady=10)
+        ttk.Button(self, text=">> 验证并带入主棋盘 <<", command=self._on_confirm).pack(side="bottom", pady=5)
+        
+        # TB Analysis Summary Label
+        self.lbl_tb_summary = tk.Label(self, text="点击分析按钮获取残局库结论", font=("Arial", 10, "italic"), fg="#666")
+        self.lbl_tb_summary.pack(side="bottom", fill="x", padx=10, pady=2)
+
+        # TB Move Buttons Frame
+        self.tb_moves_frame = ttk.Frame(self)
+        self.tb_moves_frame.pack(side="bottom", fill="x", padx=10, pady=5)
         
     def _draw_board(self):
         # Draw physical grid lines
@@ -84,6 +97,22 @@ class EditorDialog(tk.Toplevel):
                 x0, y0 = c*CELL_SIZE+COORD_MARGIN, r*CELL_SIZE+COORD_MARGIN
                 x1, y1 = (c+1)*CELL_SIZE+COORD_MARGIN, (r+1)*CELL_SIZE+COORD_MARGIN
                 self.canvas.create_rectangle(x0, y0, x1, y1, outline="black")
+                
+        # Draw labels
+        col_labels, row_labels = "ABCDE", "12345"
+        for i in range(5):
+            # Column Labels (Top)
+            self.canvas.create_text(
+                COORD_MARGIN + i*CELL_SIZE + CELL_SIZE/2, 
+                COORD_MARGIN/2, 
+                text=col_labels[i], font=("Arial", 12, "bold")
+            )
+            # Row Labels (Left)
+            self.canvas.create_text(
+                COORD_MARGIN/2, 
+                COORD_MARGIN + i*CELL_SIZE + CELL_SIZE/2, 
+                text=row_labels[i], font=("Arial", 12, "bold")
+            )
                 
     def _update_ui_from_state(self):
         # Clear pieces
@@ -170,4 +199,52 @@ class EditorDialog(tk.Toplevel):
                 
         fen_str = self.fen_var.get()
         self.on_confirm_callback(fen_str)
+        self.destroy()
+
+    def _on_tb_solve(self):
+        if not self.on_tb_solve_callback:
+            return
+            
+        try:
+            player = CANNON if self.player_var.get() == "c" else SOLDIER
+            temp_state = GameState(board=[list(row) for row in self.board], current_player=player)
+            
+            self.lbl_tb_summary.config(text="正在检索库...", fg="blue")
+            self.update_idletasks()
+            
+            results = self.on_tb_solve_callback(temp_state)
+            self._render_tb_results(results)
+            
+        except Exception as e:
+            messagebox.showerror("库查询失败", str(e), parent=self)
+
+    def _render_tb_results(self, results):
+        # 清除旧按钮
+        for widget in self.tb_moves_frame.winfo_children():
+            widget.destroy()
+            
+        if not results:
+            self.lbl_tb_summary.config(text="当前兵力暂无残局库覆盖。", fg="red")
+        elif 'moves' not in results or not results['moves']:
+            self.lbl_tb_summary.config(text=f"状态: {results.get('status', '未知')} | 无合法走法", fg="black")
+        else:
+            status_text = f"局面定性: {results['status']} | DTM: {results['dtm']} | CTI: {results['cti']:.4f}"
+            self.lbl_tb_summary.config(text=status_text, fg="#006400", font=("Arial", 10, "bold"))
+            
+            tk.Label(self.tb_moves_frame, text="库建议走法 (点击直接执行):", font=("Arial", 9)).pack(anchor="w")
+            
+            for i, m in enumerate(results['moves']):
+                v_str = "和棋" if m['val'] == 0 else ("炮胜" if m['val'] == 1 else "兵胜")
+                btn_text = f"{m['move_str']} [{v_str}] DTM:{m['dtm']} CTI:{m['cti']:.3f}"
+                btn = ttk.Button(
+                    self.tb_moves_frame, 
+                    text=btn_text, 
+                    command=lambda move_state=m['state']: self._apply_and_close(move_state)
+                )
+                btn.pack(fill="x", pady=1)
+
+    def _apply_and_close(self, next_state):
+        """点击推荐走法后，直接将结果局面带入主棋盘并关闭编辑器"""
+        if self.on_confirm_callback:
+            self.on_confirm_callback(next_state.to_fen())
         self.destroy()

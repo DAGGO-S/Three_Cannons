@@ -3,6 +3,11 @@
 /* BEGIN: Cython Metadata
 {
     "distutils": {
+        "extra_compile_args": [
+            "/O2",
+            "/fp:fast",
+            "/arch:AVX2"
+        ],
         "include_dirs": [
             "C:\\Python313\\Lib\\site-packages\\numpy\\_core\\include"
         ],
@@ -1345,55 +1350,6 @@ static const char* const __pyx_f[] = {
   "core/zobrist_hashing.pxd",
 };
 /* #### Code section: utility_code_proto_before_types ### */
-/* Profile_config.proto */
-#ifndef CYTHON_PROFILE
-#if CYTHON_COMPILING_IN_LIMITED_API || CYTHON_COMPILING_IN_PYPY
-  #define CYTHON_PROFILE 0
-#else
-  #define CYTHON_PROFILE 1
-#endif
-#endif
-#ifndef CYTHON_TRACE_NOGIL
-  #define CYTHON_TRACE_NOGIL 0
-#else
-  #if CYTHON_TRACE_NOGIL && !defined(CYTHON_TRACE)
-    #define CYTHON_TRACE 1
-  #endif
-#endif
-#ifndef CYTHON_TRACE
-  #define CYTHON_TRACE 0
-#endif
-#if CYTHON_PROFILE || CYTHON_TRACE
-#if CYTHON_USE_SYS_MONITORING
-    typedef enum {
-        __Pyx_Monitoring_PY_START = 0,
-        __Pyx_Monitoring_PY_RETURN,
-        __Pyx_Monitoring_PY_UNWIND,
-        __Pyx_Monitoring_LINE,
-        __Pyx_Monitoring_RAISE,
-        __Pyx_Monitoring_RERAISE,
-        __Pyx_Monitoring_EXCEPTION_HANDLED,
-        __Pyx_Monitoring_PY_RESUME,
-        __Pyx_Monitoring_PY_YIELD,
-        __Pyx_Monitoring_STOP_ITERATION,
-    } __Pyx_Monitoring_Event_Index;
-    static const unsigned char __Pyx_MonitoringEventTypes[] = {
-        PY_MONITORING_EVENT_PY_START,
-        PY_MONITORING_EVENT_PY_RETURN,
-        PY_MONITORING_EVENT_PY_UNWIND,
-        PY_MONITORING_EVENT_LINE,
-        PY_MONITORING_EVENT_RAISE,
-        PY_MONITORING_EVENT_RERAISE,
-        PY_MONITORING_EVENT_EXCEPTION_HANDLED,
-        PY_MONITORING_EVENT_PY_RESUME,
-        PY_MONITORING_EVENT_PY_YIELD,
-        PY_MONITORING_EVENT_STOP_ITERATION,
-    };
-    #define __Pyx_MonitoringEventTypes_CyFunc_count (sizeof(__Pyx_MonitoringEventTypes) - 3)
-    #define __Pyx_MonitoringEventTypes_CyGen_count (sizeof(__Pyx_MonitoringEventTypes))
-#endif
-#endif
-
 /* Atomics.proto */
 #include <pythread.h>
 #ifndef CYTHON_ATOMICS
@@ -1560,6 +1516,23 @@ static const char* const __pyx_f[] = {
 /*--- Type declarations ---*/
 struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher;
 
+/* "core/constants.pxd":3
+ * # core/constants.pxd
+ * 
+ * cpdef enum:             # <<<<<<<<<<<<<<
+ *     EMPTY = 0
+ *     SOLDIER = 1
+*/
+enum  {
+  __pyx_e_4core_9constants_EMPTY = 0,
+  __pyx_e_4core_9constants_SOLDIER = 1,
+  __pyx_e_4core_9constants_CANNON = 2,
+  __pyx_e_4core_9constants_DRAW = 3,
+  __pyx_e_4core_9constants_NO_WINNER = -1L,
+  __pyx_e_4core_9constants_BOARD_ROWS = 5,
+  __pyx_e_4core_9constants_BOARD_COLS = 5
+};
+
 /* "core/zobrist_hashing.pxd":2
  * # core/zobrist_hashing.pxd
  * cdef class ZobristHasher:             # <<<<<<<<<<<<<<
@@ -1578,7 +1551,7 @@ struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher {
 
 
 
-/* "core/zobrist_hashing.pyx":19
+/* "core/zobrist_hashing.pyx":16
  * PIECE_TO_INDEX = {EMPTY: -1, SOLDIER: 0, CANNON: 1}
  * 
  * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -1732,421 +1705,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStrNoError(PyObject* obj, P
 
 /* GetBuiltinName.proto */
 static PyObject *__Pyx_GetBuiltinName(PyObject *name);
-
-/* Profile.proto */
-#if CYTHON_TRACE
-  #undef CYTHON_PROFILE_REUSE_FRAME
-#endif
-#if CYTHON_USE_MODULE_STATE
-  #undef CYTHON_PROFILE_REUSE_CODEOBJ
-  #define CYTHON_PROFILE_REUSE_CODEOBJ 0
-  #undef CYTHON_PROFILE_REUSE_FRAME
-#endif
-#ifndef CYTHON_PROFILE_REUSE_CODEOBJ
-  #define CYTHON_PROFILE_REUSE_CODEOBJ 1
-#endif
-#ifndef CYTHON_PROFILE_REUSE_FRAME
-  #define CYTHON_PROFILE_REUSE_FRAME 0
-#endif
-#if CYTHON_USE_SYS_MONITORING && (CYTHON_PROFILE || CYTHON_TRACE)
-  #define __PYX_MONITORING_ABI_SUFFIX  "_mon"
-#else
-  #define __PYX_MONITORING_ABI_SUFFIX
-#endif
-#if CYTHON_PROFILE || CYTHON_TRACE
-#if CYTHON_USE_SYS_MONITORING
-  typedef uint64_t __pyx_monitoring_version_type;
-  #define __Pyx_TraceDeclarationsFunc\
-      PyObject *__pyx_frame_code = NULL;\
-      PyMonitoringState __pyx_pymonitoring_state[__Pyx_MonitoringEventTypes_CyFunc_count];\
-      int __pyx_exception_already_reported = 0;\
-      const int __pyx_sys_monitoring_disabled_in_parallel = 0; CYTHON_UNUSED_VAR(__pyx_sys_monitoring_disabled_in_parallel);
-  #define __Pyx_TraceDeclarationsGen\
-      PyObject *__pyx_frame_code = Py_NewRef(__pyx_generator->gi_code);\
-      PyMonitoringState* __pyx_pymonitoring_state = __pyx_generator->__pyx_pymonitoring_state;\
-      __pyx_monitoring_version_type __pyx_pymonitoring_version = __pyx_generator->__pyx_pymonitoring_version;\
-      int __pyx_exception_already_reported = 0;\
-      const int __pyx_sys_monitoring_disabled_in_parallel = 0; CYTHON_UNUSED_VAR(__pyx_sys_monitoring_disabled_in_parallel);
-  #define __Pyx_IsTracing(event_id)  ((!__pyx_sys_monitoring_disabled_in_parallel) && (__pyx_pymonitoring_state[event_id]).active)
-  #define __Pyx_TraceFrameInit(codeobj)\
-      if (codeobj) __pyx_frame_code = codeobj;
-  #define __Pyx_TurnOffSysMonitoringInParallel\
-    const int __pyx_sys_monitoring_disabled_in_parallel = 1;\
-    CYTHON_UNUSED_VAR(__pyx_sys_monitoring_disabled_in_parallel);
-  CYTHON_UNUSED static PyCodeObject *__Pyx_createFrameCodeObject(const char *funcname, const char *srcfile, int firstlineno);
-  CYTHON_UNUSED static int __Pyx__TraceStartFunc(PyMonitoringState *state_array, PyObject *code_obj, int offset, int skip_event);
-  CYTHON_UNUSED static int __Pyx__TraceStartGen(PyMonitoringState *state_array, __pyx_monitoring_version_type *version, PyObject *code_obj, int offset);
-  CYTHON_UNUSED static int __Pyx__TraceResumeGen(PyMonitoringState *state_array, __pyx_monitoring_version_type *version, PyObject *code_obj, int offset);
-  CYTHON_UNUSED static void __Pyx__TraceException(PyMonitoringState *monitoring_state, PyObject *code_obj, int offset, int reraised);
-  #define __Pyx_PyMonitoring_ExitScope(nogil)\
-    if (nogil) {\
-        (void) __pyx_exception_already_reported;\
-        if (CYTHON_TRACE_NOGIL) {\
-            PyGILState_STATE state = PyGILState_Ensure();\
-            PyMonitoring_ExitScope();\
-            Py_XDECREF(__pyx_frame_code);\
-            PyGILState_Release(state);\
-        }\
-    } else {\
-        PyMonitoring_ExitScope();\
-        Py_XDECREF(__pyx_frame_code);\
-    }
-  #define __Pyx_TraceStartFunc(funcname, srcfile, firstlineno, offset, nogil, skip_event, goto_error)\
-  if ((0) ); else {\
-      int ret = 0;\
-      memset(__pyx_pymonitoring_state, 0, sizeof(__pyx_pymonitoring_state));\
-      if (nogil) {\
-          if (CYTHON_TRACE_NOGIL) {\
-              PyGILState_STATE state = PyGILState_Ensure();\
-              if (!__Pyx_PyThreadState_Current->tracing) {\
-                  if (likely(__pyx_frame_code)) Py_INCREF(__pyx_frame_code);\
-                  else __pyx_frame_code = (PyObject*) __Pyx_createFrameCodeObject(funcname, srcfile, firstlineno);\
-                  if (unlikely(!__pyx_frame_code)) ret = -1;\
-                  else ret = __Pyx__TraceStartFunc(__pyx_pymonitoring_state, __pyx_frame_code, offset, skip_event);\
-              } else __pyx_frame_code = NULL;\
-              PyGILState_Release(state);\
-          } else __pyx_frame_code = NULL;\
-      } else {\
-          if (!__Pyx_PyThreadState_Current->tracing) {\
-              if (likely(__pyx_frame_code)) Py_INCREF(__pyx_frame_code);\
-              else __pyx_frame_code = (PyObject*) __Pyx_createFrameCodeObject(funcname, srcfile, firstlineno);\
-              if (unlikely(!__pyx_frame_code)) ret = -1;\
-              else ret = __Pyx__TraceStartFunc(__pyx_pymonitoring_state, __pyx_frame_code, offset, skip_event);\
-          } else __pyx_frame_code = NULL;\
-      }\
-      if (unlikely(ret == -1)) goto_error;\
-  }
-  #define __Pyx_TraceStartGen(funcname, srcfile, firstlineno, offset, nogil, skip_event, goto_error)\
-  if ((0) ); else {\
-      int ret = __Pyx__TraceStartGen(__pyx_pymonitoring_state, &__pyx_pymonitoring_version, __pyx_frame_code, offset);\
-      if (unlikely(ret == -1)) goto_error;\
-  }
-  #define __Pyx_TraceResumeGen(funcname, srcfile, firstlineno, offset, goto_error)\
-  if ((0) ); else {\
-      int ret = __Pyx__TraceResumeGen(__pyx_pymonitoring_state, &__pyx_pymonitoring_version, __pyx_frame_code, offset);\
-      if (unlikely(ret == -1)) goto_error;\
-  }
-  #define __Pyx_TraceYield(result, offset, goto_error)\
-  if (!__Pyx_IsTracing(__Pyx_Monitoring_PY_YIELD)); else {\
-      int ret = PyMonitoring_FirePyYieldEvent(&__pyx_pymonitoring_state[__Pyx_Monitoring_PY_RETURN], __pyx_frame_code, offset, result);\
-      PyMonitoring_ExitScope();\
-      if (unlikely(ret == -1)) goto_error;\
-  }
-  #define __Pyx_TraceException(offset, reraised, fresh)\
-  if (!__Pyx_IsTracing((reraised) ? __Pyx_Monitoring_RERAISE : __Pyx_Monitoring_RAISE)); else {\
-      if (fresh || reraised || !__pyx_exception_already_reported) {\
-          __Pyx__TraceException(&__pyx_pymonitoring_state[(reraised) ? __Pyx_Monitoring_RERAISE : __Pyx_Monitoring_RAISE], __pyx_frame_code, offset, reraised);\
-      }\
-      __pyx_exception_already_reported = 1;\
-  }
-  #define __Pyx_TraceExceptionDone()  __pyx_exception_already_reported = 0
-  #define __Pyx_TraceExceptionHandled(offset)\
-  if (!__Pyx_IsTracing(__Pyx_Monitoring_EXCEPTION_HANDLED)); else {\
-      (void) PyMonitoring_FireExceptionHandledEvent(&__pyx_pymonitoring_state[__Pyx_Monitoring_EXCEPTION_HANDLED], __pyx_frame_code, offset);\
-      __pyx_exception_already_reported = 0;\
-  }
-  #define __Pyx_TraceReturnValue(result, offset, nogil, goto_error)\
-  if (!__Pyx_IsTracing(__Pyx_Monitoring_PY_RETURN)); else {\
-      int ret = 0;\
-      if (nogil) {\
-          if (CYTHON_TRACE_NOGIL) {\
-              PyGILState_STATE state = PyGILState_Ensure();\
-              ret = PyMonitoring_FirePyReturnEvent(&__pyx_pymonitoring_state[__Pyx_Monitoring_PY_RETURN], __pyx_frame_code, offset, result);\
-              PyGILState_Release(state);\
-          }\
-      } else {\
-          ret = PyMonitoring_FirePyReturnEvent(&__pyx_pymonitoring_state[__Pyx_Monitoring_PY_RETURN], __pyx_frame_code, offset, result);\
-      }\
-      if (unlikely(ret == -1)) goto_error;\
-  }
-  #define __Pyx_TraceReturnCValue(cresult, convert_function, offset, nogil, goto_error)\
-  if (!__Pyx_IsTracing(__Pyx_Monitoring_PY_RETURN)); else {\
-      int ret = 0;\
-      if (nogil) {\
-          if (CYTHON_TRACE_NOGIL) {\
-              PyGILState_STATE state = PyGILState_Ensure();\
-              PyObject *pyvalue = convert_function(cresult);\
-              if (unlikely(!pyvalue)) {\
-                  PyErr_Clear();\
-                  pyvalue = Py_None; Py_INCREF(Py_None);\
-              }\
-              ret = PyMonitoring_FirePyReturnEvent(&__pyx_pymonitoring_state[__Pyx_Monitoring_PY_RETURN], __pyx_frame_code, offset, pyvalue);\
-              Py_DECREF(pyvalue);\
-              PyGILState_Release(state);\
-          }\
-      } else {\
-          PyObject *pyvalue = convert_function(cresult);\
-          if (unlikely(!pyvalue)) {\
-              PyErr_Clear();\
-              pyvalue = Py_None; Py_INCREF(Py_None);\
-          }\
-          ret = PyMonitoring_FirePyReturnEvent(&__pyx_pymonitoring_state[__Pyx_Monitoring_PY_RETURN], __pyx_frame_code, offset, pyvalue);\
-          Py_DECREF(pyvalue);\
-      }\
-      if (unlikely(ret == -1)) goto_error;\
-  }
-  #define __Pyx_TraceExceptionUnwind(offset, nogil)\
-  if (!__Pyx_IsTracing(__Pyx_Monitoring_PY_UNWIND)); else {\
-      if (nogil) {\
-          if (CYTHON_TRACE_NOGIL) {\
-              PyGILState_STATE state = PyGILState_Ensure();\
-              (void) PyMonitoring_FirePyUnwindEvent(&__pyx_pymonitoring_state[__Pyx_Monitoring_PY_UNWIND], __pyx_frame_code, offset);\
-              PyGILState_Release(state);\
-          }\
-      } else {\
-          (void) PyMonitoring_FirePyUnwindEvent(&__pyx_pymonitoring_state[__Pyx_Monitoring_PY_UNWIND], __pyx_frame_code, offset);\
-      }\
-  }
-  #if CYTHON_TRACE
-  CYTHON_UNUSED static int __Pyx__TraceLine(PyMonitoringState *monitoring_state, PyObject *code_obj, int line, int offset);
-  #define __Pyx_TraceLine(line, offset, nogil, goto_error)\
-  if (!__Pyx_IsTracing(__Pyx_Monitoring_LINE)); else {\
-      int ret = 0;\
-      if (nogil) {\
-          if (CYTHON_TRACE_NOGIL) {\
-              PyGILState_STATE state = PyGILState_Ensure();\
-              ret = __Pyx__TraceLine(&__pyx_pymonitoring_state[__Pyx_Monitoring_LINE], __pyx_frame_code, line, offset);\
-              PyGILState_Release(state);\
-          }\
-      } else {\
-          ret = __Pyx__TraceLine(&__pyx_pymonitoring_state[__Pyx_Monitoring_LINE], __pyx_frame_code, line, offset);\
-      }\
-      if (unlikely(ret == -1)) goto_error;\
-  }
-  #endif
-#else
-  #include "compile.h"
-  #include "frameobject.h"
-  #include "traceback.h"
-#if PY_VERSION_HEX >= 0x030b00a6 && !defined(PYPY_VERSION)
-  #ifndef Py_BUILD_CORE
-    #define Py_BUILD_CORE 1
-  #endif
-  #include "internal/pycore_frame.h"
-#endif
-  #if CYTHON_PROFILE_REUSE_FRAME
-    #define CYTHON_FRAME_MODIFIER static
-    #define CYTHON_FRAME_DEL(frame)
-  #else
-    #define CYTHON_FRAME_MODIFIER
-    #define CYTHON_FRAME_DEL(frame) Py_CLEAR(frame)
-  #endif
-  #if CYTHON_PROFILE_REUSE_CODEOBJ
-    #define CYTHON_CODEOBJ_MODIFIER static
-  #else
-    #define CYTHON_CODEOBJ_MODIFIER
-  #endif
-  #define __Pyx_TraceDeclarationsFunc\
-      CYTHON_CODEOBJ_MODIFIER PyCodeObject *__pyx_frame_code = NULL;\
-      CYTHON_FRAME_MODIFIER PyFrameObject *__pyx_frame = NULL;\
-      int __Pyx_use_tracing = 0;
-  #define __Pyx_TraceDeclarationsGen\
-      PyObject *__pyx_frame_code = __pyx_generator->gi_code;\
-      CYTHON_FRAME_MODIFIER PyFrameObject *__pyx_frame = NULL;\
-      int __Pyx_use_tracing = 0;
-  #define __Pyx_TraceFrameInit(codeobj)\
-      if (codeobj) __pyx_frame_code = (PyCodeObject*) codeobj;
-  #define __Pyx_PyMonitoring_ExitScope(nogil)  {}
-  #define __Pyx_TraceException(offset, reraised, fresh)  {}
-  #define __Pyx_TraceExceptionHandled(offset)  {}
-  #define __Pyx_TraceExceptionDone()  {}
-  #define __Pyx_TurnOffSysMonitoringInParallel {} // Only needed for freethreading
-#if PY_VERSION_HEX >= 0x030b00a2
-  #if PY_VERSION_HEX >= 0x030C00b1
-  #define __Pyx_IsTracing(tstate, check_tracing, check_funcs)\
-     ((!(check_tracing) || !(tstate)->tracing) &&\
-         (!(check_funcs) || (tstate)->c_profilefunc || (CYTHON_TRACE && (tstate)->c_tracefunc)))
-  #else
-  #define __Pyx_IsTracing(tstate, check_tracing, check_funcs)\
-     (unlikely((tstate)->cframe->use_tracing) &&\
-         (!(check_tracing) || !(tstate)->tracing) &&\
-         (!(check_funcs) || (tstate)->c_profilefunc || (CYTHON_TRACE && (tstate)->c_tracefunc)))
-  #endif
-  #define __Pyx_EnterTracing(tstate)  PyThreadState_EnterTracing(tstate)
-  #define __Pyx_LeaveTracing(tstate)  PyThreadState_LeaveTracing(tstate)
-#elif PY_VERSION_HEX >= 0x030a00b1
-  #define __Pyx_IsTracing(tstate, check_tracing, check_funcs)\
-     (unlikely((tstate)->cframe->use_tracing) &&\
-         (!(check_tracing) || !(tstate)->tracing) &&\
-         (!(check_funcs) || (tstate)->c_profilefunc || (CYTHON_TRACE && (tstate)->c_tracefunc)))
-  #define __Pyx_EnterTracing(tstate)\
-      do { tstate->tracing++; tstate->cframe->use_tracing = 0; } while (0)
-  #define __Pyx_LeaveTracing(tstate)\
-      do {\
-          tstate->tracing--;\
-          tstate->cframe->use_tracing = ((CYTHON_TRACE && tstate->c_tracefunc != NULL)\
-                                 || tstate->c_profilefunc != NULL);\
-      } while (0)
-#else
-  #define __Pyx_IsTracing(tstate, check_tracing, check_funcs)\
-     (unlikely((tstate)->use_tracing) &&\
-         (!(check_tracing) || !(tstate)->tracing) &&\
-         (!(check_funcs) || (tstate)->c_profilefunc || (CYTHON_TRACE && (tstate)->c_tracefunc)))
-  #define __Pyx_EnterTracing(tstate)\
-      do { tstate->tracing++; tstate->use_tracing = 0; } while (0)
-  #define __Pyx_LeaveTracing(tstate)\
-      do {\
-          tstate->tracing--;\
-          tstate->use_tracing = ((CYTHON_TRACE && tstate->c_tracefunc != NULL)\
-                                         || tstate->c_profilefunc != NULL);\
-      } while (0)
-#endif
-  #define __Pyx_TraceStartFunc(funcname, srcfile, firstlineno, offset, nogil, skip_event, goto_error)\
-  if (nogil) {\
-      if (CYTHON_TRACE_NOGIL) {\
-          PyThreadState *tstate;\
-          PyGILState_STATE state = PyGILState_Ensure();\
-          tstate = __Pyx_PyThreadState_Current;\
-          if (__Pyx_IsTracing(tstate, 1, 1)) {\
-              __Pyx_use_tracing = __Pyx_TraceSetupAndCall((PyCodeObject**)&__pyx_frame_code, &__pyx_frame, tstate, funcname, srcfile, firstlineno, skip_event);\
-          }\
-          PyGILState_Release(state);\
-          if (unlikely(__Pyx_use_tracing < 0)) goto_error;\
-      }\
-  } else {\
-      PyThreadState* tstate = PyThreadState_GET();\
-      if (__Pyx_IsTracing(tstate, 1, 1)) {\
-          __Pyx_use_tracing = __Pyx_TraceSetupAndCall((PyCodeObject**)&__pyx_frame_code, &__pyx_frame, tstate, funcname, srcfile, firstlineno, skip_event);\
-          if (unlikely(__Pyx_use_tracing < 0)) goto_error;\
-      }\
-  }
-  #define __Pyx_TraceStartGen __Pyx_TraceStartFunc
-  #define __Pyx_TraceYield(result, offset, goto_error)\
-  if (likely(!__Pyx_use_tracing)); else {\
-      PyThreadState* tstate = __Pyx_PyThreadState_Current;\
-      if (__Pyx_IsTracing(tstate, 0, 0)) {\
-          __Pyx_call_return_trace_func(tstate, __pyx_frame, (PyObject*)result, 0);\
-      }\
-      if ((1)); else goto_error;\
-  }
-  #define __Pyx_TraceResumeGen(funcname, srcfile, firstlineno, offset, goto_error)\
-      __Pyx_TraceStartFunc(funcname, srcfile, firstlineno, offset, 0, 0, goto_error)
-  CYTHON_UNUSED static void __Pyx_call_return_trace_func(PyThreadState *tstate, PyFrameObject *frame, PyObject *result, int delete_frame) {
-      PyObject *type, *value, *traceback;
-      __Pyx_ErrFetchInState(tstate, &type, &value, &traceback);
-      __Pyx_EnterTracing(tstate);
-      if (CYTHON_TRACE && tstate->c_tracefunc)
-          tstate->c_tracefunc(tstate->c_traceobj, frame, PyTrace_RETURN, result);
-      if (tstate->c_profilefunc)
-          tstate->c_profilefunc(tstate->c_profileobj, frame, PyTrace_RETURN, result);
-      if (delete_frame) {
-          CYTHON_FRAME_DEL(frame);
-      }
-      __Pyx_LeaveTracing(tstate);
-      __Pyx_ErrRestoreInState(tstate, type, value, traceback);
-  }
-  #define __Pyx_TraceReturnValue(result, offset, nogil, goto_error)\
-  if (likely(!__Pyx_use_tracing)); else {\
-      if (nogil) {\
-          if (CYTHON_TRACE_NOGIL) {\
-              PyThreadState *tstate;\
-              PyGILState_STATE state = PyGILState_Ensure();\
-              tstate = __Pyx_PyThreadState_Current;\
-              if (__Pyx_IsTracing(tstate, 0, 0)) {\
-                  __Pyx_call_return_trace_func(tstate, __pyx_frame, (PyObject*)result, 1);\
-              }\
-              PyGILState_Release(state);\
-          }\
-      } else {\
-          PyThreadState* tstate = __Pyx_PyThreadState_Current;\
-          if (__Pyx_IsTracing(tstate, 0, 0)) {\
-              __Pyx_call_return_trace_func(tstate, __pyx_frame, (PyObject*)result, 1);\
-          }\
-      }\
-      if ((1)); else goto_error;\
-  }
-  #define __Pyx_TraceReturnCValue(cresult, convert_function, offset, nogil, goto_error)\
-  if (likely(!__Pyx_use_tracing)); else {\
-      if (nogil) {\
-          if (CYTHON_TRACE_NOGIL) {\
-              PyThreadState *tstate;\
-              PyGILState_STATE state = PyGILState_Ensure();\
-              tstate = __Pyx_PyThreadState_Current;\
-              if (__Pyx_IsTracing(tstate, 0, 0)) {\
-                  PyObject *pyvalue = convert_function(cresult);\
-                  if (unlikely(!pyvalue)) goto_error;\
-                  __Pyx_call_return_trace_func(tstate, __pyx_frame, pyvalue, 1);\
-                  Py_DECREF(pyvalue);\
-              }\
-              PyGILState_Release(state);\
-          }\
-      } else {\
-          PyThreadState* tstate = __Pyx_PyThreadState_Current;\
-          if (__Pyx_IsTracing(tstate, 0, 0)) {\
-              PyObject *pyvalue = convert_function(cresult);\
-              if (unlikely(!pyvalue)) goto_error;\
-              __Pyx_call_return_trace_func(tstate, __pyx_frame, pyvalue, 1);\
-              Py_DECREF(pyvalue);\
-          }\
-      }\
-  }
-  #define __Pyx_TraceExceptionUnwind(offset, nogil)\
-  if (likely(!__Pyx_use_tracing)); else {\
-      if (nogil) {\
-          if (CYTHON_TRACE_NOGIL) {\
-              PyThreadState *tstate;\
-              PyGILState_STATE state = PyGILState_Ensure();\
-              tstate = __Pyx_PyThreadState_Current;\
-              if (__Pyx_IsTracing(tstate, 0, 0)) {\
-                  __Pyx_call_return_trace_func(tstate, __pyx_frame, Py_None, 1);\
-              }\
-              PyGILState_Release(state);\
-          }\
-      } else {\
-          PyThreadState* tstate = __Pyx_PyThreadState_Current;\
-          if (__Pyx_IsTracing(tstate, 0, 0)) {\
-              __Pyx_call_return_trace_func(tstate, __pyx_frame, Py_None, 1);\
-          }\
-      }\
-  }
-  static int __Pyx_TraceSetupAndCall(PyCodeObject** code, PyFrameObject** frame, PyThreadState* tstate, const char *funcname, const char *srcfile, int firstlineno, int skip_event);
-#if CYTHON_TRACE
-  CYTHON_UNUSED static int __Pyx_call_line_trace_func(PyThreadState *tstate, PyFrameObject *frame, int line);
-  #define __Pyx_TraceLine(line, offset, nogil, goto_error)\
-  if (likely(!__Pyx_use_tracing)); else {\
-      int ret = 0;\
-      if (nogil) {\
-          if (CYTHON_TRACE_NOGIL) {\
-              PyThreadState *tstate;\
-              PyGILState_STATE state = __Pyx_PyGILState_Ensure();\
-              tstate = __Pyx_PyThreadState_Current;\
-              if (__Pyx_IsTracing(tstate, 0, 0) && tstate->c_tracefunc && __pyx_frame->f_trace) {\
-                  ret = __Pyx_call_line_trace_func(tstate, __pyx_frame, line);\
-              }\
-              __Pyx_PyGILState_Release(state);\
-          }\
-      } else {\
-          PyThreadState* tstate = __Pyx_PyThreadState_Current;\
-          if (__Pyx_IsTracing(tstate, 0, 0) && tstate->c_tracefunc && __pyx_frame->f_trace) {\
-              ret = __Pyx_call_line_trace_func(tstate, __pyx_frame, line);\
-          }\
-      }\
-      if (unlikely(ret)) goto_error;\
-  }
-#endif
-#endif
-#else
-  #define __Pyx_TraceDeclarationsFunc
-  #define __Pyx_TraceDeclarationsGen
-  #define __Pyx_TraceExceptionDone()  {}
-  #define __Pyx_TraceFrameInit(codeobj)  {}
-  #define __Pyx_TurnOffSysMonitoringInParallel {}
-  #define __Pyx_PyMonitoring_ExitScope(nogil)  {}
-  #define __Pyx_TraceException(offset, reraised, fresh)  {}
-  #define __Pyx_TraceExceptionUnwind(offset, nogil)  {}
-  #define __Pyx_TraceExceptionHandled(offset)  {}
-  #define __Pyx_TraceStartFunc(funcname, srcfile, firstlineno, offset, nogil, skip_event, goto_error)   if ((1)); else goto_error;
-  #define __Pyx_TraceStartGen __Pyx_TraceStartFunc
-  #define __Pyx_TraceResumeGen(funcname, srcfile, firstlineno, offset, goto_error)   if ((1)); else goto_error;
-  #define __Pyx_TraceYield(result, offset, goto_error)   if ((1)); else goto_error;
-  #define __Pyx_TraceReturnValue(result, offset, nogil, goto_error)\
-      if ((1)); else goto_error;
-  #define __Pyx_TraceReturnCValue(cresult, convert_function, offset, nogil, goto_error)\
-      if ((1)); else { (void) convert_function; goto_error }
-#endif
-#if !CYTHON_TRACE
-  #define __Pyx_TraceLine(line, offset, nogil, goto_error)   if ((1)); else goto_error;
-#endif
 
 /* GetTopmostException.proto */
 #if CYTHON_USE_EXC_INFO_STACK && CYTHON_FAST_THREAD_STATE
@@ -2762,6 +2320,9 @@ static CYTHON_INLINE PyObject* __Pyx_PyLong_From_unsigned_PY_LONG_LONG(unsigned 
 /* CIntFromPy.proto */
 static CYTHON_INLINE unsigned PY_LONG_LONG __Pyx_PyLong_As_unsigned_PY_LONG_LONG(PyObject *);
 
+/* CIntToPy.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyLong_From___pyx_anon_enum(int value);
+
 /* CIntFromPy.proto */
 static CYTHON_INLINE long __Pyx_PyLong_As_long(PyObject *);
 
@@ -2793,6 +2354,25 @@ static unsigned long __Pyx_get_runtime_version(void);
 
 /* CheckBinaryVersion.proto */
 static int __Pyx_check_binary_version(unsigned long ct_version, unsigned long rt_version, int allow_newer);
+
+/* PyObjectDelAttr.proto */
+#if CYTHON_COMPILING_IN_LIMITED_API && __PYX_LIMITED_VERSION_HEX < 0x030d0000
+#define __Pyx_PyObject_DelAttr(o, n) PyObject_SetAttr(o, n, NULL)
+#else
+#define __Pyx_PyObject_DelAttr(o, n) PyObject_DelAttr(o, n)
+#endif
+
+/* PyObjectSetAttrStr.proto */
+#if CYTHON_USE_TYPE_SLOTS
+#define __Pyx_PyObject_DelAttrStr(o,n) __Pyx_PyObject_SetAttrStr(o, n, NULL)
+static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value);
+#else
+#define __Pyx_PyObject_DelAttrStr(o,n)   __Pyx_PyObject_DelAttr(o,n)
+#define __Pyx_PyObject_SetAttrStr(o,n,v) PyObject_SetAttr(o,n,v)
+#endif
+
+/* VoidPtrExport.proto */
+static int __Pyx_ExportVoidPtr(PyObject *name, void *p, const char *sig);
 
 /* MultiPhaseInitModuleState.proto */
 #if CYTHON_PEP489_MULTI_PHASE_INIT && CYTHON_USE_MODULE_STATE
@@ -2848,12 +2428,11 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_s
 
 /* Module declarations from "cython" */
 
+/* Module declarations from "core.constants" */
+
 /* Module declarations from "core.zobrist_hashing" */
-static int __pyx_v_4core_15zobrist_hashing_SOLDIER;
-static int __pyx_v_4core_15zobrist_hashing_CANNON;
-static int __pyx_v_4core_15zobrist_hashing_EMPTY;
-static PyObject *__pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX = 0;
 static struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *__pyx_v_4core_15zobrist_hashing__hasher = 0;
+static PyObject *__pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX = 0;
 static PyObject *__pyx_f_4core_15zobrist_hashing___pyx_unpickle_ZobristHasher__set_state(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *, PyObject *); /*proto*/
 static CYTHON_INLINE PyObject *__Pyx_carray_to_py_unsigned_PY_LONG_LONG(unsigned PY_LONG_LONG *, Py_ssize_t); /*proto*/
 static CYTHON_INLINE PyObject *__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG(unsigned PY_LONG_LONG *, Py_ssize_t); /*proto*/
@@ -2876,54 +2455,36 @@ static PyObject *__pyx_builtin_enumerate;
 static PyObject *__pyx_builtin_IndexError;
 /* #### Code section: string_decls ### */
 static const char __pyx_k_[] = ".";
-static const char __pyx_k_1[] = "\2401";
+static const char __pyx_k_1[] = "\200\001\340\004\013\2101";
 static const char __pyx_k_c[] = "c";
 static const char __pyx_k_h[] = "h";
-static const char __pyx_k_o[] = "o";
-static const char __pyx_k_p[] = "p";
 static const char __pyx_k_r[] = "r";
-static const char __pyx_k_v[] = "v";
 static const char __pyx_k_1F[] = "\200\001\330\004+\2501\250F\260!";
 static const char __pyx_k__2[] = "?";
-static const char __pyx_k__3[] = "_";
 static const char __pyx_k_gc[] = "gc";
-static const char __pyx_k_1_2[] = "\200\001\340\004\013\2101";
 static const char __pyx_k_col[] = "col";
-static const char __pyx_k_get[] = "__get__";
 static const char __pyx_k_new[] = "__new__";
 static const char __pyx_k_pop[] = "pop";
 static const char __pyx_k_row[] = "row";
-static const char __pyx_k_set[] = "__set__";
-static const char __pyx_k_val[] = "val";
-static const char __pyx_k_cols[] = "cols";
 static const char __pyx_k_dict[] = "__dict__";
 static const char __pyx_k_func[] = "__func__";
-static const char __pyx_k_init[] = "__init__";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_move[] = "move";
 static const char __pyx_k_name[] = "__name__";
-static const char __pyx_k_rows[] = "rows";
 static const char __pyx_k_seed[] = "seed";
 static const char __pyx_k_self[] = "self";
 static const char __pyx_k_spec[] = "__spec__";
 static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_7_q_q[] = "\200\001\340\004\013\2107\220-\230q\240\007\240q";
-static const char __pyx_k_A_y_a[] = "\200A\360\006\000\t\020\210y\230\002\230$\230a";
-static const char __pyx_k_EMPTY[] = "EMPTY";
+static const char __pyx_k_A_y_a[] = "\200A\360\014\000\t\020\210y\230\002\230$\230a";
 static const char __pyx_k_board[] = "board";
-static const char __pyx_k_end_c[] = "end_c";
-static const char __pyx_k_end_r[] = "end_r";
 static const char __pyx_k_piece[] = "piece";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_state[] = "state";
-static const char __pyx_k_table[] = "table";
-static const char __pyx_k_value[] = "value";
 static const char __pyx_k_7_az_1[] = "\200\001\340\004\013\2107\220,\230a\230z\250\026\250|\2701";
-static const char __pyx_k_CANNON[] = "CANNON";
 static const char __pyx_k_dict_2[] = "_dict";
 static const char __pyx_k_enable[] = "enable";
 static const char __pyx_k_hasher[] = "_hasher";
-static const char __pyx_k_length[] = "length";
 static const char __pyx_k_module[] = "__module__";
 static const char __pyx_k_pickle[] = "pickle";
 static const char __pyx_k_random[] = "random";
@@ -2932,13 +2493,7 @@ static const char __pyx_k_to_col[] = "to_col";
 static const char __pyx_k_to_row[] = "to_row";
 static const char __pyx_k_update[] = "update";
 static const char __pyx_k_A_t_AZz[] = "\200A\360\016\000\t\020\210t\320\023$\240A\240Z\250z\270\021";
-static const char __pyx_k_A_y_a_2[] = "\200A\360\014\000\t\020\210y\230\002\230$\230a";
-static const char __pyx_k_SOLDIER[] = "SOLDIER";
-static const char __pyx_k_board_c[] = "board_c";
 static const char __pyx_k_disable[] = "disable";
-static const char __pyx_k_start_c[] = "start_c";
-static const char __pyx_k_start_r[] = "start_r";
-static const char __pyx_k_table_c[] = "table_c";
 static const char __pyx_k_add_note[] = "add_note";
 static const char __pyx_k_from_col[] = "from_col";
 static const char __pyx_k_from_row[] = "from_row";
@@ -2946,11 +2501,11 @@ static const char __pyx_k_getstate[] = "getstate";
 static const char __pyx_k_new_hash[] = "new_hash";
 static const char __pyx_k_old_hash[] = "old_hash";
 static const char __pyx_k_position[] = "position";
+static const char __pyx_k_pyx_capi[] = "__pyx_capi__";
 static const char __pyx_k_pyx_type[] = "__pyx_type";
 static const char __pyx_k_qualname[] = "__qualname__";
 static const char __pyx_k_set_name[] = "__set_name__";
 static const char __pyx_k_setstate[] = "setstate";
-static const char __pyx_k_turn_key[] = "turn_key";
 static const char __pyx_k_TypeError[] = "TypeError";
 static const char __pyx_k_enumerate[] = "enumerate";
 static const char __pyx_k_isenabled[] = "isenabled";
@@ -2972,35 +2527,25 @@ static const char __pyx_k_compute_hash[] = "compute_hash";
 static const char __pyx_k_initializing[] = "_initializing";
 static const char __pyx_k_is_coroutine[] = "_is_coroutine";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
-static const char __pyx_k_state_backup[] = "state_backup";
 static const char __pyx_k_stringsource[] = "<stringsource>";
 static const char __pyx_k_use_setstate[] = "use_setstate";
-static const char __pyx_k_1_U_81_Qc_A_1[] = "\200\001\360\010\000\005\t\210\n\220!\2201\330\004\010\210\005\210U\220!\2208\2301\330\010\020\220\001\220\021\220!\330\010\021\220\021\220!\330\010\035\230Q\230c\240\023\240A\330\004\013\2101";
 static const char __pyx_k_OverflowError[] = "OverflowError";
 static const char __pyx_k_ZobristHasher[] = "ZobristHasher";
-static const char __pyx_k_c_update_hash[] = "c_update_hash";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
-static const char __pyx_k_1A_U_81_as_Q_1[] = "\200\001\360\010\000\005\t\210\013\2201\220A\330\004\010\210\005\210U\220!\2208\2301\330\010\020\220\001\220\021\220!\330\010\021\220\021\220!\330\010\036\230a\230s\240#\240Q\330\004\013\2101";
 static const char __pyx_k_PIECE_TO_INDEX[] = "PIECE_TO_INDEX";
-static const char __pyx_k_c_compute_hash[] = "c_compute_hash";
 static const char __pyx_k_current_player[] = "current_player";
 static const char __pyx_k_num_piece_types[] = "num_piece_types";
 static const char __pyx_k_pyx_PickleError[] = "__pyx_PickleError";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
-static const char __pyx_k_PIECE_TO_INDEX_2[] = "_PIECE_TO_INDEX";
 static const char __pyx_k_place_piece_hash[] = "place_piece_hash";
 static const char __pyx_k_switch_turn_hash[] = "switch_turn_hash";
 static const char __pyx_k_A_V1_oQa_y_fAT_aq[] = "\200A\360\016\000\t\016\210V\2201\330\010\026\220o\240Q\240a\340\010\017\210y\230\002\230$\230f\240A\240T\250\021\250$\250a\250q";
 static const char __pyx_k_remove_piece_hash[] = "remove_piece_hash";
 static const char __pyx_k_update_board_hash[] = "update_board_hash";
 static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
-static const char __pyx_k_c_switch_turn_hash[] = "c_switch_turn_hash";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_compute_board_hash[] = "compute_board_hash";
-static const char __pyx_k_c_remove_piece_hash[] = "c_remove_piece_hash";
 static const char __pyx_k_core_zobrist_hashing[] = "core.zobrist_hashing";
-static const char __pyx_k_A_r_2Rq_uKs_q_y_hat1A[] = "\200A\360\006\000\t\030\220r\230\022\2302\230R\230q\330\010\037\230u\240K\250s\260-\270q\330\010\017\210y\230\002\230$\230h\240a\240t\2501\250A";
-static const char __pyx_k_core_zobrist_hashing_pxd[] = "core/zobrist_hashing.pxd";
 static const char __pyx_k_core_zobrist_hashing_pyx[] = "core/zobrist_hashing.pyx";
 static const char __pyx_k_ZobristHasher_update_hash[] = "ZobristHasher.update_hash";
 static const char __pyx_k_hk_A_1_P_P_R_R_S_7_q0_a_1[] = "\200\001\360\006\000\005\010\200\177\220h\230k\250\033\260A\330\010\r\210^\2301\330\010\016\320\016!\360\000\000\"P\002\360\000\000P\002R\002\360\000\000R\002S\002\330\004\023\220=\240\010\250\001\250\021\330\004\007\200|\2207\230!\330\010/\250q\3200@\300\016\310a\330\004\013\2101";
@@ -3008,27 +2553,14 @@ static const char __pyx_k_ZobristHasher_compute_hash[] = "ZobristHasher.compute_
 static const char __pyx_k_pyx_unpickle_ZobristHasher[] = "__pyx_unpickle_ZobristHasher";
 static const char __pyx_k_A_1_HIQ_oQa_D_ay_1_D_awawaq_q[] = "\200A\360\020\000\t,\2501\360\010\000\t\023\220*\230H\240I\250Q\330\010\026\220o\240Q\240a\360\006\000\t\025\220D\230\006\230a\230y\250\001\250\031\260!\2601\360\006\000\t\025\220D\230\006\230a\230w\240a\240w\250a\250q\340\010\017\210q";
 static const char __pyx_k_ZobristHasher___reduce_cython[] = "ZobristHasher.__reduce_cython__";
-static const char __pyx_k_A_1_XRr_1_6_2Rq_uKs_q_D_1A_D_q[] = "\200A\360\006\000\t,\2501\330\010\035\230X\240R\240r\250\022\2501\330\010\033\2306\240\022\2402\240R\240q\330\010\037\230u\240K\250s\260-\270q\340\010\024\220D\230\010\240\001\240\032\2501\250A\330\010\024\220D\230\010\240\001\240\030\250\021\250!\340\010\017\210q";
-static const char __pyx_k_Pyx_carray_from_py_unsigned_PY[] = "__Pyx_carray_from_py_unsigned_PY_LONG_LONG";
-static const char __pyx_k_Pyx_carray_to_py_unsigned_PY_L[] = "__Pyx_carray_to_py_unsigned_PY_LONG_LONG";
-static const char __pyx_k_Pyx_carray_to_tuple_unsigned_P[] = "__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG";
 static const char __pyx_k_ZobristHasher_place_piece_hash[] = "ZobristHasher.place_piece_hash";
 static const char __pyx_k_ZobristHasher_switch_turn_hash[] = "ZobristHasher.switch_turn_hash";
-static const char __pyx_k_pyx_unpickle_ZobristHasher__se[] = "__pyx_unpickle_ZobristHasher__set_state";
-static const char __pyx_k_1D_HKq_LXaallmmqq_I_I_T_T_U_U_Y[] = "\200\001\330\004\020\220\010\230\013\2401\240D\250\014\260H\270K\300q\310\004\310L\320Xa\320al\320lm\320mq\320q}\360\000\000~\001I\002\360\000\000I\002T\002\360\000\000T\002U\002\360\000\000U\002Y\002\360\000\000Y\002e\002\360\000\000e\002q\002\360\000\000q\002|\002\360\000\000|\002}\002\360\000\000}\002~\002\330\004\007\200s\210!\210=\230\002\230\"\230D\240\007\240q\250\016\260a\330\010\024\220I\230W\240A\240[\260\001\260\021";
-static const char __pyx_k_A_A_E_aq_was_Q_T_AQ_Cq_T_AQ_Q_Q[] = "\200A\360\006\000\t%\240A\340\010\014\210E\220\025\220a\220q\330\014\017\210w\220a\220s\230#\230Q\330\020\025\220T\230\030\240\021\240\"\240A\240Q\330\021\030\230\001\230\023\230C\230q\330\020\025\220T\230\030\240\021\240\"\240A\240Q\340\010\013\210?\230#\230Q\330\014\021\220\024\220Q\330\010\017\210q";
 static const char __pyx_k_A_A_E_at1_U_4q_Qb_6_A_V1Bar_Q_Q[] = "\200A\360\010\000\t%\240A\360\006\000\t\r\210E\220\025\220a\220t\2301\330\014\020\220\005\220U\230!\2304\230q\330\020\030\230\005\230Q\230b\240\001\240\021\330\020\023\2206\230\023\230A\330\024\"\240/\260\021\260!\330\024\031\230\024\230V\2401\240B\240a\240r\250\021\250!\340\010\013\210?\230#\230Q\330\014\021\220\024\220Q\340\010\017\210q";
-static const char __pyx_k_DA_G4xq_IQaq_e5_5_Qd_e5_Q_vYa_e[] = "\320\004)\250\023\320,D\300A\360\016\000\t\r\210G\2204\220x\230q\360\006\000\t\r\210I\220Q\220a\220q\230\002\230$\230e\2405\250\001\250\021\330\027\033\2305\240\005\240Q\240d\250(\260$\260e\2705\300\001\300\024\300Q\360\016\000\t\030\220v\230Y\240a\330\010\016\210e\2201\220A\340\010\014\210E\220\025\220a\220t\2301\330\014\020\220\005\220U\230!\2304\230q\330\020\024\220E\230\025\230a\230q\330\024\032\230&\240\014\250A\250Q\330\024\030\230\006\230a\230r\240\021\240\"\240A\240U\250!\330\024\030\230\010\240\001\240\022\2402\240R\240r\250\022\2501\250E\260\021\340\010\014\210L\230\006\230l\250!\2501\330\010\016\210i\220q\230\001";
 static const char __pyx_k_T_G4xt_T_G1F_a_vWA_q_t7_q_d_7_W[] = "\200\001\360\010\000\005\016\210T\220\027\230\004\230G\2404\240x\250t\260:\270T\300\021\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220A\330\010\022\220!\330\010\027\220q\340\010\027\220t\2307\240'\250\021\330\004\007\200q\330\010\017\320\017.\250d\260!\2607\270+\300W\310A\340\010\017\320\017.\250d\260!\2607\270+\300Q";
 static const char __pyx_k_ZobristHasher___setstate_cython[] = "ZobristHasher.__setstate_cython__";
 static const char __pyx_k_ZobristHasher_remove_piece_hash[] = "ZobristHasher.remove_piece_hash";
-static const char __pyx_k_gh_Cq_q_r_A_Cxy_r_A_Qe1_r_A_q_c[] = "\200\001\330gh\330\004\030\230\001\330\004\005\330\010\014\210C\210q\220\001\330\014\027\220q\340\004\007\200r\210\023\210A\330\010\014\210C\210x\220y\240\001\240\021\330\014\017\210r\220\023\220A\330\020\021\330\014\r\210Q\210e\2201\340\014\021\220\021\330\014\017\210r\220\023\220A\330\020\027\220q\340\004\020\220\001\330\010\t\330\t\n\330\014\016\210c\220\021\330\t\n\330\010\020\220\001";
-static const char __pyx_k_rs_Cq_q_r_A_Cxy_r_A_Qe1_r_A_q_c[] = "\200\001\330rs\330\004\030\230\001\330\004\005\330\010\014\210C\210q\220\001\330\014\027\220q\340\004\007\200r\210\023\210A\330\010\014\210C\210x\220y\240\001\240\021\330\014\017\210r\220\023\220A\330\020\021\330\014\r\210Q\210e\2201\340\014\021\220\021\330\014\017\210r\220\023\220A\330\020\027\220q\340\004\020\220\001\330\010\t\330\t\n\330\014\016\210c\220\021\330\t\n\330\010\020\220\001";
 static const char __pyx_k_Incompatible_checksums_0x_x_vs_0[] = "Incompatible checksums (0x%x vs (0xd5c481f, 0xd2fe818, 0x4b2ba7c) = (cols, rows, table, table_c, turn_key))";
 static const char __pyx_k_Note_that_Cython_is_deliberately[] = "Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.";
-static const char __pyx_k_Pyx_carray_from_py_unsigned_PY_2[] = "__Pyx_carray_from_py_unsigned_PY_LONG_LONG___5b_2_5d_";
-static const char __pyx_k_Pyx_carray_to_py_unsigned_PY_L_2[] = "__Pyx_carray_to_py_unsigned_PY_LONG_LONG___5b_2_5d_";
-static const char __pyx_k_Pyx_carray_to_tuple_unsigned_P_2[] = "__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG___5b_2_5d_";
 /* #### Code section: decls ### */
 static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *__pyx_v_self, PyObject *__pyx_v_board_size, int __pyx_v_num_piece_types); /* proto */
 static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_2compute_hash(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *__pyx_v_self, PyObject *__pyx_v_board, int __pyx_v_current_player); /* proto */
@@ -3087,8 +2619,8 @@ typedef struct {
   PyTypeObject *__pyx_ptype_4core_15zobrist_hashing_ZobristHasher;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
   PyObject *__pyx_tuple[2];
-  PyObject *__pyx_codeobj_tab[25];
-  PyObject *__pyx_string_tab[132];
+  PyObject *__pyx_codeobj_tab[11];
+  PyObject *__pyx_string_tab[96];
   PyObject *__pyx_int_0;
   PyObject *__pyx_int_1;
   PyObject *__pyx_int_5;
@@ -3136,137 +2668,101 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #endif
 /* #### Code section: constant_name_defines ### */
 #define __pyx_kp_u_ __pyx_string_tab[0]
-#define __pyx_n_u_CANNON __pyx_string_tab[1]
-#define __pyx_n_u_EMPTY __pyx_string_tab[2]
-#define __pyx_kp_u_Incompatible_checksums_0x_x_vs_0 __pyx_string_tab[3]
-#define __pyx_n_u_IndexError __pyx_string_tab[4]
-#define __pyx_kp_u_Note_that_Cython_is_deliberately __pyx_string_tab[5]
-#define __pyx_n_u_OverflowError __pyx_string_tab[6]
-#define __pyx_n_u_PIECE_TO_INDEX __pyx_string_tab[7]
-#define __pyx_n_u_PIECE_TO_INDEX_2 __pyx_string_tab[8]
-#define __pyx_n_u_PickleError __pyx_string_tab[9]
-#define __pyx_n_u_Pyx_carray_from_py_unsigned_PY __pyx_string_tab[10]
-#define __pyx_n_u_Pyx_carray_from_py_unsigned_PY_2 __pyx_string_tab[11]
-#define __pyx_n_u_Pyx_carray_to_py_unsigned_PY_L __pyx_string_tab[12]
-#define __pyx_n_u_Pyx_carray_to_py_unsigned_PY_L_2 __pyx_string_tab[13]
-#define __pyx_n_u_Pyx_carray_to_tuple_unsigned_P __pyx_string_tab[14]
-#define __pyx_n_u_Pyx_carray_to_tuple_unsigned_P_2 __pyx_string_tab[15]
-#define __pyx_n_u_SOLDIER __pyx_string_tab[16]
-#define __pyx_n_u_TypeError __pyx_string_tab[17]
-#define __pyx_n_u_ZobristHasher __pyx_string_tab[18]
-#define __pyx_n_u_ZobristHasher___reduce_cython __pyx_string_tab[19]
-#define __pyx_n_u_ZobristHasher___setstate_cython __pyx_string_tab[20]
-#define __pyx_n_u_ZobristHasher_compute_hash __pyx_string_tab[21]
-#define __pyx_n_u_ZobristHasher_place_piece_hash __pyx_string_tab[22]
-#define __pyx_n_u_ZobristHasher_remove_piece_hash __pyx_string_tab[23]
-#define __pyx_n_u_ZobristHasher_switch_turn_hash __pyx_string_tab[24]
-#define __pyx_n_u_ZobristHasher_update_hash __pyx_string_tab[25]
-#define __pyx_kp_u__2 __pyx_string_tab[26]
-#define __pyx_n_u__3 __pyx_string_tab[27]
-#define __pyx_kp_u_add_note __pyx_string_tab[28]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[29]
-#define __pyx_n_u_board __pyx_string_tab[30]
-#define __pyx_n_u_board_c __pyx_string_tab[31]
-#define __pyx_n_u_board_size __pyx_string_tab[32]
-#define __pyx_n_u_c __pyx_string_tab[33]
-#define __pyx_n_u_c_compute_hash __pyx_string_tab[34]
-#define __pyx_n_u_c_remove_piece_hash __pyx_string_tab[35]
-#define __pyx_n_u_c_switch_turn_hash __pyx_string_tab[36]
-#define __pyx_n_u_c_update_hash __pyx_string_tab[37]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[38]
-#define __pyx_n_u_col __pyx_string_tab[39]
-#define __pyx_n_u_cols __pyx_string_tab[40]
-#define __pyx_n_u_compute_board_hash __pyx_string_tab[41]
-#define __pyx_n_u_compute_hash __pyx_string_tab[42]
-#define __pyx_n_u_core_zobrist_hashing __pyx_string_tab[43]
-#define __pyx_kp_u_core_zobrist_hashing_pxd __pyx_string_tab[44]
-#define __pyx_kp_u_core_zobrist_hashing_pyx __pyx_string_tab[45]
-#define __pyx_n_u_current_player __pyx_string_tab[46]
-#define __pyx_n_u_dict __pyx_string_tab[47]
-#define __pyx_n_u_dict_2 __pyx_string_tab[48]
-#define __pyx_kp_u_disable __pyx_string_tab[49]
-#define __pyx_kp_u_enable __pyx_string_tab[50]
-#define __pyx_n_u_end_c __pyx_string_tab[51]
-#define __pyx_n_u_end_r __pyx_string_tab[52]
-#define __pyx_n_u_enumerate __pyx_string_tab[53]
-#define __pyx_n_u_from_col __pyx_string_tab[54]
-#define __pyx_n_u_from_row __pyx_string_tab[55]
-#define __pyx_n_u_func __pyx_string_tab[56]
-#define __pyx_kp_u_gc __pyx_string_tab[57]
-#define __pyx_n_u_get __pyx_string_tab[58]
-#define __pyx_n_u_get_hasher __pyx_string_tab[59]
-#define __pyx_n_u_getrandbits __pyx_string_tab[60]
-#define __pyx_n_u_getstate __pyx_string_tab[61]
-#define __pyx_n_u_getstate_2 __pyx_string_tab[62]
-#define __pyx_n_u_h __pyx_string_tab[63]
-#define __pyx_n_u_hasher __pyx_string_tab[64]
-#define __pyx_n_u_init __pyx_string_tab[65]
-#define __pyx_n_u_initializing __pyx_string_tab[66]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[67]
-#define __pyx_kp_u_isenabled __pyx_string_tab[68]
-#define __pyx_n_u_length __pyx_string_tab[69]
-#define __pyx_n_u_main __pyx_string_tab[70]
-#define __pyx_n_u_module __pyx_string_tab[71]
-#define __pyx_n_u_move __pyx_string_tab[72]
-#define __pyx_n_u_name __pyx_string_tab[73]
-#define __pyx_n_u_new __pyx_string_tab[74]
-#define __pyx_n_u_new_hash __pyx_string_tab[75]
-#define __pyx_n_u_num_piece_types __pyx_string_tab[76]
-#define __pyx_n_u_o __pyx_string_tab[77]
-#define __pyx_n_u_old_hash __pyx_string_tab[78]
-#define __pyx_n_u_p __pyx_string_tab[79]
-#define __pyx_n_u_pickle __pyx_string_tab[80]
-#define __pyx_n_u_piece __pyx_string_tab[81]
-#define __pyx_n_u_piece_index __pyx_string_tab[82]
-#define __pyx_n_u_piece_type __pyx_string_tab[83]
-#define __pyx_n_u_place_piece_hash __pyx_string_tab[84]
-#define __pyx_n_u_pop __pyx_string_tab[85]
-#define __pyx_n_u_position __pyx_string_tab[86]
-#define __pyx_n_u_pyx_PickleError __pyx_string_tab[87]
-#define __pyx_n_u_pyx_checksum __pyx_string_tab[88]
-#define __pyx_n_u_pyx_result __pyx_string_tab[89]
-#define __pyx_n_u_pyx_state __pyx_string_tab[90]
-#define __pyx_n_u_pyx_type __pyx_string_tab[91]
-#define __pyx_n_u_pyx_unpickle_ZobristHasher __pyx_string_tab[92]
-#define __pyx_n_u_pyx_unpickle_ZobristHasher__se __pyx_string_tab[93]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[94]
-#define __pyx_n_u_qualname __pyx_string_tab[95]
-#define __pyx_n_u_r __pyx_string_tab[96]
-#define __pyx_n_u_random __pyx_string_tab[97]
-#define __pyx_n_u_range __pyx_string_tab[98]
-#define __pyx_n_u_reduce __pyx_string_tab[99]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[100]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[101]
-#define __pyx_n_u_remove_piece_hash __pyx_string_tab[102]
-#define __pyx_n_u_row __pyx_string_tab[103]
-#define __pyx_n_u_rows __pyx_string_tab[104]
-#define __pyx_n_u_seed __pyx_string_tab[105]
-#define __pyx_n_u_self __pyx_string_tab[106]
-#define __pyx_n_u_set __pyx_string_tab[107]
-#define __pyx_n_u_set_name __pyx_string_tab[108]
-#define __pyx_n_u_setstate __pyx_string_tab[109]
-#define __pyx_n_u_setstate_2 __pyx_string_tab[110]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[111]
-#define __pyx_n_u_spec __pyx_string_tab[112]
-#define __pyx_n_u_start_c __pyx_string_tab[113]
-#define __pyx_n_u_start_r __pyx_string_tab[114]
-#define __pyx_n_u_state __pyx_string_tab[115]
-#define __pyx_n_u_state_backup __pyx_string_tab[116]
-#define __pyx_kp_u_stringsource __pyx_string_tab[117]
-#define __pyx_n_u_switch_turn_hash __pyx_string_tab[118]
-#define __pyx_n_u_table __pyx_string_tab[119]
-#define __pyx_n_u_table_c __pyx_string_tab[120]
-#define __pyx_n_u_test __pyx_string_tab[121]
-#define __pyx_n_u_to_col __pyx_string_tab[122]
-#define __pyx_n_u_to_row __pyx_string_tab[123]
-#define __pyx_n_u_turn_key __pyx_string_tab[124]
-#define __pyx_n_u_update __pyx_string_tab[125]
-#define __pyx_n_u_update_board_hash __pyx_string_tab[126]
-#define __pyx_n_u_update_hash __pyx_string_tab[127]
-#define __pyx_n_u_use_setstate __pyx_string_tab[128]
-#define __pyx_n_u_v __pyx_string_tab[129]
-#define __pyx_n_u_val __pyx_string_tab[130]
-#define __pyx_n_u_value __pyx_string_tab[131]
+#define __pyx_kp_u_Incompatible_checksums_0x_x_vs_0 __pyx_string_tab[1]
+#define __pyx_n_u_IndexError __pyx_string_tab[2]
+#define __pyx_kp_u_Note_that_Cython_is_deliberately __pyx_string_tab[3]
+#define __pyx_n_u_OverflowError __pyx_string_tab[4]
+#define __pyx_n_u_PIECE_TO_INDEX __pyx_string_tab[5]
+#define __pyx_n_u_PickleError __pyx_string_tab[6]
+#define __pyx_n_u_TypeError __pyx_string_tab[7]
+#define __pyx_n_u_ZobristHasher __pyx_string_tab[8]
+#define __pyx_n_u_ZobristHasher___reduce_cython __pyx_string_tab[9]
+#define __pyx_n_u_ZobristHasher___setstate_cython __pyx_string_tab[10]
+#define __pyx_n_u_ZobristHasher_compute_hash __pyx_string_tab[11]
+#define __pyx_n_u_ZobristHasher_place_piece_hash __pyx_string_tab[12]
+#define __pyx_n_u_ZobristHasher_remove_piece_hash __pyx_string_tab[13]
+#define __pyx_n_u_ZobristHasher_switch_turn_hash __pyx_string_tab[14]
+#define __pyx_n_u_ZobristHasher_update_hash __pyx_string_tab[15]
+#define __pyx_kp_u__2 __pyx_string_tab[16]
+#define __pyx_kp_u_add_note __pyx_string_tab[17]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[18]
+#define __pyx_n_u_board __pyx_string_tab[19]
+#define __pyx_n_u_board_size __pyx_string_tab[20]
+#define __pyx_n_u_c __pyx_string_tab[21]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[22]
+#define __pyx_n_u_col __pyx_string_tab[23]
+#define __pyx_n_u_compute_board_hash __pyx_string_tab[24]
+#define __pyx_n_u_compute_hash __pyx_string_tab[25]
+#define __pyx_n_u_core_zobrist_hashing __pyx_string_tab[26]
+#define __pyx_kp_u_core_zobrist_hashing_pyx __pyx_string_tab[27]
+#define __pyx_n_u_current_player __pyx_string_tab[28]
+#define __pyx_n_u_dict __pyx_string_tab[29]
+#define __pyx_n_u_dict_2 __pyx_string_tab[30]
+#define __pyx_kp_u_disable __pyx_string_tab[31]
+#define __pyx_kp_u_enable __pyx_string_tab[32]
+#define __pyx_n_u_enumerate __pyx_string_tab[33]
+#define __pyx_n_u_from_col __pyx_string_tab[34]
+#define __pyx_n_u_from_row __pyx_string_tab[35]
+#define __pyx_n_u_func __pyx_string_tab[36]
+#define __pyx_kp_u_gc __pyx_string_tab[37]
+#define __pyx_n_u_get_hasher __pyx_string_tab[38]
+#define __pyx_n_u_getrandbits __pyx_string_tab[39]
+#define __pyx_n_u_getstate __pyx_string_tab[40]
+#define __pyx_n_u_getstate_2 __pyx_string_tab[41]
+#define __pyx_n_u_h __pyx_string_tab[42]
+#define __pyx_n_u_hasher __pyx_string_tab[43]
+#define __pyx_n_u_initializing __pyx_string_tab[44]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[45]
+#define __pyx_kp_u_isenabled __pyx_string_tab[46]
+#define __pyx_n_u_main __pyx_string_tab[47]
+#define __pyx_n_u_module __pyx_string_tab[48]
+#define __pyx_n_u_move __pyx_string_tab[49]
+#define __pyx_n_u_name __pyx_string_tab[50]
+#define __pyx_n_u_new __pyx_string_tab[51]
+#define __pyx_n_u_new_hash __pyx_string_tab[52]
+#define __pyx_n_u_num_piece_types __pyx_string_tab[53]
+#define __pyx_n_u_old_hash __pyx_string_tab[54]
+#define __pyx_n_u_pickle __pyx_string_tab[55]
+#define __pyx_n_u_piece __pyx_string_tab[56]
+#define __pyx_n_u_piece_index __pyx_string_tab[57]
+#define __pyx_n_u_piece_type __pyx_string_tab[58]
+#define __pyx_n_u_place_piece_hash __pyx_string_tab[59]
+#define __pyx_n_u_pop __pyx_string_tab[60]
+#define __pyx_n_u_position __pyx_string_tab[61]
+#define __pyx_n_u_pyx_PickleError __pyx_string_tab[62]
+#define __pyx_n_u_pyx_capi __pyx_string_tab[63]
+#define __pyx_n_u_pyx_checksum __pyx_string_tab[64]
+#define __pyx_n_u_pyx_result __pyx_string_tab[65]
+#define __pyx_n_u_pyx_state __pyx_string_tab[66]
+#define __pyx_n_u_pyx_type __pyx_string_tab[67]
+#define __pyx_n_u_pyx_unpickle_ZobristHasher __pyx_string_tab[68]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[69]
+#define __pyx_n_u_qualname __pyx_string_tab[70]
+#define __pyx_n_u_r __pyx_string_tab[71]
+#define __pyx_n_u_random __pyx_string_tab[72]
+#define __pyx_n_u_range __pyx_string_tab[73]
+#define __pyx_n_u_reduce __pyx_string_tab[74]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[75]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[76]
+#define __pyx_n_u_remove_piece_hash __pyx_string_tab[77]
+#define __pyx_n_u_row __pyx_string_tab[78]
+#define __pyx_n_u_seed __pyx_string_tab[79]
+#define __pyx_n_u_self __pyx_string_tab[80]
+#define __pyx_n_u_set_name __pyx_string_tab[81]
+#define __pyx_n_u_setstate __pyx_string_tab[82]
+#define __pyx_n_u_setstate_2 __pyx_string_tab[83]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[84]
+#define __pyx_n_u_spec __pyx_string_tab[85]
+#define __pyx_n_u_state __pyx_string_tab[86]
+#define __pyx_kp_u_stringsource __pyx_string_tab[87]
+#define __pyx_n_u_switch_turn_hash __pyx_string_tab[88]
+#define __pyx_n_u_test __pyx_string_tab[89]
+#define __pyx_n_u_to_col __pyx_string_tab[90]
+#define __pyx_n_u_to_row __pyx_string_tab[91]
+#define __pyx_n_u_update __pyx_string_tab[92]
+#define __pyx_n_u_update_board_hash __pyx_string_tab[93]
+#define __pyx_n_u_update_hash __pyx_string_tab[94]
+#define __pyx_n_u_use_setstate __pyx_string_tab[95]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -3290,8 +2786,8 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher);
   Py_CLEAR(clear_module_state->__pyx_type_4core_15zobrist_hashing_ZobristHasher);
   for (int i=0; i<2; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<25; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<132; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<11; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<96; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   Py_CLEAR(clear_module_state->__pyx_int_0);
   Py_CLEAR(clear_module_state->__pyx_int_1);
   Py_CLEAR(clear_module_state->__pyx_int_5);
@@ -3324,8 +2820,8 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher);
   Py_VISIT(traverse_module_state->__pyx_type_4core_15zobrist_hashing_ZobristHasher);
   for (int i=0; i<2; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<25; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<132; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<11; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<96; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_1);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_5);
@@ -3353,7 +2849,6 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_py_unsigned_PY_LONG_LONG(unsigned
   PyObject *__pyx_v_value = 0;
   PyObject *__pyx_v_l = NULL;
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   size_t __pyx_t_2;
@@ -3363,9 +2858,7 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_py_unsigned_PY_LONG_LONG(unsigned
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0]))
   __Pyx_RefNannySetupContext("__Pyx_carray_to_py_unsigned_PY_LONG_LONG", 0);
-  __Pyx_TraceStartFunc("__Pyx_carray_to_py_unsigned_PY_LONG_LONG", __pyx_f[1], 113, 0, 0, 0, __PYX_ERR(1, 113, __pyx_L1_error));
 
   /* "carray.to_py":117
  *     cdef size_t i
@@ -3432,7 +2925,6 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_py_unsigned_PY_LONG_LONG(unsigned
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_l);
   __pyx_r = __pyx_v_l;
-  __Pyx_TraceReturnValue(__pyx_r, 23, 0, __PYX_ERR(1, 122, __pyx_L1_error));
   goto __pyx_L0;
 
   /* "carray.to_py":113
@@ -3446,19 +2938,12 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_py_unsigned_PY_LONG_LONG(unsigned
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(1, 113, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("carray.to_py.__Pyx_carray_to_py_unsigned_PY_LONG_LONG", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_value);
   __Pyx_XDECREF(__pyx_v_l);
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -3476,7 +2961,6 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG(unsig
   PyObject *__pyx_v_value = 0;
   PyObject *__pyx_v_t = NULL;
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   size_t __pyx_t_2;
@@ -3486,9 +2970,7 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG(unsig
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1]))
   __Pyx_RefNannySetupContext("__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG", 0);
-  __Pyx_TraceStartFunc("__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG", __pyx_f[1], 125, 0, 0, 0, __PYX_ERR(1, 125, __pyx_L1_error));
 
   /* "carray.to_py":129
  *     cdef size_t i
@@ -3552,7 +3034,6 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG(unsig
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_t);
   __pyx_r = __pyx_v_t;
-  __Pyx_TraceReturnValue(__pyx_r, 23, 0, __PYX_ERR(1, 134, __pyx_L1_error));
   goto __pyx_L0;
 
   /* "carray.to_py":125
@@ -3566,19 +3047,12 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG(unsig
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(1, 125, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("carray.to_py.__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_value);
   __Pyx_XDECREF(__pyx_v_t);
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -3596,7 +3070,6 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_py_unsigned_PY_LONG_LONG___5b_2_5
   PyObject *__pyx_v_value = 0;
   PyObject *__pyx_v_l = NULL;
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   size_t __pyx_t_2;
@@ -3606,9 +3079,7 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_py_unsigned_PY_LONG_LONG___5b_2_5
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2]))
   __Pyx_RefNannySetupContext("__Pyx_carray_to_py_unsigned_PY_LONG_LONG___5b_2_5d_", 0);
-  __Pyx_TraceStartFunc("__Pyx_carray_to_py_unsigned_PY_LONG_LONG___5b_2_5d_", __pyx_f[1], 113, 0, 0, 0, __PYX_ERR(1, 113, __pyx_L1_error));
 
   /* "carray.to_py":117
  *     cdef size_t i
@@ -3675,7 +3146,6 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_py_unsigned_PY_LONG_LONG___5b_2_5
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_l);
   __pyx_r = __pyx_v_l;
-  __Pyx_TraceReturnValue(__pyx_r, 23, 0, __PYX_ERR(1, 122, __pyx_L1_error));
   goto __pyx_L0;
 
   /* "carray.to_py":113
@@ -3689,19 +3159,12 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_py_unsigned_PY_LONG_LONG___5b_2_5
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(1, 113, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("carray.to_py.__Pyx_carray_to_py_unsigned_PY_LONG_LONG___5b_2_5d_", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_value);
   __Pyx_XDECREF(__pyx_v_l);
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -3719,7 +3182,6 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG___5b_
   PyObject *__pyx_v_value = 0;
   PyObject *__pyx_v_t = NULL;
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   size_t __pyx_t_2;
@@ -3729,9 +3191,7 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG___5b_
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3]))
   __Pyx_RefNannySetupContext("__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG___5b_2_5d_", 0);
-  __Pyx_TraceStartFunc("__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG___5b_2_5d_", __pyx_f[1], 125, 0, 0, 0, __PYX_ERR(1, 125, __pyx_L1_error));
 
   /* "carray.to_py":129
  *     cdef size_t i
@@ -3795,7 +3255,6 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG___5b_
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_t);
   __pyx_r = __pyx_v_t;
-  __Pyx_TraceReturnValue(__pyx_r, 23, 0, __PYX_ERR(1, 134, __pyx_L1_error));
   goto __pyx_L0;
 
   /* "carray.to_py":125
@@ -3809,19 +3268,12 @@ static CYTHON_INLINE PyObject *__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG___5b_
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(1, 125, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("carray.to_py.__Pyx_carray_to_tuple_unsigned_PY_LONG_LONG___5b_2_5d_", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_value);
   __Pyx_XDECREF(__pyx_v_t);
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -3838,7 +3290,6 @@ static int __Pyx_carray_from_py_unsigned_PY_LONG_LONG(PyObject *__pyx_v_o, unsig
   Py_ssize_t __pyx_v_i;
   PyObject *__pyx_v_item = NULL;
   int __pyx_r;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -3855,9 +3306,7 @@ static int __Pyx_carray_from_py_unsigned_PY_LONG_LONG(PyObject *__pyx_v_o, unsig
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4]))
   __Pyx_RefNannySetupContext("__Pyx_carray_from_py_unsigned_PY_LONG_LONG", 0);
-  __Pyx_TraceStartFunc("__Pyx_carray_from_py_unsigned_PY_LONG_LONG", __pyx_f[1], 78, 0, 0, 0, __PYX_ERR(1, 78, __pyx_L1_error));
 
   /* "carray.from_py":80
  * @cname("__Pyx_carray_from_py_unsigned_PY_LONG_LONG")
@@ -3907,7 +3356,6 @@ static int __Pyx_carray_from_py_unsigned_PY_LONG_LONG(PyObject *__pyx_v_o, unsig
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     goto __pyx_L8_try_end;
     __pyx_L3_error:;
-    __Pyx_TraceException(__pyx_lineno, 0, 0);
 
     /* "carray.from_py":83
  *     try:
@@ -3918,10 +3366,7 @@ static int __Pyx_carray_from_py_unsigned_PY_LONG_LONG(PyObject *__pyx_v_o, unsig
 */
     __pyx_t_5 = __Pyx_PyErr_ExceptionMatches2(__pyx_builtin_TypeError, __pyx_builtin_OverflowError);
     if (__pyx_t_5) {
-      __Pyx_AddTraceback("carray.from_py.__Pyx_carray_from_py_unsigned_PY_LONG_LONG", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      __Pyx_TraceExceptionHandled(0);
       __Pyx_ErrRestore(0,0,0);
-      __Pyx_TraceExceptionDone();
       goto __pyx_L4_exception_handled;
     }
     goto __pyx_L5_except_error;
@@ -4100,7 +3545,6 @@ static int __Pyx_carray_from_py_unsigned_PY_LONG_LONG(PyObject *__pyx_v_o, unsig
  *     PyErr_Format(
 */
         __pyx_r = 0;
-        __Pyx_TraceReturnCValue(__pyx_r, __Pyx_PyLong_From_int, 36, 0, __PYX_ERR(1, 93, __pyx_L1_error));
         goto __pyx_L0;
 
         /* "carray.from_py":92
@@ -4158,22 +3602,14 @@ static int __Pyx_carray_from_py_unsigned_PY_LONG_LONG(PyObject *__pyx_v_o, unsig
 
   /* function exit code */
   __pyx_r = 0;
-  __Pyx_TraceReturnCValue(__pyx_r, __Pyx_PyLong_From_int, 0, 0, __PYX_ERR(1, 78, __pyx_L1_error));
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(1, 78, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("carray.from_py.__Pyx_carray_from_py_unsigned_PY_LONG_LONG", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = -1;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_item);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -4182,7 +3618,6 @@ static int __Pyx_carray_from_py_unsigned_PY_LONG_LONG___5b_2_5d_(PyObject *__pyx
   Py_ssize_t __pyx_v_i;
   PyObject *__pyx_v_item = NULL;
   int __pyx_r;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -4199,9 +3634,7 @@ static int __Pyx_carray_from_py_unsigned_PY_LONG_LONG___5b_2_5d_(PyObject *__pyx
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5]))
   __Pyx_RefNannySetupContext("__Pyx_carray_from_py_unsigned_PY_LONG_LONG___5b_2_5d_", 0);
-  __Pyx_TraceStartFunc("__Pyx_carray_from_py_unsigned_PY_LONG_LONG___5b_2_5d_", __pyx_f[1], 78, 0, 0, 0, __PYX_ERR(1, 78, __pyx_L1_error));
 
   /* "carray.from_py":80
  * @cname("__Pyx_carray_from_py_unsigned_PY_LONG_LONG___5b_2_5d_")
@@ -4251,7 +3684,6 @@ static int __Pyx_carray_from_py_unsigned_PY_LONG_LONG___5b_2_5d_(PyObject *__pyx
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     goto __pyx_L8_try_end;
     __pyx_L3_error:;
-    __Pyx_TraceException(__pyx_lineno, 0, 0);
 
     /* "carray.from_py":83
  *     try:
@@ -4262,10 +3694,7 @@ static int __Pyx_carray_from_py_unsigned_PY_LONG_LONG___5b_2_5d_(PyObject *__pyx
 */
     __pyx_t_5 = __Pyx_PyErr_ExceptionMatches2(__pyx_builtin_TypeError, __pyx_builtin_OverflowError);
     if (__pyx_t_5) {
-      __Pyx_AddTraceback("carray.from_py.__Pyx_carray_from_py_unsigned_PY_LONG_LONG___5b_2_5d_", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      __Pyx_TraceExceptionHandled(0);
       __Pyx_ErrRestore(0,0,0);
-      __Pyx_TraceExceptionDone();
       goto __pyx_L4_exception_handled;
     }
     goto __pyx_L5_except_error;
@@ -4444,7 +3873,6 @@ static int __Pyx_carray_from_py_unsigned_PY_LONG_LONG___5b_2_5d_(PyObject *__pyx
  *     PyErr_Format(
 */
         __pyx_r = 0;
-        __Pyx_TraceReturnCValue(__pyx_r, __Pyx_PyLong_From_int, 36, 0, __PYX_ERR(1, 93, __pyx_L1_error));
         goto __pyx_L0;
 
         /* "carray.from_py":92
@@ -4502,27 +3930,19 @@ static int __Pyx_carray_from_py_unsigned_PY_LONG_LONG___5b_2_5d_(PyObject *__pyx
 
   /* function exit code */
   __pyx_r = 0;
-  __Pyx_TraceReturnCValue(__pyx_r, __Pyx_PyLong_From_int, 0, 0, __PYX_ERR(1, 78, __pyx_L1_error));
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(1, 78, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("carray.from_py.__Pyx_carray_from_py_unsigned_PY_LONG_LONG___5b_2_5d_", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = -1;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_item);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "core/zobrist_hashing.pyx":24
+/* "core/zobrist_hashing.pyx":21
  *     """Zobrist - Cython"""
  * 
  *     def __init__(self, tuple board_size=(5, 5), int num_piece_types=2):             # <<<<<<<<<<<<<<
@@ -4557,32 +3977,32 @@ static int __pyx_pw_4core_15zobrist_hashing_13ZobristHasher_1__init__(PyObject *
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_board_size,&__pyx_mstate_global->__pyx_n_u_num_piece_types,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 24, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 21, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 24, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 21, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 24, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 21, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 24, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < 0) __PYX_ERR(0, 21, __pyx_L3_error)
       if (!values[0]) values[0] = __Pyx_NewRef(((PyObject*)__pyx_mstate_global->__pyx_tuple[0]));
     } else {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 24, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 21, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 24, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 21, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
@@ -4591,14 +4011,14 @@ static int __pyx_pw_4core_15zobrist_hashing_13ZobristHasher_1__init__(PyObject *
     }
     __pyx_v_board_size = ((PyObject*)values[0]);
     if (values[1]) {
-      __pyx_v_num_piece_types = __Pyx_PyLong_As_int(values[1]); if (unlikely((__pyx_v_num_piece_types == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 24, __pyx_L3_error)
+      __pyx_v_num_piece_types = __Pyx_PyLong_As_int(values[1]); if (unlikely((__pyx_v_num_piece_types == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 21, __pyx_L3_error)
     } else {
       __pyx_v_num_piece_types = ((int)2);
     }
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 0, 2, __pyx_nargs); __PYX_ERR(0, 24, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 0, 2, __pyx_nargs); __PYX_ERR(0, 21, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -4609,7 +4029,7 @@ static int __pyx_pw_4core_15zobrist_hashing_13ZobristHasher_1__init__(PyObject *
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_board_size), (&PyTuple_Type), 1, "board_size", 1))) __PYX_ERR(0, 24, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_board_size), (&PyTuple_Type), 1, "board_size", 1))) __PYX_ERR(0, 21, __pyx_L1_error)
   __pyx_r = __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(((struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *)__pyx_v_self), __pyx_v_board_size, __pyx_v_num_piece_types);
 
   /* function exit code */
@@ -4639,7 +4059,6 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
   CYTHON_UNUSED int __pyx_8genexpr1__pyx_v__;
   CYTHON_UNUSED int __pyx_8genexpr2__pyx_v__;
   int __pyx_r;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -4659,11 +4078,9 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6]))
   __Pyx_RefNannySetupContext("__init__", 0);
-  __Pyx_TraceStartFunc("__init__", __pyx_f[0], 24, 0, 0, 0, __PYX_ERR(0, 24, __pyx_L1_error));
 
-  /* "core/zobrist_hashing.pyx":31
+  /* "core/zobrist_hashing.pyx":28
  *         cdef int r, c, p
  * 
  *         self.rows, self.cols = board_size             # <<<<<<<<<<<<<<
@@ -4676,7 +4093,7 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 31, __pyx_L1_error)
+      __PYX_ERR(0, 28, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     __pyx_t_1 = PyTuple_GET_ITEM(sequence, 0);
@@ -4684,22 +4101,22 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
     __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1);
     __Pyx_INCREF(__pyx_t_2);
     #else
-    __pyx_t_1 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 31, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 31, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     #endif
   } else {
-    __Pyx_RaiseNoneNotIterableError(); __PYX_ERR(0, 31, __pyx_L1_error)
+    __Pyx_RaiseNoneNotIterableError(); __PYX_ERR(0, 28, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_PyLong_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_4 = __Pyx_PyLong_As_int(__pyx_t_2); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyLong_As_int(__pyx_t_2); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_self->rows = __pyx_t_3;
   __pyx_v_self->cols = __pyx_t_4;
 
-  /* "core/zobrist_hashing.pyx":34
+  /* "core/zobrist_hashing.pyx":31
  * 
  *         # Python
  *         self.table = [[[0 for _ in range(num_piece_types)]             # <<<<<<<<<<<<<<
@@ -4707,10 +4124,10 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
  * 
 */
   { /* enter inner scope */
-    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 34, __pyx_L1_error)
+    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 31, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
 
-    /* "core/zobrist_hashing.pyx":35
+    /* "core/zobrist_hashing.pyx":32
  *         # Python
  *         self.table = [[[0 for _ in range(num_piece_types)]
  *                        for _ in range(self.cols)] for _ in range(self.rows)]             # <<<<<<<<<<<<<<
@@ -4723,17 +4140,17 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
       __pyx_7genexpr__pyx_v__ = __pyx_t_5;
       { /* enter inner scope */
 
-        /* "core/zobrist_hashing.pyx":34
+        /* "core/zobrist_hashing.pyx":31
  * 
  *         # Python
  *         self.table = [[[0 for _ in range(num_piece_types)]             # <<<<<<<<<<<<<<
  *                        for _ in range(self.cols)] for _ in range(self.rows)]
  * 
 */
-        __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L1_error)
+        __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 31, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
 
-        /* "core/zobrist_hashing.pyx":35
+        /* "core/zobrist_hashing.pyx":32
  *         # Python
  *         self.table = [[[0 for _ in range(num_piece_types)]
  *                        for _ in range(self.cols)] for _ in range(self.rows)]             # <<<<<<<<<<<<<<
@@ -4746,27 +4163,27 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
           __pyx_8genexpr1__pyx_v__ = __pyx_t_8;
           { /* enter inner scope */
 
-            /* "core/zobrist_hashing.pyx":34
+            /* "core/zobrist_hashing.pyx":31
  * 
  *         # Python
  *         self.table = [[[0 for _ in range(num_piece_types)]             # <<<<<<<<<<<<<<
  *                        for _ in range(self.cols)] for _ in range(self.rows)]
  * 
 */
-            __pyx_t_9 = PyList_New(0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 34, __pyx_L1_error)
+            __pyx_t_9 = PyList_New(0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 31, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_9);
             __pyx_t_10 = __pyx_v_num_piece_types;
             __pyx_t_11 = __pyx_t_10;
             for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
               __pyx_8genexpr2__pyx_v__ = __pyx_t_12;
-              if (unlikely(__Pyx_ListComp_Append(__pyx_t_9, (PyObject*)__pyx_mstate_global->__pyx_int_0))) __PYX_ERR(0, 34, __pyx_L1_error)
+              if (unlikely(__Pyx_ListComp_Append(__pyx_t_9, (PyObject*)__pyx_mstate_global->__pyx_int_0))) __PYX_ERR(0, 31, __pyx_L1_error)
             }
           } /* exit inner scope */
-          if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_9))) __PYX_ERR(0, 34, __pyx_L1_error)
+          if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_9))) __PYX_ERR(0, 31, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         }
       } /* exit inner scope */
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_t_1))) __PYX_ERR(0, 34, __pyx_L1_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_t_1))) __PYX_ERR(0, 31, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
   } /* exit inner scope */
@@ -4776,7 +4193,7 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
   __pyx_v_self->table = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":42
+  /* "core/zobrist_hashing.pyx":39
  * 
  *         #
  *         state_backup = random.getstate()             # <<<<<<<<<<<<<<
@@ -4784,9 +4201,9 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
  * 
 */
   __pyx_t_1 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_random); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_random); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_getstate); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_getstate); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   __pyx_t_14 = 1;
@@ -4806,13 +4223,13 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_13, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (__pyx_t_14*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 42, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 39, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __pyx_v_state_backup = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":43
+  /* "core/zobrist_hashing.pyx":40
  *         #
  *         state_backup = random.getstate()
  *         random.seed(123456789)             # <<<<<<<<<<<<<<
@@ -4820,9 +4237,9 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
  *         for r in range(self.rows):
 */
   __pyx_t_13 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_random); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_random); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_seed); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_seed); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_14 = 1;
@@ -4842,12 +4259,12 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_9, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (__pyx_t_14*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":45
+  /* "core/zobrist_hashing.pyx":42
  *         random.seed(123456789)
  * 
  *         for r in range(self.rows):             # <<<<<<<<<<<<<<
@@ -4859,7 +4276,7 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
   for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_3; __pyx_t_5+=1) {
     __pyx_v_r = __pyx_t_5;
 
-    /* "core/zobrist_hashing.pyx":46
+    /* "core/zobrist_hashing.pyx":43
  * 
  *         for r in range(self.rows):
  *             for c in range(self.cols):             # <<<<<<<<<<<<<<
@@ -4871,7 +4288,7 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
     for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
       __pyx_v_c = __pyx_t_8;
 
-      /* "core/zobrist_hashing.pyx":47
+      /* "core/zobrist_hashing.pyx":44
  *         for r in range(self.rows):
  *             for c in range(self.cols):
  *                 for p in range(num_piece_types):             # <<<<<<<<<<<<<<
@@ -4883,7 +4300,7 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
       for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
         __pyx_v_p = __pyx_t_12;
 
-        /* "core/zobrist_hashing.pyx":48
+        /* "core/zobrist_hashing.pyx":45
  *             for c in range(self.cols):
  *                 for p in range(num_piece_types):
  *                     val = random.getrandbits(64)             # <<<<<<<<<<<<<<
@@ -4891,9 +4308,9 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
  *                     self.table_c[r * 5 + c][p] = val
 */
         __pyx_t_9 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_random); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 48, __pyx_L1_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_random); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 45, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_13);
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_getrandbits); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 48, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_getrandbits); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
         __pyx_t_14 = 1;
@@ -4913,32 +4330,32 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (__pyx_t_14*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 48, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        __pyx_t_15 = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(__pyx_t_2); if (unlikely((__pyx_t_15 == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 48, __pyx_L1_error)
+        __pyx_t_15 = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(__pyx_t_2); if (unlikely((__pyx_t_15 == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 45, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_v_val = __pyx_t_15;
 
-        /* "core/zobrist_hashing.pyx":49
+        /* "core/zobrist_hashing.pyx":46
  *                 for p in range(num_piece_types):
  *                     val = random.getrandbits(64)
  *                     self.table[r][c][p] = val             # <<<<<<<<<<<<<<
  *                     self.table_c[r * 5 + c][p] = val
  * 
 */
-        __pyx_t_2 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_val); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 49, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_val); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 46, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_self->table, __pyx_v_r, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 49, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_self->table, __pyx_v_r, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 46, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_c, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 49, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_c, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 46, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        if (unlikely((__Pyx_SetItemInt(__pyx_t_9, __pyx_v_p, __pyx_t_2, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1) < 0))) __PYX_ERR(0, 49, __pyx_L1_error)
+        if (unlikely((__Pyx_SetItemInt(__pyx_t_9, __pyx_v_p, __pyx_t_2, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1) < 0))) __PYX_ERR(0, 46, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "core/zobrist_hashing.pyx":50
+        /* "core/zobrist_hashing.pyx":47
  *                     val = random.getrandbits(64)
  *                     self.table[r][c][p] = val
  *                     self.table_c[r * 5 + c][p] = val             # <<<<<<<<<<<<<<
@@ -4950,7 +4367,7 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
     }
   }
 
-  /* "core/zobrist_hashing.pyx":52
+  /* "core/zobrist_hashing.pyx":49
  *                     self.table_c[r * 5 + c][p] = val
  * 
  *         self.turn_key = random.getrandbits(64)             # <<<<<<<<<<<<<<
@@ -4958,9 +4375,9 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
  * 
 */
   __pyx_t_9 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_random); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_random); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 49, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_getrandbits); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_getrandbits); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 49, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_14 = 1;
@@ -4980,14 +4397,14 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_13, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (__pyx_t_14*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 49, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
-  __pyx_t_15 = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(__pyx_t_2); if (unlikely((__pyx_t_15 == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_t_15 = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(__pyx_t_2); if (unlikely((__pyx_t_15 == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 49, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_self->turn_key = __pyx_t_15;
 
-  /* "core/zobrist_hashing.pyx":53
+  /* "core/zobrist_hashing.pyx":50
  * 
  *         self.turn_key = random.getrandbits(64)
  *         random.setstate(state_backup)             # <<<<<<<<<<<<<<
@@ -4995,9 +4412,9 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
  *     @cython.boundscheck(False)
 */
   __pyx_t_13 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_random); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_random); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_setstate); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_setstate); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   __pyx_t_14 = 1;
@@ -5017,12 +4434,12 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (__pyx_t_14*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":24
+  /* "core/zobrist_hashing.pyx":21
  *     """Zobrist - Cython"""
  * 
  *     def __init__(self, tuple board_size=(5, 5), int num_piece_types=2):             # <<<<<<<<<<<<<<
@@ -5032,59 +4449,45 @@ static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher___init__(struct __py
 
   /* function exit code */
   __pyx_r = 0;
-  __Pyx_TraceReturnCValue(__pyx_r, __Pyx_Owned_Py_None, 0, 0, __PYX_ERR(0, 24, __pyx_L1_error));
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_9);
   __Pyx_XDECREF(__pyx_t_13);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(0, 24, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("core.zobrist_hashing.ZobristHasher.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = -1;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_state_backup);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "core/zobrist_hashing.pyx":55
+/* "core/zobrist_hashing.pyx":52
  *         random.setstate(state_backup)
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
- *     cdef unsigned long long c_compute_hash(self, int[25] board_c, int current_player):
+ *     cdef unsigned long long c_compute_hash(self, int[25] board_c, int current_player) noexcept nogil:
 */
 
 static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_compute_hash(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *__pyx_v_self, int *__pyx_v_board_c, int __pyx_v_current_player) {
   unsigned PY_LONG_LONG __pyx_v_h;
   int __pyx_v_i;
   unsigned PY_LONG_LONG __pyx_r;
-  __Pyx_TraceDeclarationsFunc
   int __pyx_t_1;
   int __pyx_t_2;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7]))
-  __Pyx_TraceStartFunc("c_compute_hash", __pyx_f[0], 55, 0, 0, 0, __PYX_ERR(0, 55, __pyx_L1_error));
 
-  /* "core/zobrist_hashing.pyx":58
+  /* "core/zobrist_hashing.pyx":55
  *     @cython.wraparound(False)
- *     cdef unsigned long long c_compute_hash(self, int[25] board_c, int current_player):
+ *     cdef unsigned long long c_compute_hash(self, int[25] board_c, int current_player) noexcept nogil:
  *         cdef unsigned long long h = 0             # <<<<<<<<<<<<<<
  *         cdef int i
  *         for i in range(25):
 */
   __pyx_v_h = 0;
 
-  /* "core/zobrist_hashing.pyx":60
+  /* "core/zobrist_hashing.pyx":57
  *         cdef unsigned long long h = 0
  *         cdef int i
  *         for i in range(25):             # <<<<<<<<<<<<<<
@@ -5094,17 +4497,17 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_c
   for (__pyx_t_1 = 0; __pyx_t_1 < 25; __pyx_t_1+=1) {
     __pyx_v_i = __pyx_t_1;
 
-    /* "core/zobrist_hashing.pyx":61
+    /* "core/zobrist_hashing.pyx":58
  *         cdef int i
  *         for i in range(25):
  *             if board_c[i] == SOLDIER:             # <<<<<<<<<<<<<<
  *                 h ^= self.table_c[i][0]
  *             elif board_c[i] == CANNON:
 */
-    __pyx_t_2 = ((__pyx_v_board_c[__pyx_v_i]) == __pyx_v_4core_15zobrist_hashing_SOLDIER);
+    __pyx_t_2 = ((__pyx_v_board_c[__pyx_v_i]) == __pyx_e_4core_9constants_SOLDIER);
     if (__pyx_t_2) {
 
-      /* "core/zobrist_hashing.pyx":62
+      /* "core/zobrist_hashing.pyx":59
  *         for i in range(25):
  *             if board_c[i] == SOLDIER:
  *                 h ^= self.table_c[i][0]             # <<<<<<<<<<<<<<
@@ -5113,7 +4516,7 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_c
 */
       __pyx_v_h = (__pyx_v_h ^ ((__pyx_v_self->table_c[__pyx_v_i])[0]));
 
-      /* "core/zobrist_hashing.pyx":61
+      /* "core/zobrist_hashing.pyx":58
  *         cdef int i
  *         for i in range(25):
  *             if board_c[i] == SOLDIER:             # <<<<<<<<<<<<<<
@@ -5123,17 +4526,17 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_c
       goto __pyx_L5;
     }
 
-    /* "core/zobrist_hashing.pyx":63
+    /* "core/zobrist_hashing.pyx":60
  *             if board_c[i] == SOLDIER:
  *                 h ^= self.table_c[i][0]
  *             elif board_c[i] == CANNON:             # <<<<<<<<<<<<<<
  *                 h ^= self.table_c[i][1]
  * 
 */
-    __pyx_t_2 = ((__pyx_v_board_c[__pyx_v_i]) == __pyx_v_4core_15zobrist_hashing_CANNON);
+    __pyx_t_2 = ((__pyx_v_board_c[__pyx_v_i]) == __pyx_e_4core_9constants_CANNON);
     if (__pyx_t_2) {
 
-      /* "core/zobrist_hashing.pyx":64
+      /* "core/zobrist_hashing.pyx":61
  *                 h ^= self.table_c[i][0]
  *             elif board_c[i] == CANNON:
  *                 h ^= self.table_c[i][1]             # <<<<<<<<<<<<<<
@@ -5142,7 +4545,7 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_c
 */
       __pyx_v_h = (__pyx_v_h ^ ((__pyx_v_self->table_c[__pyx_v_i])[1]));
 
-      /* "core/zobrist_hashing.pyx":63
+      /* "core/zobrist_hashing.pyx":60
  *             if board_c[i] == SOLDIER:
  *                 h ^= self.table_c[i][0]
  *             elif board_c[i] == CANNON:             # <<<<<<<<<<<<<<
@@ -5153,17 +4556,17 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_c
     __pyx_L5:;
   }
 
-  /* "core/zobrist_hashing.pyx":66
+  /* "core/zobrist_hashing.pyx":63
  *                 h ^= self.table_c[i][1]
  * 
  *         if current_player == CANNON:             # <<<<<<<<<<<<<<
  *             h ^= self.turn_key
  *         return h
 */
-  __pyx_t_2 = (__pyx_v_current_player == __pyx_v_4core_15zobrist_hashing_CANNON);
+  __pyx_t_2 = (__pyx_v_current_player == __pyx_e_4core_9constants_CANNON);
   if (__pyx_t_2) {
 
-    /* "core/zobrist_hashing.pyx":67
+    /* "core/zobrist_hashing.pyx":64
  * 
  *         if current_player == CANNON:
  *             h ^= self.turn_key             # <<<<<<<<<<<<<<
@@ -5172,7 +4575,7 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_c
 */
     __pyx_v_h = (__pyx_v_h ^ __pyx_v_self->turn_key);
 
-    /* "core/zobrist_hashing.pyx":66
+    /* "core/zobrist_hashing.pyx":63
  *                 h ^= self.table_c[i][1]
  * 
  *         if current_player == CANNON:             # <<<<<<<<<<<<<<
@@ -5181,7 +4584,7 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_c
 */
   }
 
-  /* "core/zobrist_hashing.pyx":68
+  /* "core/zobrist_hashing.pyx":65
  *         if current_player == CANNON:
  *             h ^= self.turn_key
  *         return h             # <<<<<<<<<<<<<<
@@ -5189,38 +4592,27 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_c
  *     @cython.boundscheck(False)
 */
   __pyx_r = __pyx_v_h;
-  __Pyx_TraceReturnCValue(__pyx_r, __Pyx_PyLong_From_unsigned_PY_LONG_LONG, 40, 0, __PYX_ERR(0, 68, __pyx_L1_error));
   goto __pyx_L0;
 
-  /* "core/zobrist_hashing.pyx":55
+  /* "core/zobrist_hashing.pyx":52
  *         random.setstate(state_backup)
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
- *     cdef unsigned long long c_compute_hash(self, int[25] board_c, int current_player):
+ *     cdef unsigned long long c_compute_hash(self, int[25] board_c, int current_player) noexcept nogil:
 */
 
   /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(0, 55, __pyx_L1_error));
-  #endif
-  __Pyx_AddTraceback("core.zobrist_hashing.ZobristHasher.c_compute_hash", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = 0;
   __pyx_L0:;
-  __Pyx_PyMonitoring_ExitScope(0);
   return __pyx_r;
 }
 
-/* "core/zobrist_hashing.pyx":70
+/* "core/zobrist_hashing.pyx":67
  *         return h
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
- *     cdef unsigned long long c_update_hash(self, unsigned long long old_hash, int start_r, int start_c, int end_r, int end_c, int piece_type):
+ *     cdef unsigned long long c_update_hash(self, unsigned long long old_hash, int start_r, int start_c, int end_r, int end_c, int piece_type) noexcept nogil:
 */
 
 static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_update_hash(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *__pyx_v_self, unsigned PY_LONG_LONG __pyx_v_old_hash, int __pyx_v_start_r, int __pyx_v_start_c, int __pyx_v_end_r, int __pyx_v_end_c, int __pyx_v_piece_type) {
@@ -5229,26 +4621,20 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_u
   int __pyx_v_end_idx;
   int __pyx_v_piece_index;
   unsigned PY_LONG_LONG __pyx_r;
-  __Pyx_TraceDeclarationsFunc
   int __pyx_t_1;
   int __pyx_t_2;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8]))
-  __Pyx_TraceStartFunc("c_update_hash", __pyx_f[0], 70, 0, 0, 0, __PYX_ERR(0, 70, __pyx_L1_error));
 
-  /* "core/zobrist_hashing.pyx":73
+  /* "core/zobrist_hashing.pyx":70
  *     @cython.wraparound(False)
- *     cdef unsigned long long c_update_hash(self, unsigned long long old_hash, int start_r, int start_c, int end_r, int end_c, int piece_type):
+ *     cdef unsigned long long c_update_hash(self, unsigned long long old_hash, int start_r, int start_c, int end_r, int end_c, int piece_type) noexcept nogil:
  *         cdef unsigned long long new_hash = old_hash             # <<<<<<<<<<<<<<
  *         cdef int start_idx = start_r * 5 + start_c
  *         cdef int end_idx = end_r * 5 + end_c
 */
   __pyx_v_new_hash = __pyx_v_old_hash;
 
-  /* "core/zobrist_hashing.pyx":74
- *     cdef unsigned long long c_update_hash(self, unsigned long long old_hash, int start_r, int start_c, int end_r, int end_c, int piece_type):
+  /* "core/zobrist_hashing.pyx":71
+ *     cdef unsigned long long c_update_hash(self, unsigned long long old_hash, int start_r, int start_c, int end_r, int end_c, int piece_type) noexcept nogil:
  *         cdef unsigned long long new_hash = old_hash
  *         cdef int start_idx = start_r * 5 + start_c             # <<<<<<<<<<<<<<
  *         cdef int end_idx = end_r * 5 + end_c
@@ -5256,7 +4642,7 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_u
 */
   __pyx_v_start_idx = ((__pyx_v_start_r * 5) + __pyx_v_start_c);
 
-  /* "core/zobrist_hashing.pyx":75
+  /* "core/zobrist_hashing.pyx":72
  *         cdef unsigned long long new_hash = old_hash
  *         cdef int start_idx = start_r * 5 + start_c
  *         cdef int end_idx = end_r * 5 + end_c             # <<<<<<<<<<<<<<
@@ -5265,14 +4651,14 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_u
 */
   __pyx_v_end_idx = ((__pyx_v_end_r * 5) + __pyx_v_end_c);
 
-  /* "core/zobrist_hashing.pyx":76
+  /* "core/zobrist_hashing.pyx":73
  *         cdef int start_idx = start_r * 5 + start_c
  *         cdef int end_idx = end_r * 5 + end_c
  *         cdef int piece_index = 0 if piece_type == SOLDIER else 1             # <<<<<<<<<<<<<<
  * 
  *         new_hash ^= self.table_c[start_idx][piece_index]
 */
-  __pyx_t_2 = (__pyx_v_piece_type == __pyx_v_4core_15zobrist_hashing_SOLDIER);
+  __pyx_t_2 = (__pyx_v_piece_type == __pyx_e_4core_9constants_SOLDIER);
   if (__pyx_t_2) {
     __pyx_t_1 = 0;
   } else {
@@ -5280,7 +4666,7 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_u
   }
   __pyx_v_piece_index = __pyx_t_1;
 
-  /* "core/zobrist_hashing.pyx":78
+  /* "core/zobrist_hashing.pyx":75
  *         cdef int piece_index = 0 if piece_type == SOLDIER else 1
  * 
  *         new_hash ^= self.table_c[start_idx][piece_index]             # <<<<<<<<<<<<<<
@@ -5289,7 +4675,7 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_u
 */
   __pyx_v_new_hash = (__pyx_v_new_hash ^ ((__pyx_v_self->table_c[__pyx_v_start_idx])[__pyx_v_piece_index]));
 
-  /* "core/zobrist_hashing.pyx":79
+  /* "core/zobrist_hashing.pyx":76
  * 
  *         new_hash ^= self.table_c[start_idx][piece_index]
  *         new_hash ^= self.table_c[end_idx][piece_index]             # <<<<<<<<<<<<<<
@@ -5298,7 +4684,7 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_u
 */
   __pyx_v_new_hash = (__pyx_v_new_hash ^ ((__pyx_v_self->table_c[__pyx_v_end_idx])[__pyx_v_piece_index]));
 
-  /* "core/zobrist_hashing.pyx":81
+  /* "core/zobrist_hashing.pyx":78
  *         new_hash ^= self.table_c[end_idx][piece_index]
  * 
  *         return new_hash             # <<<<<<<<<<<<<<
@@ -5306,70 +4692,53 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_u
  *     @cython.boundscheck(False)
 */
   __pyx_r = __pyx_v_new_hash;
-  __Pyx_TraceReturnCValue(__pyx_r, __Pyx_PyLong_From_unsigned_PY_LONG_LONG, 35, 0, __PYX_ERR(0, 81, __pyx_L1_error));
   goto __pyx_L0;
 
-  /* "core/zobrist_hashing.pyx":70
+  /* "core/zobrist_hashing.pyx":67
  *         return h
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
- *     cdef unsigned long long c_update_hash(self, unsigned long long old_hash, int start_r, int start_c, int end_r, int end_c, int piece_type):
+ *     cdef unsigned long long c_update_hash(self, unsigned long long old_hash, int start_r, int start_c, int end_r, int end_c, int piece_type) noexcept nogil:
 */
 
   /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(0, 70, __pyx_L1_error));
-  #endif
-  __Pyx_AddTraceback("core.zobrist_hashing.ZobristHasher.c_update_hash", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = 0;
   __pyx_L0:;
-  __Pyx_PyMonitoring_ExitScope(0);
   return __pyx_r;
 }
 
-/* "core/zobrist_hashing.pyx":83
+/* "core/zobrist_hashing.pyx":80
  *         return new_hash
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
- *     cdef unsigned long long c_remove_piece_hash(self, unsigned long long old_hash, int r, int c, int piece_type):
+ *     cdef unsigned long long c_remove_piece_hash(self, unsigned long long old_hash, int r, int c, int piece_type) noexcept nogil:
 */
 
 static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_remove_piece_hash(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *__pyx_v_self, unsigned PY_LONG_LONG __pyx_v_old_hash, int __pyx_v_r, int __pyx_v_c, int __pyx_v_piece_type) {
   int __pyx_v_idx;
   int __pyx_v_piece_index;
   unsigned PY_LONG_LONG __pyx_r;
-  __Pyx_TraceDeclarationsFunc
   int __pyx_t_1;
   int __pyx_t_2;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9]))
-  __Pyx_TraceStartFunc("c_remove_piece_hash", __pyx_f[0], 83, 0, 0, 0, __PYX_ERR(0, 83, __pyx_L1_error));
 
-  /* "core/zobrist_hashing.pyx":86
+  /* "core/zobrist_hashing.pyx":83
  *     @cython.wraparound(False)
- *     cdef unsigned long long c_remove_piece_hash(self, unsigned long long old_hash, int r, int c, int piece_type):
+ *     cdef unsigned long long c_remove_piece_hash(self, unsigned long long old_hash, int r, int c, int piece_type) noexcept nogil:
  *         cdef int idx = r * 5 + c             # <<<<<<<<<<<<<<
  *         cdef int piece_index = 0 if piece_type == SOLDIER else 1
  *         return old_hash ^ self.table_c[idx][piece_index]
 */
   __pyx_v_idx = ((__pyx_v_r * 5) + __pyx_v_c);
 
-  /* "core/zobrist_hashing.pyx":87
- *     cdef unsigned long long c_remove_piece_hash(self, unsigned long long old_hash, int r, int c, int piece_type):
+  /* "core/zobrist_hashing.pyx":84
+ *     cdef unsigned long long c_remove_piece_hash(self, unsigned long long old_hash, int r, int c, int piece_type) noexcept nogil:
  *         cdef int idx = r * 5 + c
  *         cdef int piece_index = 0 if piece_type == SOLDIER else 1             # <<<<<<<<<<<<<<
  *         return old_hash ^ self.table_c[idx][piece_index]
  * 
 */
-  __pyx_t_2 = (__pyx_v_piece_type == __pyx_v_4core_15zobrist_hashing_SOLDIER);
+  __pyx_t_2 = (__pyx_v_piece_type == __pyx_e_4core_9constants_SOLDIER);
   if (__pyx_t_2) {
     __pyx_t_1 = 0;
   } else {
@@ -5377,7 +4746,7 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_r
   }
   __pyx_v_piece_index = __pyx_t_1;
 
-  /* "core/zobrist_hashing.pyx":88
+  /* "core/zobrist_hashing.pyx":85
  *         cdef int idx = r * 5 + c
  *         cdef int piece_index = 0 if piece_type == SOLDIER else 1
  *         return old_hash ^ self.table_c[idx][piece_index]             # <<<<<<<<<<<<<<
@@ -5385,84 +4754,56 @@ static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_r
  *     @cython.boundscheck(False)
 */
   __pyx_r = (__pyx_v_old_hash ^ ((__pyx_v_self->table_c[__pyx_v_idx])[__pyx_v_piece_index]));
-  __Pyx_TraceReturnCValue(__pyx_r, __Pyx_PyLong_From_unsigned_PY_LONG_LONG, 13, 0, __PYX_ERR(0, 88, __pyx_L1_error));
   goto __pyx_L0;
 
-  /* "core/zobrist_hashing.pyx":83
+  /* "core/zobrist_hashing.pyx":80
  *         return new_hash
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
- *     cdef unsigned long long c_remove_piece_hash(self, unsigned long long old_hash, int r, int c, int piece_type):
+ *     cdef unsigned long long c_remove_piece_hash(self, unsigned long long old_hash, int r, int c, int piece_type) noexcept nogil:
 */
 
   /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(0, 83, __pyx_L1_error));
-  #endif
-  __Pyx_AddTraceback("core.zobrist_hashing.ZobristHasher.c_remove_piece_hash", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = 0;
   __pyx_L0:;
-  __Pyx_PyMonitoring_ExitScope(0);
   return __pyx_r;
 }
 
-/* "core/zobrist_hashing.pyx":90
+/* "core/zobrist_hashing.pyx":87
  *         return old_hash ^ self.table_c[idx][piece_index]
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
- *     cdef unsigned long long c_switch_turn_hash(self, unsigned long long old_hash):
+ *     cdef unsigned long long c_switch_turn_hash(self, unsigned long long old_hash) noexcept nogil:
 */
 
 static unsigned PY_LONG_LONG __pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_switch_turn_hash(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *__pyx_v_self, unsigned PY_LONG_LONG __pyx_v_old_hash) {
   unsigned PY_LONG_LONG __pyx_r;
-  __Pyx_TraceDeclarationsFunc
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10]))
-  __Pyx_TraceStartFunc("c_switch_turn_hash", __pyx_f[0], 90, 0, 0, 0, __PYX_ERR(0, 90, __pyx_L1_error));
 
-  /* "core/zobrist_hashing.pyx":93
+  /* "core/zobrist_hashing.pyx":90
  *     @cython.wraparound(False)
- *     cdef unsigned long long c_switch_turn_hash(self, unsigned long long old_hash):
+ *     cdef unsigned long long c_switch_turn_hash(self, unsigned long long old_hash) noexcept nogil:
  *         return old_hash ^ self.turn_key             # <<<<<<<<<<<<<<
  * 
  *     @cython.boundscheck(False)
 */
   __pyx_r = (__pyx_v_old_hash ^ __pyx_v_self->turn_key);
-  __Pyx_TraceReturnCValue(__pyx_r, __Pyx_PyLong_From_unsigned_PY_LONG_LONG, 1, 0, __PYX_ERR(0, 93, __pyx_L1_error));
   goto __pyx_L0;
 
-  /* "core/zobrist_hashing.pyx":90
+  /* "core/zobrist_hashing.pyx":87
  *         return old_hash ^ self.table_c[idx][piece_index]
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
- *     cdef unsigned long long c_switch_turn_hash(self, unsigned long long old_hash):
+ *     cdef unsigned long long c_switch_turn_hash(self, unsigned long long old_hash) noexcept nogil:
 */
 
   /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(0, 90, __pyx_L1_error));
-  #endif
-  __Pyx_AddTraceback("core.zobrist_hashing.ZobristHasher.c_switch_turn_hash", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = 0;
   __pyx_L0:;
-  __Pyx_PyMonitoring_ExitScope(0);
   return __pyx_r;
 }
 
-/* "core/zobrist_hashing.pyx":95
+/* "core/zobrist_hashing.pyx":92
  *         return old_hash ^ self.turn_key
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -5511,39 +4852,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_board,&__pyx_mstate_global->__pyx_n_u_current_player,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 95, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 92, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 95, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 92, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 95, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 92, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "compute_hash", 0) < 0) __PYX_ERR(0, 95, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "compute_hash", 0) < 0) __PYX_ERR(0, 92, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("compute_hash", 1, 2, 2, i); __PYX_ERR(0, 95, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("compute_hash", 1, 2, 2, i); __PYX_ERR(0, 92, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 95, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 92, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 95, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 92, __pyx_L3_error)
     }
     __pyx_v_board = ((PyObject*)values[0]);
-    __pyx_v_current_player = __Pyx_PyLong_As_int(values[1]); if (unlikely((__pyx_v_current_player == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 97, __pyx_L3_error)
+    __pyx_v_current_player = __Pyx_PyLong_As_int(values[1]); if (unlikely((__pyx_v_current_player == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 94, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("compute_hash", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 95, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("compute_hash", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 92, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -5554,7 +4895,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_board), (&PyList_Type), 1, "board", 1))) __PYX_ERR(0, 97, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_board), (&PyList_Type), 1, "board", 1))) __PYX_ERR(0, 94, __pyx_L1_error)
   __pyx_r = __pyx_pf_4core_15zobrist_hashing_13ZobristHasher_2compute_hash(((struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *)__pyx_v_self), __pyx_v_board, __pyx_v_current_player);
 
   /* function exit code */
@@ -5581,7 +4922,6 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_2compute_hash(
   int __pyx_v_piece;
   int __pyx_v_piece_index;
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   int __pyx_t_2;
@@ -5598,11 +4938,9 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_2compute_hash(
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[11]))
   __Pyx_RefNannySetupContext("compute_hash", 0);
-  __Pyx_TraceStartFunc("compute_hash", __pyx_f[0], 95, 0, 0, 0, __PYX_ERR(0, 95, __pyx_L1_error));
 
-  /* "core/zobrist_hashing.pyx":99
+  /* "core/zobrist_hashing.pyx":96
  *     def compute_hash(self, list board, int current_player):
  *         """"""
  *         cdef unsigned long long h = 0             # <<<<<<<<<<<<<<
@@ -5611,7 +4949,7 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_2compute_hash(
 */
   __pyx_v_h = 0;
 
-  /* "core/zobrist_hashing.pyx":102
+  /* "core/zobrist_hashing.pyx":99
  *         cdef int r, c, piece, piece_index
  * 
  *         for r in range(self.rows):             # <<<<<<<<<<<<<<
@@ -5623,7 +4961,7 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_2compute_hash(
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_r = __pyx_t_3;
 
-    /* "core/zobrist_hashing.pyx":103
+    /* "core/zobrist_hashing.pyx":100
  * 
  *         for r in range(self.rows):
  *             for c in range(self.cols):             # <<<<<<<<<<<<<<
@@ -5635,7 +4973,7 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_2compute_hash(
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_c = __pyx_t_6;
 
-      /* "core/zobrist_hashing.pyx":104
+      /* "core/zobrist_hashing.pyx":101
  *         for r in range(self.rows):
  *             for c in range(self.cols):
  *                 piece = board[r][c]             # <<<<<<<<<<<<<<
@@ -5644,25 +4982,25 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_2compute_hash(
 */
       if (unlikely(__pyx_v_board == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 104, __pyx_L1_error)
+        __PYX_ERR(0, 101, __pyx_L1_error)
       }
-      __pyx_t_7 = __Pyx_GetItemInt(__Pyx_PyList_GET_ITEM(__pyx_v_board, __pyx_v_r), __pyx_v_c, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 104, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_GetItemInt(__Pyx_PyList_GET_ITEM(__pyx_v_board, __pyx_v_r), __pyx_v_c, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 101, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_8 = __Pyx_PyLong_As_int(__pyx_t_7); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 104, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyLong_As_int(__pyx_t_7); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 101, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __pyx_v_piece = __pyx_t_8;
 
-      /* "core/zobrist_hashing.pyx":105
+      /* "core/zobrist_hashing.pyx":102
  *             for c in range(self.cols):
  *                 piece = board[r][c]
  *                 if piece != EMPTY:             # <<<<<<<<<<<<<<
  *                     piece_index = _PIECE_TO_INDEX[piece]
  *                     h ^= self.table[r][c][piece_index]
 */
-      __pyx_t_9 = (__pyx_v_piece != __pyx_v_4core_15zobrist_hashing_EMPTY);
+      __pyx_t_9 = (__pyx_v_piece != __pyx_e_4core_9constants_EMPTY);
       if (__pyx_t_9) {
 
-        /* "core/zobrist_hashing.pyx":106
+        /* "core/zobrist_hashing.pyx":103
  *                 piece = board[r][c]
  *                 if piece != EMPTY:
  *                     piece_index = _PIECE_TO_INDEX[piece]             # <<<<<<<<<<<<<<
@@ -5671,43 +5009,43 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_2compute_hash(
 */
         if (unlikely(__pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 106, __pyx_L1_error)
+          __PYX_ERR(0, 103, __pyx_L1_error)
         }
-        __pyx_t_7 = __Pyx_PyLong_From_int(__pyx_v_piece); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 106, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PyLong_From_int(__pyx_v_piece); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 103, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_10 = __Pyx_PyDict_GetItem(__pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX, __pyx_t_7); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 106, __pyx_L1_error)
+        __pyx_t_10 = __Pyx_PyDict_GetItem(__pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX, __pyx_t_7); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 103, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_10);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        __pyx_t_8 = __Pyx_PyLong_As_int(__pyx_t_10); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 106, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyLong_As_int(__pyx_t_10); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 103, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
         __pyx_v_piece_index = __pyx_t_8;
 
-        /* "core/zobrist_hashing.pyx":107
+        /* "core/zobrist_hashing.pyx":104
  *                 if piece != EMPTY:
  *                     piece_index = _PIECE_TO_INDEX[piece]
  *                     h ^= self.table[r][c][piece_index]             # <<<<<<<<<<<<<<
  * 
  *         if current_player == CANNON:
 */
-        __pyx_t_10 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_h); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 107, __pyx_L1_error)
+        __pyx_t_10 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_h); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 104, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_10);
-        __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_self->table, __pyx_v_r, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 107, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_self->table, __pyx_v_r, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 104, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_7, __pyx_v_c, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 107, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_7, __pyx_v_c, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 104, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_11, __pyx_v_piece_index, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 107, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_11, __pyx_v_piece_index, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 104, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __pyx_t_11 = PyNumber_InPlaceXor(__pyx_t_10, __pyx_t_7); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 107, __pyx_L1_error)
+        __pyx_t_11 = PyNumber_InPlaceXor(__pyx_t_10, __pyx_t_7); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 104, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        __pyx_t_12 = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(__pyx_t_11); if (unlikely((__pyx_t_12 == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 107, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(__pyx_t_11); if (unlikely((__pyx_t_12 == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 104, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __pyx_v_h = __pyx_t_12;
 
-        /* "core/zobrist_hashing.pyx":105
+        /* "core/zobrist_hashing.pyx":102
  *             for c in range(self.cols):
  *                 piece = board[r][c]
  *                 if piece != EMPTY:             # <<<<<<<<<<<<<<
@@ -5718,17 +5056,17 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_2compute_hash(
     }
   }
 
-  /* "core/zobrist_hashing.pyx":109
+  /* "core/zobrist_hashing.pyx":106
  *                     h ^= self.table[r][c][piece_index]
  * 
  *         if current_player == CANNON:             # <<<<<<<<<<<<<<
  *             h ^= self.turn_key
  * 
 */
-  __pyx_t_9 = (__pyx_v_current_player == __pyx_v_4core_15zobrist_hashing_CANNON);
+  __pyx_t_9 = (__pyx_v_current_player == __pyx_e_4core_9constants_CANNON);
   if (__pyx_t_9) {
 
-    /* "core/zobrist_hashing.pyx":110
+    /* "core/zobrist_hashing.pyx":107
  * 
  *         if current_player == CANNON:
  *             h ^= self.turn_key             # <<<<<<<<<<<<<<
@@ -5737,7 +5075,7 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_2compute_hash(
 */
     __pyx_v_h = (__pyx_v_h ^ __pyx_v_self->turn_key);
 
-    /* "core/zobrist_hashing.pyx":109
+    /* "core/zobrist_hashing.pyx":106
  *                     h ^= self.table[r][c][piece_index]
  * 
  *         if current_player == CANNON:             # <<<<<<<<<<<<<<
@@ -5746,7 +5084,7 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_2compute_hash(
 */
   }
 
-  /* "core/zobrist_hashing.pyx":112
+  /* "core/zobrist_hashing.pyx":109
  *             h ^= self.turn_key
  * 
  *         return h             # <<<<<<<<<<<<<<
@@ -5754,14 +5092,13 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_2compute_hash(
  *     @cython.boundscheck(False)
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_11 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_h); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 112, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_h); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 109, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __pyx_r = __pyx_t_11;
   __pyx_t_11 = 0;
-  __Pyx_TraceReturnValue(__pyx_r, 45, 0, __PYX_ERR(0, 112, __pyx_L1_error));
   goto __pyx_L0;
 
-  /* "core/zobrist_hashing.pyx":95
+  /* "core/zobrist_hashing.pyx":92
  *         return old_hash ^ self.turn_key
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -5774,22 +5111,15 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_2compute_hash(
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_10);
   __Pyx_XDECREF(__pyx_t_11);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(0, 95, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("core.zobrist_hashing.ZobristHasher.compute_hash", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "core/zobrist_hashing.pyx":114
+/* "core/zobrist_hashing.pyx":111
  *         return h
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -5839,46 +5169,46 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_old_hash,&__pyx_mstate_global->__pyx_n_u_move,&__pyx_mstate_global->__pyx_n_u_piece_type,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 114, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 111, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 114, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 111, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 114, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 111, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 114, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 111, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "update_hash", 0) < 0) __PYX_ERR(0, 114, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "update_hash", 0) < 0) __PYX_ERR(0, 111, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("update_hash", 1, 3, 3, i); __PYX_ERR(0, 114, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("update_hash", 1, 3, 3, i); __PYX_ERR(0, 111, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 3)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 114, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 111, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 114, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 111, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 114, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 111, __pyx_L3_error)
     }
-    __pyx_v_old_hash = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(values[0]); if (unlikely((__pyx_v_old_hash == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 116, __pyx_L3_error)
+    __pyx_v_old_hash = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(values[0]); if (unlikely((__pyx_v_old_hash == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 113, __pyx_L3_error)
     __pyx_v_move = ((PyObject*)values[1]);
-    __pyx_v_piece_type = __Pyx_PyLong_As_int(values[2]); if (unlikely((__pyx_v_piece_type == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 116, __pyx_L3_error)
+    __pyx_v_piece_type = __Pyx_PyLong_As_int(values[2]); if (unlikely((__pyx_v_piece_type == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 113, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("update_hash", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 114, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("update_hash", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 111, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -5889,7 +5219,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_move), (&PyTuple_Type), 1, "move", 1))) __PYX_ERR(0, 116, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_move), (&PyTuple_Type), 1, "move", 1))) __PYX_ERR(0, 113, __pyx_L1_error)
   __pyx_r = __pyx_pf_4core_15zobrist_hashing_13ZobristHasher_4update_hash(((struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *)__pyx_v_self), __pyx_v_old_hash, __pyx_v_move, __pyx_v_piece_type);
 
   /* function exit code */
@@ -5917,7 +5247,6 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_4update_hash(s
   int __pyx_v_to_col;
   int __pyx_v_piece_index;
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -5931,11 +5260,9 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_4update_hash(s
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[12]))
   __Pyx_RefNannySetupContext("update_hash", 0);
-  __Pyx_TraceStartFunc("update_hash", __pyx_f[0], 114, 0, 0, 0, __PYX_ERR(0, 114, __pyx_L1_error));
 
-  /* "core/zobrist_hashing.pyx":122
+  /* "core/zobrist_hashing.pyx":119
  *         piece_type:
  *         """
  *         cdef unsigned long long new_hash = old_hash             # <<<<<<<<<<<<<<
@@ -5944,7 +5271,7 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_4update_hash(s
 */
   __pyx_v_new_hash = __pyx_v_old_hash;
 
-  /* "core/zobrist_hashing.pyx":126
+  /* "core/zobrist_hashing.pyx":123
  *         cdef int piece_index
  * 
  *         from_row, from_col, to_row, to_col = move             # <<<<<<<<<<<<<<
@@ -5957,7 +5284,7 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_4update_hash(s
     if (unlikely(size != 4)) {
       if (size > 4) __Pyx_RaiseTooManyValuesError(4);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 126, __pyx_L1_error)
+      __PYX_ERR(0, 123, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     __pyx_t_1 = PyTuple_GET_ITEM(sequence, 0);
@@ -5973,29 +5300,29 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_4update_hash(s
       Py_ssize_t i;
       PyObject** temps[4] = {&__pyx_t_1,&__pyx_t_2,&__pyx_t_3,&__pyx_t_4};
       for (i=0; i < 4; i++) {
-        PyObject* item = __Pyx_PySequence_ITEM(sequence, i); if (unlikely(!item)) __PYX_ERR(0, 126, __pyx_L1_error)
+        PyObject* item = __Pyx_PySequence_ITEM(sequence, i); if (unlikely(!item)) __PYX_ERR(0, 123, __pyx_L1_error)
         __Pyx_GOTREF(item);
         *(temps[i]) = item;
       }
     }
     #endif
   } else {
-    __Pyx_RaiseNoneNotIterableError(); __PYX_ERR(0, 126, __pyx_L1_error)
+    __Pyx_RaiseNoneNotIterableError(); __PYX_ERR(0, 123, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_PyLong_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyLong_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_6 = __Pyx_PyLong_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyLong_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_7 = __Pyx_PyLong_As_int(__pyx_t_3); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyLong_As_int(__pyx_t_3); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_8 = __Pyx_PyLong_As_int(__pyx_t_4); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyLong_As_int(__pyx_t_4); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_from_row = __pyx_t_5;
   __pyx_v_from_col = __pyx_t_6;
   __pyx_v_to_row = __pyx_t_7;
   __pyx_v_to_col = __pyx_t_8;
 
-  /* "core/zobrist_hashing.pyx":127
+  /* "core/zobrist_hashing.pyx":124
  * 
  *         from_row, from_col, to_row, to_col = move
  *         piece_index = _PIECE_TO_INDEX[piece_type]             # <<<<<<<<<<<<<<
@@ -6004,68 +5331,68 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_4update_hash(s
 */
   if (unlikely(__pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 127, __pyx_L1_error)
+    __PYX_ERR(0, 124, __pyx_L1_error)
   }
-  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_v_piece_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_v_piece_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_8 = __Pyx_PyLong_As_int(__pyx_t_3); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyLong_As_int(__pyx_t_3); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_piece_index = __pyx_t_8;
 
-  /* "core/zobrist_hashing.pyx":130
+  /* "core/zobrist_hashing.pyx":127
  * 
  *         #
  *         new_hash ^= self.table[from_row][from_col][piece_index]             # <<<<<<<<<<<<<<
  * 
  *         #
 */
-  __pyx_t_3 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_new_hash); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_new_hash); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_self->table, __pyx_v_from_row, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_self->table, __pyx_v_from_row, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_4, __pyx_v_from_col, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_4, __pyx_v_from_col, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_piece_index, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_piece_index, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyNumber_InPlaceXor(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_InPlaceXor(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_9 = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(__pyx_t_2); if (unlikely((__pyx_t_9 == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(__pyx_t_2); if (unlikely((__pyx_t_9 == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_new_hash = __pyx_t_9;
 
-  /* "core/zobrist_hashing.pyx":133
+  /* "core/zobrist_hashing.pyx":130
  * 
  *         #
  *         new_hash ^= self.table[to_row][to_col][piece_index]             # <<<<<<<<<<<<<<
  * 
  *         return new_hash
 */
-  __pyx_t_2 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_new_hash); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_new_hash); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_self->table, __pyx_v_to_row, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_self->table, __pyx_v_to_row, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_4, __pyx_v_to_col, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_4, __pyx_v_to_col, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_3, __pyx_v_piece_index, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_3, __pyx_v_piece_index, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyNumber_InPlaceXor(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_InPlaceXor(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_9 = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(__pyx_t_3); if (unlikely((__pyx_t_9 == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(__pyx_t_3); if (unlikely((__pyx_t_9 == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_new_hash = __pyx_t_9;
 
-  /* "core/zobrist_hashing.pyx":135
+  /* "core/zobrist_hashing.pyx":132
  *         new_hash ^= self.table[to_row][to_col][piece_index]
  * 
  *         return new_hash             # <<<<<<<<<<<<<<
@@ -6073,14 +5400,13 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_4update_hash(s
  *     @cython.boundscheck(False)
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_new_hash); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_new_hash); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_r = __pyx_t_3;
   __pyx_t_3 = 0;
-  __Pyx_TraceReturnValue(__pyx_r, 30, 0, __PYX_ERR(0, 135, __pyx_L1_error));
   goto __pyx_L0;
 
-  /* "core/zobrist_hashing.pyx":114
+  /* "core/zobrist_hashing.pyx":111
  *         return h
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -6094,22 +5420,15 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_4update_hash(s
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(0, 114, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("core.zobrist_hashing.ZobristHasher.update_hash", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "core/zobrist_hashing.pyx":137
+/* "core/zobrist_hashing.pyx":134
  *         return new_hash
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -6159,46 +5478,46 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_old_hash,&__pyx_mstate_global->__pyx_n_u_position,&__pyx_mstate_global->__pyx_n_u_piece_type,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 137, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 134, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 137, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 134, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 137, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 134, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 137, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 134, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "place_piece_hash", 0) < 0) __PYX_ERR(0, 137, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "place_piece_hash", 0) < 0) __PYX_ERR(0, 134, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("place_piece_hash", 1, 3, 3, i); __PYX_ERR(0, 137, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("place_piece_hash", 1, 3, 3, i); __PYX_ERR(0, 134, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 3)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 137, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 134, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 137, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 134, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 137, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 134, __pyx_L3_error)
     }
-    __pyx_v_old_hash = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(values[0]); if (unlikely((__pyx_v_old_hash == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 139, __pyx_L3_error)
+    __pyx_v_old_hash = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(values[0]); if (unlikely((__pyx_v_old_hash == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 136, __pyx_L3_error)
     __pyx_v_position = ((PyObject*)values[1]);
-    __pyx_v_piece_type = __Pyx_PyLong_As_int(values[2]); if (unlikely((__pyx_v_piece_type == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 139, __pyx_L3_error)
+    __pyx_v_piece_type = __Pyx_PyLong_As_int(values[2]); if (unlikely((__pyx_v_piece_type == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 136, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("place_piece_hash", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 137, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("place_piece_hash", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 134, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -6209,7 +5528,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_position), (&PyTuple_Type), 1, "position", 1))) __PYX_ERR(0, 139, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_position), (&PyTuple_Type), 1, "position", 1))) __PYX_ERR(0, 136, __pyx_L1_error)
   __pyx_r = __pyx_pf_4core_15zobrist_hashing_13ZobristHasher_6place_piece_hash(((struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *)__pyx_v_self), __pyx_v_old_hash, __pyx_v_position, __pyx_v_piece_type);
 
   /* function exit code */
@@ -6234,7 +5553,6 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_6place_piece_h
   int __pyx_v_col;
   int __pyx_v_piece_index;
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -6244,11 +5562,9 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_6place_piece_h
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[13]))
   __Pyx_RefNannySetupContext("place_piece_hash", 0);
-  __Pyx_TraceStartFunc("place_piece_hash", __pyx_f[0], 137, 0, 0, 0, __PYX_ERR(0, 137, __pyx_L1_error));
 
-  /* "core/zobrist_hashing.pyx":144
+  /* "core/zobrist_hashing.pyx":141
  *         """
  *         cdef int row, col, piece_index
  *         row, col = position             # <<<<<<<<<<<<<<
@@ -6261,7 +5577,7 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_6place_piece_h
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 144, __pyx_L1_error)
+      __PYX_ERR(0, 141, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     __pyx_t_1 = PyTuple_GET_ITEM(sequence, 0);
@@ -6269,22 +5585,22 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_6place_piece_h
     __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1);
     __Pyx_INCREF(__pyx_t_2);
     #else
-    __pyx_t_1 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     #endif
   } else {
-    __Pyx_RaiseNoneNotIterableError(); __PYX_ERR(0, 144, __pyx_L1_error)
+    __Pyx_RaiseNoneNotIterableError(); __PYX_ERR(0, 141, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_PyLong_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_4 = __Pyx_PyLong_As_int(__pyx_t_2); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyLong_As_int(__pyx_t_2); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_row = __pyx_t_3;
   __pyx_v_col = __pyx_t_4;
 
-  /* "core/zobrist_hashing.pyx":145
+  /* "core/zobrist_hashing.pyx":142
  *         cdef int row, col, piece_index
  *         row, col = position
  *         piece_index = _PIECE_TO_INDEX[piece_type]             # <<<<<<<<<<<<<<
@@ -6293,18 +5609,18 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_6place_piece_h
 */
   if (unlikely(__pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 145, __pyx_L1_error)
+    __PYX_ERR(0, 142, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_v_piece_type); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_v_piece_type); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 142, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 142, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_4 = __Pyx_PyLong_As_int(__pyx_t_1); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyLong_As_int(__pyx_t_1); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 142, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_piece_index = __pyx_t_4;
 
-  /* "core/zobrist_hashing.pyx":147
+  /* "core/zobrist_hashing.pyx":144
  *         piece_index = _PIECE_TO_INDEX[piece_type]
  * 
  *         return old_hash ^ self.table[row][col][piece_index]             # <<<<<<<<<<<<<<
@@ -6312,26 +5628,25 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_6place_piece_h
  *     @cython.boundscheck(False)
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_old_hash); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_old_hash); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_self->table, __pyx_v_row, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_self->table, __pyx_v_row, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_col, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_col, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_piece_index, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_piece_index, int, 1, __Pyx_PyLong_From_int, 0, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyNumber_Xor(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_t_5 = PyNumber_Xor(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_r = __pyx_t_5;
   __pyx_t_5 = 0;
-  __Pyx_TraceReturnValue(__pyx_r, 8, 0, __PYX_ERR(0, 147, __pyx_L1_error));
   goto __pyx_L0;
 
-  /* "core/zobrist_hashing.pyx":137
+  /* "core/zobrist_hashing.pyx":134
  *         return new_hash
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -6344,22 +5659,15 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_6place_piece_h
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(0, 137, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("core.zobrist_hashing.ZobristHasher.place_piece_hash", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "core/zobrist_hashing.pyx":149
+/* "core/zobrist_hashing.pyx":146
  *         return old_hash ^ self.table[row][col][piece_index]
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -6409,46 +5717,46 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_old_hash,&__pyx_mstate_global->__pyx_n_u_position,&__pyx_mstate_global->__pyx_n_u_piece_type,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 149, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 146, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 149, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 146, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 149, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 146, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 149, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 146, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "remove_piece_hash", 0) < 0) __PYX_ERR(0, 149, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "remove_piece_hash", 0) < 0) __PYX_ERR(0, 146, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("remove_piece_hash", 1, 3, 3, i); __PYX_ERR(0, 149, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("remove_piece_hash", 1, 3, 3, i); __PYX_ERR(0, 146, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 3)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 149, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 146, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 149, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 146, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 149, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 146, __pyx_L3_error)
     }
-    __pyx_v_old_hash = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(values[0]); if (unlikely((__pyx_v_old_hash == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 151, __pyx_L3_error)
+    __pyx_v_old_hash = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(values[0]); if (unlikely((__pyx_v_old_hash == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 148, __pyx_L3_error)
     __pyx_v_position = ((PyObject*)values[1]);
-    __pyx_v_piece_type = __Pyx_PyLong_As_int(values[2]); if (unlikely((__pyx_v_piece_type == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 151, __pyx_L3_error)
+    __pyx_v_piece_type = __Pyx_PyLong_As_int(values[2]); if (unlikely((__pyx_v_piece_type == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 148, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("remove_piece_hash", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 149, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("remove_piece_hash", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 146, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -6459,7 +5767,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_position), (&PyTuple_Type), 1, "position", 1))) __PYX_ERR(0, 151, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_position), (&PyTuple_Type), 1, "position", 1))) __PYX_ERR(0, 148, __pyx_L1_error)
   __pyx_r = __pyx_pf_4core_15zobrist_hashing_13ZobristHasher_8remove_piece_hash(((struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *)__pyx_v_self), __pyx_v_old_hash, __pyx_v_position, __pyx_v_piece_type);
 
   /* function exit code */
@@ -6481,7 +5789,6 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 
 static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_8remove_piece_hash(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *__pyx_v_self, unsigned PY_LONG_LONG __pyx_v_old_hash, PyObject *__pyx_v_position, int __pyx_v_piece_type) {
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -6491,11 +5798,9 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_8remove_piece_
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[14]))
   __Pyx_RefNannySetupContext("remove_piece_hash", 0);
-  __Pyx_TraceStartFunc("remove_piece_hash", __pyx_f[0], 149, 0, 0, 0, __PYX_ERR(0, 149, __pyx_L1_error));
 
-  /* "core/zobrist_hashing.pyx":156
+  /* "core/zobrist_hashing.pyx":153
  *         """
  *         #
  *         return self.place_piece_hash(old_hash, position, piece_type)             # <<<<<<<<<<<<<<
@@ -6505,9 +5810,9 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_8remove_piece_
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2 = ((PyObject *)__pyx_v_self);
   __Pyx_INCREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_old_hash); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 156, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_old_hash); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_v_piece_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 156, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_v_piece_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = 0;
   {
@@ -6516,15 +5821,14 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_8remove_piece_
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 156, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
-  __Pyx_TraceReturnValue(__pyx_r, 1, 0, __PYX_ERR(0, 156, __pyx_L1_error));
   goto __pyx_L0;
 
-  /* "core/zobrist_hashing.pyx":149
+  /* "core/zobrist_hashing.pyx":146
  *         return old_hash ^ self.table[row][col][piece_index]
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -6538,22 +5842,15 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_8remove_piece_
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(0, 149, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("core.zobrist_hashing.ZobristHasher.remove_piece_hash", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "core/zobrist_hashing.pyx":158
+/* "core/zobrist_hashing.pyx":155
  *         return self.place_piece_hash(old_hash, position, piece_type)
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -6601,32 +5898,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_old_hash,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 158, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 155, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 158, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 155, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "switch_turn_hash", 0) < 0) __PYX_ERR(0, 158, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "switch_turn_hash", 0) < 0) __PYX_ERR(0, 155, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("switch_turn_hash", 1, 1, 1, i); __PYX_ERR(0, 158, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("switch_turn_hash", 1, 1, 1, i); __PYX_ERR(0, 155, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 158, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 155, __pyx_L3_error)
     }
-    __pyx_v_old_hash = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(values[0]); if (unlikely((__pyx_v_old_hash == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 160, __pyx_L3_error)
+    __pyx_v_old_hash = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(values[0]); if (unlikely((__pyx_v_old_hash == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 157, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("switch_turn_hash", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 158, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("switch_turn_hash", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 155, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -6649,17 +5946,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 
 static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_10switch_turn_hash(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *__pyx_v_self, unsigned PY_LONG_LONG __pyx_v_old_hash) {
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[15]))
   __Pyx_RefNannySetupContext("switch_turn_hash", 0);
-  __Pyx_TraceStartFunc("switch_turn_hash", __pyx_f[0], 158, 0, 0, 0, __PYX_ERR(0, 158, __pyx_L1_error));
 
-  /* "core/zobrist_hashing.pyx":164
+  /* "core/zobrist_hashing.pyx":161
  * 
  *         """
  *         return old_hash ^ self.turn_key             # <<<<<<<<<<<<<<
@@ -6667,14 +5961,13 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_10switch_turn_
  * # hasher
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG((__pyx_v_old_hash ^ __pyx_v_self->turn_key)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG((__pyx_v_old_hash ^ __pyx_v_self->turn_key)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 161, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
-  __Pyx_TraceReturnValue(__pyx_r, 1, 0, __PYX_ERR(0, 164, __pyx_L1_error));
   goto __pyx_L0;
 
-  /* "core/zobrist_hashing.pyx":158
+  /* "core/zobrist_hashing.pyx":155
  *         return self.place_piece_hash(old_hash, position, piece_type)
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -6685,17 +5978,10 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_10switch_turn_
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(0, 158, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("core.zobrist_hashing.ZobristHasher.switch_turn_hash", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -6725,37 +6011,26 @@ static PyObject *__pyx_pw_4core_15zobrist_hashing_13ZobristHasher_8turn_key_1__g
 
 static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_8turn_key___get__(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[16]))
   __Pyx_RefNannySetupContext("__get__", 0);
-  __Pyx_TraceStartFunc("__get__", __pyx_f[2], 5, 0, 0, 0, __PYX_ERR(2, 5, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_1 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_self->turn_key); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
-  __Pyx_TraceReturnValue(__pyx_r, 0, 0, __PYX_ERR(2, 5, __pyx_L1_error));
   goto __pyx_L0;
 
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(2, 5, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("core.zobrist_hashing.ZobristHasher.turn_key.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -6777,31 +6052,20 @@ static int __pyx_pw_4core_15zobrist_hashing_13ZobristHasher_8turn_key_3__set__(P
 
 static int __pyx_pf_4core_15zobrist_hashing_13ZobristHasher_8turn_key_2__set__(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *__pyx_v_self, PyObject *__pyx_v_value) {
   int __pyx_r;
-  __Pyx_TraceDeclarationsFunc
   unsigned PY_LONG_LONG __pyx_t_1;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[17]))
-  __Pyx_TraceStartFunc("__set__", __pyx_f[2], 5, 0, 0, 0, __PYX_ERR(2, 5, __pyx_L1_error));
   __pyx_t_1 = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(__pyx_v_value); if (unlikely((__pyx_t_1 == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(2, 5, __pyx_L1_error)
   __pyx_v_self->turn_key = __pyx_t_1;
 
   /* function exit code */
   __pyx_r = 0;
-  __Pyx_TraceReturnCValue(__pyx_r, __Pyx_Owned_Py_None, 0, 0, __PYX_ERR(2, 5, __pyx_L1_error));
   goto __pyx_L0;
   __pyx_L1_error:;
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(2, 5, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("core.zobrist_hashing.ZobristHasher.turn_key.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = -1;
   __pyx_L0:;
-  __Pyx_PyMonitoring_ExitScope(0);
   return __pyx_r;
 }
 
@@ -6858,7 +6122,6 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_12__reduce_cyt
   PyObject *__pyx_v__dict = 0;
   int __pyx_v_use_setstate;
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -6869,9 +6132,7 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_12__reduce_cyt
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[18]))
   __Pyx_RefNannySetupContext("__reduce_cython__", 0);
-  __Pyx_TraceStartFunc("__reduce_cython__", __pyx_f[1], 1, 0, 0, 0, __PYX_ERR(1, 1, __pyx_L1_error));
 
   /* "(tree fragment)":5
  *     cdef object _dict
@@ -7023,7 +6284,6 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_12__reduce_cyt
     __pyx_t_5 = 0;
     __pyx_r = __pyx_t_3;
     __pyx_t_3 = 0;
-    __Pyx_TraceReturnValue(__pyx_r, 33, 0, __PYX_ERR(1, 13, __pyx_L1_error));
     goto __pyx_L0;
 
     /* "(tree fragment)":12
@@ -7067,7 +6327,6 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_12__reduce_cyt
     __pyx_t_5 = 0;
     __pyx_r = __pyx_t_4;
     __pyx_t_4 = 0;
-    __Pyx_TraceReturnValue(__pyx_r, 41, 0, __PYX_ERR(1, 15, __pyx_L1_error));
     goto __pyx_L0;
   }
 
@@ -7084,19 +6343,12 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_12__reduce_cyt
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(1, 1, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("core.zobrist_hashing.ZobristHasher.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_state);
   __Pyx_XDECREF(__pyx_v__dict);
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -7195,15 +6447,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 
 static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_14__setstate_cython__(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[19]))
   __Pyx_RefNannySetupContext("__setstate_cython__", 0);
-  __Pyx_TraceStartFunc("__setstate_cython__", __pyx_f[1], 16, 0, 0, 0, __PYX_ERR(1, 16, __pyx_L1_error));
 
   /* "(tree fragment)":17
  *         return __pyx_unpickle_ZobristHasher, (type(self), 0xd5c481f, state)
@@ -7224,26 +6473,18 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_13ZobristHasher_14__setstate_c
 
   /* function exit code */
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
-  __Pyx_TraceReturnValue(__pyx_r, 0, 0, __PYX_ERR(1, 16, __pyx_L1_error));
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(1, 16, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("core.zobrist_hashing.ZobristHasher.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "core/zobrist_hashing.pyx":170
+/* "core/zobrist_hashing.pyx":167
  * 
  * # Python
  * def get_hasher():             # <<<<<<<<<<<<<<
@@ -7270,16 +6511,10 @@ static PyObject *__pyx_pw_4core_15zobrist_hashing_1get_hasher(PyObject *__pyx_se
 
 static PyObject *__pyx_pf_4core_15zobrist_hashing_get_hasher(CYTHON_UNUSED PyObject *__pyx_self) {
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[20]))
   __Pyx_RefNannySetupContext("get_hasher", 0);
-  __Pyx_TraceStartFunc("get_hasher", __pyx_f[0], 170, 0, 0, 0, __PYX_ERR(0, 170, __pyx_L1_error));
 
-  /* "core/zobrist_hashing.pyx":172
+  /* "core/zobrist_hashing.pyx":169
  * def get_hasher():
  *     """"""
  *     return _hasher             # <<<<<<<<<<<<<<
@@ -7289,10 +6524,9 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_get_hasher(CYTHON_UNUSED PyObj
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF((PyObject *)__pyx_v_4core_15zobrist_hashing__hasher);
   __pyx_r = ((PyObject *)__pyx_v_4core_15zobrist_hashing__hasher);
-  __Pyx_TraceReturnValue(__pyx_r, 1, 0, __PYX_ERR(0, 172, __pyx_L1_error));
   goto __pyx_L0;
 
-  /* "core/zobrist_hashing.pyx":170
+  /* "core/zobrist_hashing.pyx":167
  * 
  * # Python
  * def get_hasher():             # <<<<<<<<<<<<<<
@@ -7301,23 +6535,13 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_get_hasher(CYTHON_UNUSED PyObj
 */
 
   /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(0, 170, __pyx_L1_error));
-  #endif
-  __Pyx_AddTraceback("core.zobrist_hashing.get_hasher", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "core/zobrist_hashing.pyx":174
+/* "core/zobrist_hashing.pyx":171
  *     return _hasher
  * 
  * def compute_board_hash(list board, int current_player):             # <<<<<<<<<<<<<<
@@ -7366,39 +6590,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_board,&__pyx_mstate_global->__pyx_n_u_current_player,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 174, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 171, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 174, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 171, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 174, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 171, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "compute_board_hash", 0) < 0) __PYX_ERR(0, 174, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "compute_board_hash", 0) < 0) __PYX_ERR(0, 171, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("compute_board_hash", 1, 2, 2, i); __PYX_ERR(0, 174, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("compute_board_hash", 1, 2, 2, i); __PYX_ERR(0, 171, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 174, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 171, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 174, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 171, __pyx_L3_error)
     }
     __pyx_v_board = ((PyObject*)values[0]);
-    __pyx_v_current_player = __Pyx_PyLong_As_int(values[1]); if (unlikely((__pyx_v_current_player == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 174, __pyx_L3_error)
+    __pyx_v_current_player = __Pyx_PyLong_As_int(values[1]); if (unlikely((__pyx_v_current_player == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 171, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("compute_board_hash", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 174, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("compute_board_hash", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 171, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -7409,7 +6633,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_board), (&PyList_Type), 1, "board", 1))) __PYX_ERR(0, 174, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_board), (&PyList_Type), 1, "board", 1))) __PYX_ERR(0, 171, __pyx_L1_error)
   __pyx_r = __pyx_pf_4core_15zobrist_hashing_2compute_board_hash(__pyx_self, __pyx_v_board, __pyx_v_current_player);
 
   /* function exit code */
@@ -7431,7 +6655,6 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 
 static PyObject *__pyx_pf_4core_15zobrist_hashing_2compute_board_hash(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_board, int __pyx_v_current_player) {
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -7440,11 +6663,9 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_2compute_board_hash(CYTHON_UNU
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[21]))
   __Pyx_RefNannySetupContext("compute_board_hash", 0);
-  __Pyx_TraceStartFunc("compute_board_hash", __pyx_f[0], 174, 0, 0, 0, __PYX_ERR(0, 174, __pyx_L1_error));
 
-  /* "core/zobrist_hashing.pyx":176
+  /* "core/zobrist_hashing.pyx":173
  * def compute_board_hash(list board, int current_player):
  *     """"""
  *     return _hasher.compute_hash(board, current_player)             # <<<<<<<<<<<<<<
@@ -7454,7 +6675,7 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_2compute_board_hash(CYTHON_UNU
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2 = ((PyObject *)__pyx_v_4core_15zobrist_hashing__hasher);
   __Pyx_INCREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyLong_From_int(__pyx_v_current_player); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 176, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From_int(__pyx_v_current_player); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 173, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = 0;
   {
@@ -7462,15 +6683,14 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_2compute_board_hash(CYTHON_UNU
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_compute_hash, __pyx_callargs+__pyx_t_4, (3-__pyx_t_4) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 176, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 173, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
-  __Pyx_TraceReturnValue(__pyx_r, 1, 0, __PYX_ERR(0, 176, __pyx_L1_error));
   goto __pyx_L0;
 
-  /* "core/zobrist_hashing.pyx":174
+  /* "core/zobrist_hashing.pyx":171
  *     return _hasher
  * 
  * def compute_board_hash(list board, int current_player):             # <<<<<<<<<<<<<<
@@ -7483,22 +6703,15 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_2compute_board_hash(CYTHON_UNU
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(0, 174, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("core.zobrist_hashing.compute_board_hash", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "core/zobrist_hashing.pyx":178
+/* "core/zobrist_hashing.pyx":175
  *     return _hasher.compute_hash(board, current_player)
  * 
  * def update_board_hash(unsigned long long old_hash, tuple move, int piece_type, int current_player):             # <<<<<<<<<<<<<<
@@ -7549,53 +6762,53 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_old_hash,&__pyx_mstate_global->__pyx_n_u_move,&__pyx_mstate_global->__pyx_n_u_piece_type,&__pyx_mstate_global->__pyx_n_u_current_player,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 178, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 175, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 178, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 175, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 178, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 175, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 178, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 175, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 178, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 175, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "update_board_hash", 0) < 0) __PYX_ERR(0, 178, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "update_board_hash", 0) < 0) __PYX_ERR(0, 175, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 4; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("update_board_hash", 1, 4, 4, i); __PYX_ERR(0, 178, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("update_board_hash", 1, 4, 4, i); __PYX_ERR(0, 175, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 4)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 178, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 175, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 178, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 175, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 178, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 175, __pyx_L3_error)
       values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 178, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 175, __pyx_L3_error)
     }
-    __pyx_v_old_hash = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(values[0]); if (unlikely((__pyx_v_old_hash == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 178, __pyx_L3_error)
+    __pyx_v_old_hash = __Pyx_PyLong_As_unsigned_PY_LONG_LONG(values[0]); if (unlikely((__pyx_v_old_hash == (unsigned PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 175, __pyx_L3_error)
     __pyx_v_move = ((PyObject*)values[1]);
-    __pyx_v_piece_type = __Pyx_PyLong_As_int(values[2]); if (unlikely((__pyx_v_piece_type == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 178, __pyx_L3_error)
-    __pyx_v_current_player = __Pyx_PyLong_As_int(values[3]); if (unlikely((__pyx_v_current_player == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 178, __pyx_L3_error)
+    __pyx_v_piece_type = __Pyx_PyLong_As_int(values[2]); if (unlikely((__pyx_v_piece_type == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 175, __pyx_L3_error)
+    __pyx_v_current_player = __Pyx_PyLong_As_int(values[3]); if (unlikely((__pyx_v_current_player == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 175, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("update_board_hash", 1, 4, 4, __pyx_nargs); __PYX_ERR(0, 178, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("update_board_hash", 1, 4, 4, __pyx_nargs); __PYX_ERR(0, 175, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -7606,7 +6819,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_move), (&PyTuple_Type), 1, "move", 1))) __PYX_ERR(0, 178, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_move), (&PyTuple_Type), 1, "move", 1))) __PYX_ERR(0, 175, __pyx_L1_error)
   __pyx_r = __pyx_pf_4core_15zobrist_hashing_4update_board_hash(__pyx_self, __pyx_v_old_hash, __pyx_v_move, __pyx_v_piece_type, __pyx_v_current_player);
 
   /* function exit code */
@@ -7628,7 +6841,6 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 
 static PyObject *__pyx_pf_4core_15zobrist_hashing_4update_board_hash(CYTHON_UNUSED PyObject *__pyx_self, unsigned PY_LONG_LONG __pyx_v_old_hash, PyObject *__pyx_v_move, int __pyx_v_piece_type, int __pyx_v_current_player) {
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -7639,11 +6851,9 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_4update_board_hash(CYTHON_UNUS
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[22]))
   __Pyx_RefNannySetupContext("update_board_hash", 0);
-  __Pyx_TraceStartFunc("update_board_hash", __pyx_f[0], 178, 0, 0, 0, __PYX_ERR(0, 178, __pyx_L1_error));
 
-  /* "core/zobrist_hashing.pyx":180
+  /* "core/zobrist_hashing.pyx":177
  * def update_board_hash(unsigned long long old_hash, tuple move, int piece_type, int current_player):
  *     """"""
  *     return _hasher.update_hash(old_hash, move, piece_type, current_player)             # <<<<<<<<<<<<<<
@@ -7651,11 +6861,11 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_4update_board_hash(CYTHON_UNUS
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2 = ((PyObject *)__pyx_v_4core_15zobrist_hashing__hasher);
   __Pyx_INCREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_old_hash); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 180, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From_unsigned_PY_LONG_LONG(__pyx_v_old_hash); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 177, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_v_piece_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 180, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_v_piece_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 177, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyLong_From_int(__pyx_v_current_player); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 180, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyLong_From_int(__pyx_v_current_player); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 177, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = 0;
   {
@@ -7665,15 +6875,14 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_4update_board_hash(CYTHON_UNUS
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 180, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 177, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
-  __Pyx_TraceReturnValue(__pyx_r, 1, 0, __PYX_ERR(0, 180, __pyx_L1_error));
   goto __pyx_L0;
 
-  /* "core/zobrist_hashing.pyx":178
+  /* "core/zobrist_hashing.pyx":175
  *     return _hasher.compute_hash(board, current_player)
  * 
  * def update_board_hash(unsigned long long old_hash, tuple move, int piece_type, int current_player):             # <<<<<<<<<<<<<<
@@ -7688,17 +6897,10 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_4update_board_hash(CYTHON_UNUS
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(0, 178, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("core.zobrist_hashing.update_board_hash", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -7814,7 +7016,6 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_6__pyx_unpickle_ZobristHasher(
   PyObject *__pyx_v___pyx_PickleError = 0;
   PyObject *__pyx_v___pyx_result = 0;
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   int __pyx_t_2;
@@ -7823,9 +7024,7 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_6__pyx_unpickle_ZobristHasher(
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[23]))
   __Pyx_RefNannySetupContext("__pyx_unpickle_ZobristHasher", 0);
-  __Pyx_TraceStartFunc("__pyx_unpickle_ZobristHasher", __pyx_f[1], 1, 0, 0, 0, __PYX_ERR(1, 1, __pyx_L1_error));
 
   /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
@@ -7948,7 +7147,6 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_6__pyx_unpickle_ZobristHasher(
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v___pyx_result);
   __pyx_r = __pyx_v___pyx_result;
-  __Pyx_TraceReturnValue(__pyx_r, 29, 0, __PYX_ERR(1, 10, __pyx_L1_error));
   goto __pyx_L0;
 
   /* "(tree fragment)":1
@@ -7961,19 +7159,12 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_6__pyx_unpickle_ZobristHasher(
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(1, 1, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("core.zobrist_hashing.__pyx_unpickle_ZobristHasher", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v___pyx_PickleError);
   __Pyx_XDECREF(__pyx_v___pyx_result);
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -7988,7 +7179,6 @@ static PyObject *__pyx_pf_4core_15zobrist_hashing_6__pyx_unpickle_ZobristHasher(
 
 static PyObject *__pyx_f_4core_15zobrist_hashing___pyx_unpickle_ZobristHasher__set_state(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *__pyx_v___pyx_result, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
-  __Pyx_TraceDeclarationsFunc
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   int __pyx_t_2;
@@ -8004,9 +7194,7 @@ static PyObject *__pyx_f_4core_15zobrist_hashing___pyx_unpickle_ZobristHasher__s
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_TraceFrameInit(((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[24]))
   __Pyx_RefNannySetupContext("__pyx_unpickle_ZobristHasher__set_state", 0);
-  __Pyx_TraceStartFunc("__pyx_unpickle_ZobristHasher__set_state", __pyx_f[1], 11, 0, 0, 0, __PYX_ERR(1, 11, __pyx_L1_error));
 
   /* "(tree fragment)":12
  *     return __pyx_result
@@ -8130,24 +7318,16 @@ static PyObject *__pyx_f_4core_15zobrist_hashing___pyx_unpickle_ZobristHasher__s
 
   /* function exit code */
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
-  __Pyx_TraceReturnValue(__pyx_r, 0, 0, __PYX_ERR(1, 11, __pyx_L1_error));
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_9);
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  #if CYTHON_USE_SYS_MONITORING
-  __Pyx_TraceExceptionUnwind(0, 0);
-  #else
-  __Pyx_TraceReturnValue(NULL, 0, 0, __PYX_ERR(1, 11, __pyx_L1_error));
-  #endif
   __Pyx_AddTraceback("core.zobrist_hashing.__pyx_unpickle_ZobristHasher__set_state", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_PyMonitoring_ExitScope(0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -8368,8 +7548,8 @@ static int __Pyx_modinit_global_init_code(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   __Pyx_RefNannySetupContext("__Pyx_modinit_global_init_code", 0);
   /*--- Global init code ---*/
-  __pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX = ((PyObject*)Py_None); Py_INCREF(Py_None);
   __pyx_v_4core_15zobrist_hashing__hasher = ((struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *)Py_None); Py_INCREF(Py_None);
+  __pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX = ((PyObject*)Py_None); Py_INCREF(Py_None);
   __Pyx_RefNannyFinishContext();
   return 0;
 }
@@ -8377,10 +7557,17 @@ static int __Pyx_modinit_global_init_code(__pyx_mstatetype *__pyx_mstate) {
 static int __Pyx_modinit_variable_export_code(__pyx_mstatetype *__pyx_mstate) {
   __Pyx_RefNannyDeclarations
   CYTHON_UNUSED_VAR(__pyx_mstate);
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_variable_export_code", 0);
   /*--- Variable export code ---*/
+  if (__Pyx_ExportVoidPtr(__pyx_mstate_global->__pyx_n_u_hasher, (void *)&__pyx_v_4core_15zobrist_hashing__hasher, "struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
+  __pyx_L1_error:;
+  __Pyx_RefNannyFinishContext();
+  return -1;
 }
 
 static int __Pyx_modinit_function_export_code(__pyx_mstatetype *__pyx_mstate) {
@@ -8406,15 +7593,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_vtable_4core_15zobrist_hashing_ZobristHasher.c_remove_piece_hash = (unsigned PY_LONG_LONG (*)(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *, unsigned PY_LONG_LONG, int, int, int))__pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_remove_piece_hash;
   __pyx_vtable_4core_15zobrist_hashing_ZobristHasher.c_switch_turn_hash = (unsigned PY_LONG_LONG (*)(struct __pyx_obj_4core_15zobrist_hashing_ZobristHasher *, unsigned PY_LONG_LONG))__pyx_f_4core_15zobrist_hashing_13ZobristHasher_c_switch_turn_hash;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_4core_15zobrist_hashing_ZobristHasher_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher)) __PYX_ERR(0, 19, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_4core_15zobrist_hashing_ZobristHasher_spec, __pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher) < 0) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_4core_15zobrist_hashing_ZobristHasher_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher)) __PYX_ERR(0, 16, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_4core_15zobrist_hashing_ZobristHasher_spec, __pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher) < 0) __PYX_ERR(0, 16, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher = &__pyx_type_4core_15zobrist_hashing_ZobristHasher;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher) < 0) __PYX_ERR(0, 19, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher) < 0) __PYX_ERR(0, 16, __pyx_L1_error)
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher->tp_dictoffset && __pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher->tp_getattro == PyObject_GenericGetAttr)) {
@@ -8423,7 +7610,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   #endif
   #if CYTHON_UPDATE_DESCRIPTOR_DOC
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 19, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)__pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 16, __pyx_L1_error)
     if (__Pyx_IS_TYPE(wrapper, &PyWrapperDescr_Type)) {
       __pyx_wrapperbase_4core_15zobrist_hashing_13ZobristHasher___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_4core_15zobrist_hashing_13ZobristHasher___init__.doc = __pyx_doc_4core_15zobrist_hashing_13ZobristHasher___init__;
@@ -8431,10 +7618,10 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
     }
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, __pyx_vtabptr_4core_15zobrist_hashing_ZobristHasher) < 0) __PYX_ERR(0, 19, __pyx_L1_error)
-  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher) < 0) __PYX_ERR(0, 19, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_ZobristHasher, (PyObject *) __pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher) < 0) __PYX_ERR(0, 19, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher) < 0) __PYX_ERR(0, 19, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, __pyx_vtabptr_4core_15zobrist_hashing_ZobristHasher) < 0) __PYX_ERR(0, 16, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher) < 0) __PYX_ERR(0, 16, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_ZobristHasher, (PyObject *) __pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher) < 0) __PYX_ERR(0, 16, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher) < 0) __PYX_ERR(0, 16, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -8643,7 +7830,6 @@ static CYTHON_SMALL_CODE int __pyx_pymod_exec_zobrist_hashing(PyObject *__pyx_py
   int pystate_addmodule_run = 0;
   #endif
   __pyx_mstatetype *__pyx_mstate = NULL;
-  __Pyx_TraceDeclarationsFunc
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
@@ -8747,162 +7933,134 @@ __Pyx_RefNannySetupContext("PyInit_zobrist_hashing", 0);
   if (__Pyx_CreateCodeObjects(__pyx_mstate) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   /*--- Global type/function init code ---*/
   (void)__Pyx_modinit_global_init_code(__pyx_mstate);
-  (void)__Pyx_modinit_variable_export_code(__pyx_mstate);
+  if (unlikely((__Pyx_modinit_variable_export_code(__pyx_mstate) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
   (void)__Pyx_modinit_function_export_code(__pyx_mstate);
   if (unlikely((__Pyx_modinit_type_init_code(__pyx_mstate) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
   (void)__Pyx_modinit_type_import_code(__pyx_mstate);
   (void)__Pyx_modinit_variable_import_code(__pyx_mstate);
   (void)__Pyx_modinit_function_import_code(__pyx_mstate);
   /*--- Execution code ---*/
-  __Pyx_TraceStartFunc("PyInit_zobrist_hashing", __pyx_f[0], 1, 2, 0, 0, __PYX_ERR(0, 1, __pyx_L1_error));
 
   /* "core/zobrist_hashing.pyx":6
  * import cython
  * from cython cimport Py_ssize_t
  * import random             # <<<<<<<<<<<<<<
  * 
- * #
+ * from core.constants cimport SOLDIER, CANNON, EMPTY
 */
   __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_random, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_random, __pyx_t_2) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":9
- * 
- * #
- * cdef int SOLDIER = 1             # <<<<<<<<<<<<<<
- * cdef int CANNON = 2
- * cdef int EMPTY = 0
-*/
-  __pyx_v_4core_15zobrist_hashing_SOLDIER = 1;
-
-  /* "core/zobrist_hashing.pyx":10
- * #
- * cdef int SOLDIER = 1
- * cdef int CANNON = 2             # <<<<<<<<<<<<<<
- * cdef int EMPTY = 0
- * 
-*/
-  __pyx_v_4core_15zobrist_hashing_CANNON = 2;
-
   /* "core/zobrist_hashing.pyx":11
- * cdef int SOLDIER = 1
- * cdef int CANNON = 2
- * cdef int EMPTY = 0             # <<<<<<<<<<<<<<
- * 
- * #
-*/
-  __pyx_v_4core_15zobrist_hashing_EMPTY = 0;
-
-  /* "core/zobrist_hashing.pyx":14
  * 
  * #
  * cdef dict _PIECE_TO_INDEX = {EMPTY: -1, SOLDIER: 0, CANNON: 1}             # <<<<<<<<<<<<<<
  * 
  * # Python
 */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyLong_From_int(__pyx_v_4core_15zobrist_hashing_EMPTY); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From___pyx_anon_enum(__pyx_e_4core_9constants_EMPTY); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_t_3, __pyx_mstate_global->__pyx_int_neg_1) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_t_3, __pyx_mstate_global->__pyx_int_neg_1) < 0) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyLong_From_int(__pyx_v_4core_15zobrist_hashing_SOLDIER); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From___pyx_anon_enum(__pyx_e_4core_9constants_SOLDIER); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_t_3, __pyx_mstate_global->__pyx_int_0) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_t_3, __pyx_mstate_global->__pyx_int_0) < 0) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyLong_From_int(__pyx_v_4core_15zobrist_hashing_CANNON); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From___pyx_anon_enum(__pyx_e_4core_9constants_CANNON); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_t_3, __pyx_mstate_global->__pyx_int_1) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_t_3, __pyx_mstate_global->__pyx_int_1) < 0) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_XGOTREF(__pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX);
   __Pyx_DECREF_SET(__pyx_v_4core_15zobrist_hashing__PIECE_TO_INDEX, ((PyObject*)__pyx_t_2));
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":17
+  /* "core/zobrist_hashing.pyx":14
  * 
  * # Python
  * PIECE_TO_INDEX = {EMPTY: -1, SOLDIER: 0, CANNON: 1}             # <<<<<<<<<<<<<<
  * 
  * @cython.boundscheck(False)
 */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyLong_From_int(__pyx_v_4core_15zobrist_hashing_EMPTY); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From___pyx_anon_enum(__pyx_e_4core_9constants_EMPTY); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_t_3, __pyx_mstate_global->__pyx_int_neg_1) < 0) __PYX_ERR(0, 17, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_t_3, __pyx_mstate_global->__pyx_int_neg_1) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyLong_From_int(__pyx_v_4core_15zobrist_hashing_SOLDIER); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From___pyx_anon_enum(__pyx_e_4core_9constants_SOLDIER); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_t_3, __pyx_mstate_global->__pyx_int_0) < 0) __PYX_ERR(0, 17, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_t_3, __pyx_mstate_global->__pyx_int_0) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyLong_From_int(__pyx_v_4core_15zobrist_hashing_CANNON); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From___pyx_anon_enum(__pyx_e_4core_9constants_CANNON); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_t_3, __pyx_mstate_global->__pyx_int_1) < 0) __PYX_ERR(0, 17, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_t_3, __pyx_mstate_global->__pyx_int_1) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_PIECE_TO_INDEX, __pyx_t_2) < 0) __PYX_ERR(0, 17, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_PIECE_TO_INDEX, __pyx_t_2) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":95
+  /* "core/zobrist_hashing.pyx":92
  *         return old_hash ^ self.turn_key
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
  *     def compute_hash(self, list board, int current_player):
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_13ZobristHasher_3compute_hash, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ZobristHasher_compute_hash, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[11])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 95, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_13ZobristHasher_3compute_hash, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ZobristHasher_compute_hash, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 92, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, __pyx_mstate_global->__pyx_n_u_compute_hash, __pyx_t_2) < 0) __PYX_ERR(0, 95, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, __pyx_mstate_global->__pyx_n_u_compute_hash, __pyx_t_2) < 0) __PYX_ERR(0, 92, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":114
+  /* "core/zobrist_hashing.pyx":111
  *         return h
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
  *     def update_hash(self, unsigned long long old_hash, tuple move, int piece_type):
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_13ZobristHasher_5update_hash, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ZobristHasher_update_hash, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[12])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_13ZobristHasher_5update_hash, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ZobristHasher_update_hash, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, __pyx_mstate_global->__pyx_n_u_update_hash, __pyx_t_2) < 0) __PYX_ERR(0, 114, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, __pyx_mstate_global->__pyx_n_u_update_hash, __pyx_t_2) < 0) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":137
+  /* "core/zobrist_hashing.pyx":134
  *         return new_hash
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
  *     def place_piece_hash(self, unsigned long long old_hash, tuple position, int piece_type):
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_13ZobristHasher_7place_piece_hash, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ZobristHasher_place_piece_hash, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[13])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_13ZobristHasher_7place_piece_hash, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ZobristHasher_place_piece_hash, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 134, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, __pyx_mstate_global->__pyx_n_u_place_piece_hash, __pyx_t_2) < 0) __PYX_ERR(0, 137, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, __pyx_mstate_global->__pyx_n_u_place_piece_hash, __pyx_t_2) < 0) __PYX_ERR(0, 134, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":149
+  /* "core/zobrist_hashing.pyx":146
  *         return old_hash ^ self.table[row][col][piece_index]
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
  *     def remove_piece_hash(self, unsigned long long old_hash, tuple position, int piece_type):
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_13ZobristHasher_9remove_piece_hash, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ZobristHasher_remove_piece_hash, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[14])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_13ZobristHasher_9remove_piece_hash, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ZobristHasher_remove_piece_hash, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, __pyx_mstate_global->__pyx_n_u_remove_piece_hash, __pyx_t_2) < 0) __PYX_ERR(0, 149, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, __pyx_mstate_global->__pyx_n_u_remove_piece_hash, __pyx_t_2) < 0) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":158
+  /* "core/zobrist_hashing.pyx":155
  *         return self.place_piece_hash(old_hash, position, piece_type)
  * 
  *     @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  *     @cython.wraparound(False)
  *     def switch_turn_hash(self, unsigned long long old_hash):
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_13ZobristHasher_11switch_turn_hash, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ZobristHasher_switch_turn_hash, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[15])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 158, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_13ZobristHasher_11switch_turn_hash, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ZobristHasher_switch_turn_hash, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, __pyx_mstate_global->__pyx_n_u_switch_turn_hash, __pyx_t_2) < 0) __PYX_ERR(0, 158, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, __pyx_mstate_global->__pyx_n_u_switch_turn_hash, __pyx_t_2) < 0) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":1
@@ -8910,7 +8068,7 @@ __Pyx_RefNannySetupContext("PyInit_zobrist_hashing", 0);
  *     cdef tuple state
  *     cdef object _dict
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_13ZobristHasher_13__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ZobristHasher___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[18])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_13ZobristHasher_13__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ZobristHasher___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, __pyx_mstate_global->__pyx_n_u_reduce_cython, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -8921,12 +8079,12 @@ __Pyx_RefNannySetupContext("PyInit_zobrist_hashing", 0);
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_ZobristHasher__set_state(self, __pyx_state)
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_13ZobristHasher_15__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ZobristHasher___setstate_cython, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[19])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 16, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_13ZobristHasher_15__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_ZobristHasher___setstate_cython, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 16, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_15zobrist_hashing_ZobristHasher, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_2) < 0) __PYX_ERR(1, 16, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":167
+  /* "core/zobrist_hashing.pyx":164
  * 
  * # hasher
  * cdef ZobristHasher _hasher = ZobristHasher()             # <<<<<<<<<<<<<<
@@ -8942,7 +8100,7 @@ __Pyx_RefNannySetupContext("PyInit_zobrist_hashing", 0);
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 167, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_2);
   }
   __Pyx_XGOTREF((PyObject *)__pyx_v_4core_15zobrist_hashing__hasher);
@@ -8950,40 +8108,40 @@ __Pyx_RefNannySetupContext("PyInit_zobrist_hashing", 0);
   __Pyx_GIVEREF((PyObject *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":170
+  /* "core/zobrist_hashing.pyx":167
  * 
  * # Python
  * def get_hasher():             # <<<<<<<<<<<<<<
  *     """"""
  *     return _hasher
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_1get_hasher, 0, __pyx_mstate_global->__pyx_n_u_get_hasher, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[20])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_1get_hasher, 0, __pyx_mstate_global->__pyx_n_u_get_hasher, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 167, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_get_hasher, __pyx_t_2) < 0) __PYX_ERR(0, 170, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_get_hasher, __pyx_t_2) < 0) __PYX_ERR(0, 167, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":174
+  /* "core/zobrist_hashing.pyx":171
  *     return _hasher
  * 
  * def compute_board_hash(list board, int current_player):             # <<<<<<<<<<<<<<
  *     """"""
  *     return _hasher.compute_hash(board, current_player)
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_3compute_board_hash, 0, __pyx_mstate_global->__pyx_n_u_compute_board_hash, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[21])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 174, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_3compute_board_hash, 0, __pyx_mstate_global->__pyx_n_u_compute_board_hash, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_compute_board_hash, __pyx_t_2) < 0) __PYX_ERR(0, 174, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_compute_board_hash, __pyx_t_2) < 0) __PYX_ERR(0, 171, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/zobrist_hashing.pyx":178
+  /* "core/zobrist_hashing.pyx":175
  *     return _hasher.compute_hash(board, current_player)
  * 
  * def update_board_hash(unsigned long long old_hash, tuple move, int piece_type, int current_player):             # <<<<<<<<<<<<<<
  *     """"""
  *     return _hasher.update_hash(old_hash, move, piece_type, current_player)
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_5update_board_hash, 0, __pyx_mstate_global->__pyx_n_u_update_board_hash, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[22])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 178, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_5update_board_hash, 0, __pyx_mstate_global->__pyx_n_u_update_board_hash, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 175, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_update_board_hash, __pyx_t_2) < 0) __PYX_ERR(0, 178, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_update_board_hash, __pyx_t_2) < 0) __PYX_ERR(0, 175, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":1
@@ -8991,13 +8149,13 @@ __Pyx_RefNannySetupContext("PyInit_zobrist_hashing", 0);
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_7__pyx_unpickle_ZobristHasher, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_ZobristHasher, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[23])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_15zobrist_hashing_7__pyx_unpickle_ZobristHasher, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_ZobristHasher, NULL, __pyx_mstate_global->__pyx_n_u_core_zobrist_hashing, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_ZobristHasher, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "core/zobrist_hashing.pyx":1
- * # own_game/core/zobrist_hashing.pyx             # <<<<<<<<<<<<<<
+ * # core/zobrist_hashing.pyx             # <<<<<<<<<<<<<<
  * 
  * # Cython imports
 */
@@ -9005,8 +8163,6 @@ __Pyx_RefNannySetupContext("PyInit_zobrist_hashing", 0);
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_test, __pyx_t_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_TraceReturnValue(Py_None, 2, 0, __PYX_ERR(0, 1, __pyx_L1_error));
-  __Pyx_PyMonitoring_ExitScope(0);
 
   /*--- Wrapped vars code ---*/
 
@@ -9015,8 +8171,6 @@ __Pyx_RefNannySetupContext("PyInit_zobrist_hashing", 0);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_TraceException(__pyx_lineno, 0, 0);
-  __Pyx_TraceExceptionUnwind(2, 0);
   if (__pyx_m) {
     if (__pyx_mstate->__pyx_d && stringtab_initialized) {
       __Pyx_AddTraceback("init core.zobrist_hashing", __pyx_clineno, __pyx_lineno, __pyx_filename);
@@ -9071,22 +8225,12 @@ typedef struct {
 static const char * const __pyx_string_tab_encodings[] = { 0 };
 static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_, sizeof(__pyx_k_), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_ */
-  {__pyx_k_CANNON, sizeof(__pyx_k_CANNON), 0, 1, 1}, /* PyObject cname: __pyx_n_u_CANNON */
-  {__pyx_k_EMPTY, sizeof(__pyx_k_EMPTY), 0, 1, 1}, /* PyObject cname: __pyx_n_u_EMPTY */
   {__pyx_k_Incompatible_checksums_0x_x_vs_0, sizeof(__pyx_k_Incompatible_checksums_0x_x_vs_0), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Incompatible_checksums_0x_x_vs_0 */
   {__pyx_k_IndexError, sizeof(__pyx_k_IndexError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_IndexError */
   {__pyx_k_Note_that_Cython_is_deliberately, sizeof(__pyx_k_Note_that_Cython_is_deliberately), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Note_that_Cython_is_deliberately */
   {__pyx_k_OverflowError, sizeof(__pyx_k_OverflowError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_OverflowError */
   {__pyx_k_PIECE_TO_INDEX, sizeof(__pyx_k_PIECE_TO_INDEX), 0, 1, 1}, /* PyObject cname: __pyx_n_u_PIECE_TO_INDEX */
-  {__pyx_k_PIECE_TO_INDEX_2, sizeof(__pyx_k_PIECE_TO_INDEX_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_PIECE_TO_INDEX_2 */
   {__pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_PickleError */
-  {__pyx_k_Pyx_carray_from_py_unsigned_PY, sizeof(__pyx_k_Pyx_carray_from_py_unsigned_PY), 0, 1, 1}, /* PyObject cname: __pyx_n_u_Pyx_carray_from_py_unsigned_PY */
-  {__pyx_k_Pyx_carray_from_py_unsigned_PY_2, sizeof(__pyx_k_Pyx_carray_from_py_unsigned_PY_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_Pyx_carray_from_py_unsigned_PY_2 */
-  {__pyx_k_Pyx_carray_to_py_unsigned_PY_L, sizeof(__pyx_k_Pyx_carray_to_py_unsigned_PY_L), 0, 1, 1}, /* PyObject cname: __pyx_n_u_Pyx_carray_to_py_unsigned_PY_L */
-  {__pyx_k_Pyx_carray_to_py_unsigned_PY_L_2, sizeof(__pyx_k_Pyx_carray_to_py_unsigned_PY_L_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_Pyx_carray_to_py_unsigned_PY_L_2 */
-  {__pyx_k_Pyx_carray_to_tuple_unsigned_P, sizeof(__pyx_k_Pyx_carray_to_tuple_unsigned_P), 0, 1, 1}, /* PyObject cname: __pyx_n_u_Pyx_carray_to_tuple_unsigned_P */
-  {__pyx_k_Pyx_carray_to_tuple_unsigned_P_2, sizeof(__pyx_k_Pyx_carray_to_tuple_unsigned_P_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_Pyx_carray_to_tuple_unsigned_P_2 */
-  {__pyx_k_SOLDIER, sizeof(__pyx_k_SOLDIER), 0, 1, 1}, /* PyObject cname: __pyx_n_u_SOLDIER */
   {__pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_TypeError */
   {__pyx_k_ZobristHasher, sizeof(__pyx_k_ZobristHasher), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ZobristHasher */
   {__pyx_k_ZobristHasher___reduce_cython, sizeof(__pyx_k_ZobristHasher___reduce_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ZobristHasher___reduce_cython */
@@ -9097,49 +8241,36 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_ZobristHasher_switch_turn_hash, sizeof(__pyx_k_ZobristHasher_switch_turn_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ZobristHasher_switch_turn_hash */
   {__pyx_k_ZobristHasher_update_hash, sizeof(__pyx_k_ZobristHasher_update_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ZobristHasher_update_hash */
   {__pyx_k__2, sizeof(__pyx_k__2), 0, 1, 0}, /* PyObject cname: __pyx_kp_u__2 */
-  {__pyx_k__3, sizeof(__pyx_k__3), 0, 1, 1}, /* PyObject cname: __pyx_n_u__3 */
   {__pyx_k_add_note, sizeof(__pyx_k_add_note), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_add_note */
   {__pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 1, 1}, /* PyObject cname: __pyx_n_u_asyncio_coroutines */
   {__pyx_k_board, sizeof(__pyx_k_board), 0, 1, 1}, /* PyObject cname: __pyx_n_u_board */
-  {__pyx_k_board_c, sizeof(__pyx_k_board_c), 0, 1, 1}, /* PyObject cname: __pyx_n_u_board_c */
   {__pyx_k_board_size, sizeof(__pyx_k_board_size), 0, 1, 1}, /* PyObject cname: __pyx_n_u_board_size */
   {__pyx_k_c, sizeof(__pyx_k_c), 0, 1, 1}, /* PyObject cname: __pyx_n_u_c */
-  {__pyx_k_c_compute_hash, sizeof(__pyx_k_c_compute_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_c_compute_hash */
-  {__pyx_k_c_remove_piece_hash, sizeof(__pyx_k_c_remove_piece_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_c_remove_piece_hash */
-  {__pyx_k_c_switch_turn_hash, sizeof(__pyx_k_c_switch_turn_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_c_switch_turn_hash */
-  {__pyx_k_c_update_hash, sizeof(__pyx_k_c_update_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_c_update_hash */
   {__pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cline_in_traceback */
   {__pyx_k_col, sizeof(__pyx_k_col), 0, 1, 1}, /* PyObject cname: __pyx_n_u_col */
-  {__pyx_k_cols, sizeof(__pyx_k_cols), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cols */
   {__pyx_k_compute_board_hash, sizeof(__pyx_k_compute_board_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_compute_board_hash */
   {__pyx_k_compute_hash, sizeof(__pyx_k_compute_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_compute_hash */
   {__pyx_k_core_zobrist_hashing, sizeof(__pyx_k_core_zobrist_hashing), 0, 1, 1}, /* PyObject cname: __pyx_n_u_core_zobrist_hashing */
-  {__pyx_k_core_zobrist_hashing_pxd, sizeof(__pyx_k_core_zobrist_hashing_pxd), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_core_zobrist_hashing_pxd */
   {__pyx_k_core_zobrist_hashing_pyx, sizeof(__pyx_k_core_zobrist_hashing_pyx), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_core_zobrist_hashing_pyx */
   {__pyx_k_current_player, sizeof(__pyx_k_current_player), 0, 1, 1}, /* PyObject cname: __pyx_n_u_current_player */
   {__pyx_k_dict, sizeof(__pyx_k_dict), 0, 1, 1}, /* PyObject cname: __pyx_n_u_dict */
   {__pyx_k_dict_2, sizeof(__pyx_k_dict_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_dict_2 */
   {__pyx_k_disable, sizeof(__pyx_k_disable), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_disable */
   {__pyx_k_enable, sizeof(__pyx_k_enable), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_enable */
-  {__pyx_k_end_c, sizeof(__pyx_k_end_c), 0, 1, 1}, /* PyObject cname: __pyx_n_u_end_c */
-  {__pyx_k_end_r, sizeof(__pyx_k_end_r), 0, 1, 1}, /* PyObject cname: __pyx_n_u_end_r */
   {__pyx_k_enumerate, sizeof(__pyx_k_enumerate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_enumerate */
   {__pyx_k_from_col, sizeof(__pyx_k_from_col), 0, 1, 1}, /* PyObject cname: __pyx_n_u_from_col */
   {__pyx_k_from_row, sizeof(__pyx_k_from_row), 0, 1, 1}, /* PyObject cname: __pyx_n_u_from_row */
   {__pyx_k_func, sizeof(__pyx_k_func), 0, 1, 1}, /* PyObject cname: __pyx_n_u_func */
   {__pyx_k_gc, sizeof(__pyx_k_gc), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_gc */
-  {__pyx_k_get, sizeof(__pyx_k_get), 0, 1, 1}, /* PyObject cname: __pyx_n_u_get */
   {__pyx_k_get_hasher, sizeof(__pyx_k_get_hasher), 0, 1, 1}, /* PyObject cname: __pyx_n_u_get_hasher */
   {__pyx_k_getrandbits, sizeof(__pyx_k_getrandbits), 0, 1, 1}, /* PyObject cname: __pyx_n_u_getrandbits */
   {__pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_getstate */
   {__pyx_k_getstate_2, sizeof(__pyx_k_getstate_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_getstate_2 */
   {__pyx_k_h, sizeof(__pyx_k_h), 0, 1, 1}, /* PyObject cname: __pyx_n_u_h */
   {__pyx_k_hasher, sizeof(__pyx_k_hasher), 0, 1, 1}, /* PyObject cname: __pyx_n_u_hasher */
-  {__pyx_k_init, sizeof(__pyx_k_init), 0, 1, 1}, /* PyObject cname: __pyx_n_u_init */
   {__pyx_k_initializing, sizeof(__pyx_k_initializing), 0, 1, 1}, /* PyObject cname: __pyx_n_u_initializing */
   {__pyx_k_is_coroutine, sizeof(__pyx_k_is_coroutine), 0, 1, 1}, /* PyObject cname: __pyx_n_u_is_coroutine */
   {__pyx_k_isenabled, sizeof(__pyx_k_isenabled), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_isenabled */
-  {__pyx_k_length, sizeof(__pyx_k_length), 0, 1, 1}, /* PyObject cname: __pyx_n_u_length */
   {__pyx_k_main, sizeof(__pyx_k_main), 0, 1, 1}, /* PyObject cname: __pyx_n_u_main */
   {__pyx_k_module, sizeof(__pyx_k_module), 0, 1, 1}, /* PyObject cname: __pyx_n_u_module */
   {__pyx_k_move, sizeof(__pyx_k_move), 0, 1, 1}, /* PyObject cname: __pyx_n_u_move */
@@ -9147,9 +8278,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_new, sizeof(__pyx_k_new), 0, 1, 1}, /* PyObject cname: __pyx_n_u_new */
   {__pyx_k_new_hash, sizeof(__pyx_k_new_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_new_hash */
   {__pyx_k_num_piece_types, sizeof(__pyx_k_num_piece_types), 0, 1, 1}, /* PyObject cname: __pyx_n_u_num_piece_types */
-  {__pyx_k_o, sizeof(__pyx_k_o), 0, 1, 1}, /* PyObject cname: __pyx_n_u_o */
   {__pyx_k_old_hash, sizeof(__pyx_k_old_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_old_hash */
-  {__pyx_k_p, sizeof(__pyx_k_p), 0, 1, 1}, /* PyObject cname: __pyx_n_u_p */
   {__pyx_k_pickle, sizeof(__pyx_k_pickle), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pickle */
   {__pyx_k_piece, sizeof(__pyx_k_piece), 0, 1, 1}, /* PyObject cname: __pyx_n_u_piece */
   {__pyx_k_piece_index, sizeof(__pyx_k_piece_index), 0, 1, 1}, /* PyObject cname: __pyx_n_u_piece_index */
@@ -9158,12 +8287,12 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_pop, sizeof(__pyx_k_pop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pop */
   {__pyx_k_position, sizeof(__pyx_k_position), 0, 1, 1}, /* PyObject cname: __pyx_n_u_position */
   {__pyx_k_pyx_PickleError, sizeof(__pyx_k_pyx_PickleError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_PickleError */
+  {__pyx_k_pyx_capi, sizeof(__pyx_k_pyx_capi), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_capi */
   {__pyx_k_pyx_checksum, sizeof(__pyx_k_pyx_checksum), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_checksum */
   {__pyx_k_pyx_result, sizeof(__pyx_k_pyx_result), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_result */
   {__pyx_k_pyx_state, sizeof(__pyx_k_pyx_state), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_state */
   {__pyx_k_pyx_type, sizeof(__pyx_k_pyx_type), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_type */
   {__pyx_k_pyx_unpickle_ZobristHasher, sizeof(__pyx_k_pyx_unpickle_ZobristHasher), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_unpickle_ZobristHasher */
-  {__pyx_k_pyx_unpickle_ZobristHasher__se, sizeof(__pyx_k_pyx_unpickle_ZobristHasher__se), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_unpickle_ZobristHasher__se */
   {__pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_vtable */
   {__pyx_k_qualname, sizeof(__pyx_k_qualname), 0, 1, 1}, /* PyObject cname: __pyx_n_u_qualname */
   {__pyx_k_r, sizeof(__pyx_k_r), 0, 1, 1}, /* PyObject cname: __pyx_n_u_r */
@@ -9174,34 +8303,23 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 1, 1}, /* PyObject cname: __pyx_n_u_reduce_ex */
   {__pyx_k_remove_piece_hash, sizeof(__pyx_k_remove_piece_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_remove_piece_hash */
   {__pyx_k_row, sizeof(__pyx_k_row), 0, 1, 1}, /* PyObject cname: __pyx_n_u_row */
-  {__pyx_k_rows, sizeof(__pyx_k_rows), 0, 1, 1}, /* PyObject cname: __pyx_n_u_rows */
   {__pyx_k_seed, sizeof(__pyx_k_seed), 0, 1, 1}, /* PyObject cname: __pyx_n_u_seed */
   {__pyx_k_self, sizeof(__pyx_k_self), 0, 1, 1}, /* PyObject cname: __pyx_n_u_self */
-  {__pyx_k_set, sizeof(__pyx_k_set), 0, 1, 1}, /* PyObject cname: __pyx_n_u_set */
   {__pyx_k_set_name, sizeof(__pyx_k_set_name), 0, 1, 1}, /* PyObject cname: __pyx_n_u_set_name */
   {__pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate */
   {__pyx_k_setstate_2, sizeof(__pyx_k_setstate_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate_2 */
   {__pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate_cython */
   {__pyx_k_spec, sizeof(__pyx_k_spec), 0, 1, 1}, /* PyObject cname: __pyx_n_u_spec */
-  {__pyx_k_start_c, sizeof(__pyx_k_start_c), 0, 1, 1}, /* PyObject cname: __pyx_n_u_start_c */
-  {__pyx_k_start_r, sizeof(__pyx_k_start_r), 0, 1, 1}, /* PyObject cname: __pyx_n_u_start_r */
   {__pyx_k_state, sizeof(__pyx_k_state), 0, 1, 1}, /* PyObject cname: __pyx_n_u_state */
-  {__pyx_k_state_backup, sizeof(__pyx_k_state_backup), 0, 1, 1}, /* PyObject cname: __pyx_n_u_state_backup */
   {__pyx_k_stringsource, sizeof(__pyx_k_stringsource), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_stringsource */
   {__pyx_k_switch_turn_hash, sizeof(__pyx_k_switch_turn_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_switch_turn_hash */
-  {__pyx_k_table, sizeof(__pyx_k_table), 0, 1, 1}, /* PyObject cname: __pyx_n_u_table */
-  {__pyx_k_table_c, sizeof(__pyx_k_table_c), 0, 1, 1}, /* PyObject cname: __pyx_n_u_table_c */
   {__pyx_k_test, sizeof(__pyx_k_test), 0, 1, 1}, /* PyObject cname: __pyx_n_u_test */
   {__pyx_k_to_col, sizeof(__pyx_k_to_col), 0, 1, 1}, /* PyObject cname: __pyx_n_u_to_col */
   {__pyx_k_to_row, sizeof(__pyx_k_to_row), 0, 1, 1}, /* PyObject cname: __pyx_n_u_to_row */
-  {__pyx_k_turn_key, sizeof(__pyx_k_turn_key), 0, 1, 1}, /* PyObject cname: __pyx_n_u_turn_key */
   {__pyx_k_update, sizeof(__pyx_k_update), 0, 1, 1}, /* PyObject cname: __pyx_n_u_update */
   {__pyx_k_update_board_hash, sizeof(__pyx_k_update_board_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_update_board_hash */
   {__pyx_k_update_hash, sizeof(__pyx_k_update_hash), 0, 1, 1}, /* PyObject cname: __pyx_n_u_update_hash */
   {__pyx_k_use_setstate, sizeof(__pyx_k_use_setstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_use_setstate */
-  {__pyx_k_v, sizeof(__pyx_k_v), 0, 1, 1}, /* PyObject cname: __pyx_n_u_v */
-  {__pyx_k_val, sizeof(__pyx_k_val), 0, 1, 1}, /* PyObject cname: __pyx_n_u_val */
-  {__pyx_k_value, sizeof(__pyx_k_value), 0, 1, 1}, /* PyObject cname: __pyx_n_u_value */
   {0, 0, 0, 0, 0}
 };
 /* InitStrings.proto */
@@ -9211,7 +8329,7 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry const *t, PyObject **target, c
 
 static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 42, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 83, __pyx_L1_error)
   __pyx_builtin_OverflowError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_OverflowError); if (!__pyx_builtin_OverflowError) __PYX_ERR(1, 83, __pyx_L1_error)
   __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(1, 86, __pyx_L1_error)
@@ -9227,14 +8345,14 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "core/zobrist_hashing.pyx":24
+  /* "core/zobrist_hashing.pyx":21
  *     """Zobrist - Cython"""
  * 
  *     def __init__(self, tuple board_size=(5, 5), int num_piece_types=2):             # <<<<<<<<<<<<<<
  *         """
  *         Zobrist Hashing
 */
-  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(2, __pyx_mstate_global->__pyx_int_5, __pyx_mstate_global->__pyx_int_5); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 24, __pyx_L1_error)
+  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(2, __pyx_mstate_global->__pyx_int_5, __pyx_mstate_global->__pyx_int_5); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[0]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[0]);
 
@@ -9283,7 +8401,7 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
             unsigned int nlocals : 4;
             unsigned int flags : 10;
             unsigned int first_line : 8;
-            unsigned int line_table_length : 13;
+            unsigned int line_table_length : 12;
         } __Pyx_PyCode_New_function_description;
 /* NewCodeObj.proto */
 static PyObject* __Pyx_PyCode_New(
@@ -9300,129 +8418,59 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   PyObject* tuple_dedup_map = PyDict_New();
   if (unlikely(!tuple_dedup_map)) return -1;
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 113, 58};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_v, __pyx_mstate->__pyx_n_u_length};
-    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_Pyx_carray_to_py_unsigned_PY_L, __pyx_k_1_U_81_Qc_A_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 125, 58};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_v, __pyx_mstate->__pyx_n_u_length};
-    __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_Pyx_carray_to_tuple_unsigned_P, __pyx_k_1A_U_81_as_Q_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 113, 58};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_v, __pyx_mstate->__pyx_n_u_length};
-    __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_Pyx_carray_to_py_unsigned_PY_L_2, __pyx_k_1_U_81_Qc_A_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 125, 58};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_v, __pyx_mstate->__pyx_n_u_length};
-    __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_Pyx_carray_to_tuple_unsigned_P_2, __pyx_k_1A_U_81_as_Q_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 78, 115};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_o, __pyx_mstate->__pyx_n_u_v, __pyx_mstate->__pyx_n_u_length};
-    __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_Pyx_carray_from_py_unsigned_PY, __pyx_k_gh_Cq_q_r_A_Cxy_r_A_Qe1_r_A_q_c, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 78, 115};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_o, __pyx_mstate->__pyx_n_u_v, __pyx_mstate->__pyx_n_u_length};
-    __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_Pyx_carray_from_py_unsigned_PY_2, __pyx_k_rs_Cq_q_r_A_Cxy_r_A_Qe1_r_A_q_c, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 11, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 24, 205};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_board_size, __pyx_mstate->__pyx_n_u_num_piece_types, __pyx_mstate->__pyx_n_u_r, __pyx_mstate->__pyx_n_u_c, __pyx_mstate->__pyx_n_u_p, __pyx_mstate->__pyx_n_u_val, __pyx_mstate->__pyx_n_u_state_backup, __pyx_mstate->__pyx_n_u__3, __pyx_mstate->__pyx_n_u__3, __pyx_mstate->__pyx_n_u__3};
-    __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_init, __pyx_k_DA_G4xq_IQaq_e5_5_Qd_e5_Q_vYa_e, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 8, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 55, 95};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_board_c, __pyx_mstate->__pyx_n_u_current_player, __pyx_mstate->__pyx_n_u_table, __pyx_mstate->__pyx_n_u_table_c, __pyx_mstate->__pyx_n_u_turn_key, __pyx_mstate->__pyx_n_u_rows, __pyx_mstate->__pyx_n_u_cols};
-    __pyx_mstate_global->__pyx_codeobj_tab[7] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_c_compute_hash, __pyx_k_A_A_E_aq_was_Q_T_AQ_Cq_T_AQ_Q_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[7])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {7, 0, 0, 12, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 70, 83};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_old_hash, __pyx_mstate->__pyx_n_u_start_r, __pyx_mstate->__pyx_n_u_start_c, __pyx_mstate->__pyx_n_u_end_r, __pyx_mstate->__pyx_n_u_end_c, __pyx_mstate->__pyx_n_u_piece_type, __pyx_mstate->__pyx_n_u_table, __pyx_mstate->__pyx_n_u_table_c, __pyx_mstate->__pyx_n_u_turn_key, __pyx_mstate->__pyx_n_u_rows, __pyx_mstate->__pyx_n_u_cols};
-    __pyx_mstate_global->__pyx_codeobj_tab[8] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_c_update_hash, __pyx_k_A_1_XRr_1_6_2Rq_uKs_q_D_1A_D_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[8])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 10, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 83, 49};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_old_hash, __pyx_mstate->__pyx_n_u_r, __pyx_mstate->__pyx_n_u_c, __pyx_mstate->__pyx_n_u_piece_type, __pyx_mstate->__pyx_n_u_table, __pyx_mstate->__pyx_n_u_table_c, __pyx_mstate->__pyx_n_u_turn_key, __pyx_mstate->__pyx_n_u_rows, __pyx_mstate->__pyx_n_u_cols};
-    __pyx_mstate_global->__pyx_codeobj_tab[9] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_c_remove_piece_hash, __pyx_k_A_r_2Rq_uKs_q_y_hat1A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[9])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 90, 15};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_old_hash, __pyx_mstate->__pyx_n_u_table, __pyx_mstate->__pyx_n_u_table_c, __pyx_mstate->__pyx_n_u_turn_key, __pyx_mstate->__pyx_n_u_rows, __pyx_mstate->__pyx_n_u_cols};
-    __pyx_mstate_global->__pyx_codeobj_tab[10] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_c_switch_turn_hash, __pyx_k_A_y_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[10])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 8, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 95, 108};
+    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 8, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 92, 108};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_board, __pyx_mstate->__pyx_n_u_current_player, __pyx_mstate->__pyx_n_u_h, __pyx_mstate->__pyx_n_u_r, __pyx_mstate->__pyx_n_u_c, __pyx_mstate->__pyx_n_u_piece, __pyx_mstate->__pyx_n_u_piece_index};
-    __pyx_mstate_global->__pyx_codeobj_tab[11] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_compute_hash, __pyx_k_A_A_E_at1_U_4q_Qb_6_A_V1Bar_Q_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[11])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_compute_hash, __pyx_k_A_A_E_at1_U_4q_Qb_6_A_V1Bar_Q_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 10, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 114, 78};
+    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 10, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 111, 78};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_old_hash, __pyx_mstate->__pyx_n_u_move, __pyx_mstate->__pyx_n_u_piece_type, __pyx_mstate->__pyx_n_u_new_hash, __pyx_mstate->__pyx_n_u_from_row, __pyx_mstate->__pyx_n_u_from_col, __pyx_mstate->__pyx_n_u_to_row, __pyx_mstate->__pyx_n_u_to_col, __pyx_mstate->__pyx_n_u_piece_index};
-    __pyx_mstate_global->__pyx_codeobj_tab[12] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_update_hash, __pyx_k_A_1_HIQ_oQa_D_ay_1_D_awawaq_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[12])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_update_hash, __pyx_k_A_1_HIQ_oQa_D_ay_1_D_awawaq_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 137, 43};
+    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 134, 43};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_old_hash, __pyx_mstate->__pyx_n_u_position, __pyx_mstate->__pyx_n_u_piece_type, __pyx_mstate->__pyx_n_u_row, __pyx_mstate->__pyx_n_u_col, __pyx_mstate->__pyx_n_u_piece_index};
-    __pyx_mstate_global->__pyx_codeobj_tab[13] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_place_piece_hash, __pyx_k_A_V1_oQa_y_fAT_aq, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[13])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_place_piece_hash, __pyx_k_A_V1_oQa_y_fAT_aq, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 149, 20};
+    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 146, 20};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_old_hash, __pyx_mstate->__pyx_n_u_position, __pyx_mstate->__pyx_n_u_piece_type};
-    __pyx_mstate_global->__pyx_codeobj_tab[14] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_remove_piece_hash, __pyx_k_A_t_AZz, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[14])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_remove_piece_hash, __pyx_k_A_t_AZz, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 158, 15};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 155, 15};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_old_hash};
-    __pyx_mstate_global->__pyx_codeobj_tab[15] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_switch_turn_hash, __pyx_k_A_y_a_2, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[15])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 5, 2};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[16] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pxd, __pyx_mstate->__pyx_n_u_get, __pyx_k_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[16])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 5, 2};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_value};
-    __pyx_mstate_global->__pyx_codeobj_tab[17] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pxd, __pyx_mstate->__pyx_n_u_set, __pyx_k_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[17])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_switch_turn_hash, __pyx_k_A_y_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 109};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_state, __pyx_mstate->__pyx_n_u_dict_2, __pyx_mstate->__pyx_n_u_use_setstate};
-    __pyx_mstate_global->__pyx_codeobj_tab[18] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_T_G4xt_T_G1F_a_vWA_q_t7_q_d_7_W, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[18])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_k_T_G4xt_T_G1F_a_vWA_q_t7_q_d_7_W, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 16, 11};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[19] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_1F, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[19])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_k_1F, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 0, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 170, 7};
+    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 0, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 167, 7};
     PyObject* const varnames[] = {0};
-    __pyx_mstate_global->__pyx_codeobj_tab[20] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_get_hasher, __pyx_k_1_2, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[20])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[7] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_get_hasher, __pyx_k_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[7])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 174, 15};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 171, 15};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_board, __pyx_mstate->__pyx_n_u_current_player};
-    __pyx_mstate_global->__pyx_codeobj_tab[21] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_compute_board_hash, __pyx_k_7_q_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[21])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[8] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_compute_board_hash, __pyx_k_7_q_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[8])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 178, 19};
+    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 175, 19};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_old_hash, __pyx_mstate->__pyx_n_u_move, __pyx_mstate->__pyx_n_u_piece_type, __pyx_mstate->__pyx_n_u_current_player};
-    __pyx_mstate_global->__pyx_codeobj_tab[22] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_update_board_hash, __pyx_k_7_az_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[22])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[9] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_zobrist_hashing_pyx, __pyx_mstate->__pyx_n_u_update_board_hash, __pyx_k_7_az_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[9])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1, 87};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_pyx_type, __pyx_mstate->__pyx_n_u_pyx_checksum, __pyx_mstate->__pyx_n_u_pyx_state, __pyx_mstate->__pyx_n_u_pyx_PickleError, __pyx_mstate->__pyx_n_u_pyx_result};
-    __pyx_mstate_global->__pyx_codeobj_tab[23] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_ZobristHasher, __pyx_k_hk_A_1_P_P_R_R_S_7_q0_a_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[23])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 11, 141};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_pyx_result, __pyx_mstate->__pyx_n_u_pyx_state, __pyx_mstate->__pyx_n_u_SOLDIER, __pyx_mstate->__pyx_n_u_CANNON, __pyx_mstate->__pyx_n_u_EMPTY, __pyx_mstate->__pyx_n_u_PIECE_TO_INDEX_2, __pyx_mstate->__pyx_n_u_hasher};
-    __pyx_mstate_global->__pyx_codeobj_tab[24] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_ZobristHasher__se, __pyx_k_1D_HKq_LXaallmmqq_I_I_T_T_U_U_Y, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[24])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[10] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_ZobristHasher, __pyx_k_hk_A_1_P_P_R_R_S_7_q0_a_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[10])) goto bad;
   }
   Py_DECREF(tuple_dedup_map);
   return 0;
@@ -9639,124 +8687,6 @@ static PyObject *__Pyx_GetBuiltinName(PyObject *name) {
     }
     return result;
 }
-
-/* Profile */
-#if CYTHON_PROFILE || CYTHON_TRACE
-#if CYTHON_TRACE && !CYTHON_USE_SYS_MONITORING
-static int __Pyx_call_line_trace_func(PyThreadState *tstate, PyFrameObject *frame, int line) {
-    int ret;
-    PyObject *type, *value, *traceback;
-    __Pyx_ErrFetchInState(tstate, &type, &value, &traceback);
-    __Pyx_PyFrame_SetLineNumber(frame, line);
-    __Pyx_EnterTracing(tstate);
-    ret = tstate->c_tracefunc(tstate->c_traceobj, frame, PyTrace_LINE, NULL);
-    __Pyx_LeaveTracing(tstate);
-    if (likely(!ret)) {
-        __Pyx_ErrRestoreInState(tstate, type, value, traceback);
-    } else {
-        Py_XDECREF(type);
-        Py_XDECREF(value);
-        Py_XDECREF(traceback);
-    }
-    return ret;
-}
-#endif
-CYTHON_UNUSED static PyCodeObject *__Pyx_createFrameCodeObject(const char *funcname, const char *srcfile, int firstlineno) {
-    PyCodeObject *py_code = PyCode_NewEmpty(srcfile, funcname, firstlineno);
-    if (likely(py_code)) {
-        py_code->co_flags |= CO_OPTIMIZED | CO_NEWLOCALS;
-    }
-    return py_code;
-}
-#if CYTHON_USE_SYS_MONITORING
-CYTHON_UNUSED static int __Pyx__TraceStartFunc(PyMonitoringState *state_array, PyObject *code_obj, int offset, int skip_event) {
-    int ret;
-    __pyx_monitoring_version_type version = 0;
-    ret = PyMonitoring_EnterScope(state_array, &version, __Pyx_MonitoringEventTypes, __Pyx_MonitoringEventTypes_CyFunc_count);
-    if (unlikely(ret == -1)) return -1;
-    return skip_event ? 0 : PyMonitoring_FirePyStartEvent(&state_array[__Pyx_Monitoring_PY_START], code_obj, offset);
-}
-CYTHON_UNUSED static int __Pyx__TraceStartGen(PyMonitoringState *state_array, __pyx_monitoring_version_type *version, PyObject *code_obj, int offset) {
-    int ret;
-    ret = PyMonitoring_EnterScope(state_array, version, __Pyx_MonitoringEventTypes, __Pyx_MonitoringEventTypes_CyGen_count);
-    if (unlikely(ret == -1)) return -1;
-    return PyMonitoring_FirePyStartEvent(&state_array[__Pyx_Monitoring_PY_START], code_obj, offset);
-}
-CYTHON_UNUSED static int __Pyx__TraceResumeGen(PyMonitoringState *state_array, __pyx_monitoring_version_type *version, PyObject *code_obj, int offset) {
-    int ret;
-    ret = PyMonitoring_EnterScope(state_array, version, __Pyx_MonitoringEventTypes, __Pyx_MonitoringEventTypes_CyGen_count);
-    if (unlikely(ret == -1)) return -1;
-    return PyMonitoring_FirePyResumeEvent(&state_array[__Pyx_Monitoring_PY_RESUME], code_obj, offset);
-}
-CYTHON_UNUSED static void __Pyx__TraceException(PyMonitoringState *monitoring_state, PyObject *code_obj, int offset, int reraised) {
-    if (reraised) {
-        (void) PyMonitoring_FireReraiseEvent(monitoring_state, code_obj, offset);
-    } else {
-        (void) PyMonitoring_FireRaiseEvent(monitoring_state, code_obj, offset);
-    }
-}
-#if CYTHON_TRACE
-CYTHON_UNUSED static int __Pyx__TraceLine(PyMonitoringState *monitoring_state, PyObject *code_obj, int line, int offset) {
-    int ret;
-    PyObject *exc = PyErr_GetRaisedException();
-    ret = PyMonitoring_FireLineEvent(monitoring_state, code_obj, offset, line);
-    if (exc) PyErr_SetRaisedException(exc);
-    return ret;
-}
-#endif
-#else
-static int __Pyx_TraceSetupAndCall(PyCodeObject** code,
-                                   PyFrameObject** frame,
-                                   PyThreadState* tstate,
-                                   const char *funcname,
-                                   const char *srcfile,
-                                   int firstlineno,
-                                   int skip_event) {
-    if (*frame == NULL || !CYTHON_PROFILE_REUSE_FRAME) {
-        int needs_new_code_obj = (*code == NULL);
-        if (needs_new_code_obj) {
-            *code = __Pyx_createFrameCodeObject(funcname, srcfile, firstlineno);
-            if (*code == NULL) return 0;
-        }
-        *frame = PyFrame_New(
-            tstate,                          /*PyThreadState *tstate*/
-            *code,                           /*PyCodeObject *code*/
-            __pyx_mstate_global->__pyx_d,    /*PyObject *globals*/
-            0                                /*PyObject *locals*/
-        );
-        if (needs_new_code_obj && !CYTHON_PROFILE_REUSE_CODEOBJ)
-            Py_CLEAR(*code); // otherwise the reference is owned externally
-        if (*frame == NULL) return 0;
-        if (CYTHON_TRACE && (*frame)->f_trace == NULL) {
-            Py_INCREF(Py_None);
-            (*frame)->f_trace = Py_None;
-        }
-    }
-    if (!skip_event) {
-        PyObject *type, *value, *traceback;
-        int retval = 1;
-        __Pyx_PyFrame_SetLineNumber(*frame, firstlineno);
-        __Pyx_EnterTracing(tstate);
-        __Pyx_ErrFetchInState(tstate, &type, &value, &traceback);
-        #if CYTHON_TRACE
-        if (tstate->c_tracefunc)
-            retval = tstate->c_tracefunc(tstate->c_traceobj, *frame, PyTrace_CALL, NULL) == 0;
-        if (retval && tstate->c_profilefunc)
-        #endif
-            retval = tstate->c_profilefunc(tstate->c_profileobj, *frame, PyTrace_CALL, NULL) == 0;
-        __Pyx_LeaveTracing(tstate);
-        if (unlikely(!retval)) {
-            Py_XDECREF(type);
-            Py_XDECREF(value);
-            Py_XDECREF(traceback);
-            return -1;
-        }
-        __Pyx_ErrRestoreInState(tstate, type, value, traceback);
-    }
-    return __Pyx_IsTracing(tstate, 0, 0);
-}
-#endif
-#endif
 
 /* GetTopmostException */
 #if CYTHON_USE_EXC_INFO_STACK && CYTHON_FAST_THREAD_STATE
@@ -14684,6 +13614,77 @@ raise_neg_overflow:
     return (unsigned PY_LONG_LONG) -1;
 }
 
+/* CIntToPy */
+static CYTHON_INLINE PyObject* __Pyx_PyLong_From___pyx_anon_enum(int value) {
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+    const int neg_one = (int) -1, const_zero = (int) 0;
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic pop
+#endif
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(int) < sizeof(long)) {
+            return PyLong_FromLong((long) value);
+        } else if (sizeof(int) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+#if defined(HAVE_LONG_LONG) && !CYTHON_COMPILING_IN_PYPY
+        } else if (sizeof(int) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
+#endif
+        }
+    } else {
+        if (sizeof(int) <= sizeof(long)) {
+            return PyLong_FromLong((long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(int) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
+#endif
+        }
+    }
+    {
+        unsigned char *bytes = (unsigned char *)&value;
+#if !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX >= 0x030d00A4
+        if (is_unsigned) {
+            return PyLong_FromUnsignedNativeBytes(bytes, sizeof(value), -1);
+        } else {
+            return PyLong_FromNativeBytes(bytes, sizeof(value), -1);
+        }
+#elif !CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x030d0000
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        return _PyLong_FromByteArray(bytes, sizeof(int),
+                                     little, !is_unsigned);
+#else
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        PyObject *from_bytes, *result = NULL, *kwds = NULL;
+        PyObject *py_bytes = NULL, *order_str = NULL;
+        from_bytes = PyObject_GetAttrString((PyObject*)&PyLong_Type, "from_bytes");
+        if (!from_bytes) return NULL;
+        py_bytes = PyBytes_FromStringAndSize((char*)bytes, sizeof(int));
+        if (!py_bytes) goto limited_bad;
+        order_str = PyUnicode_FromString(little ? "little" : "big");
+        if (!order_str) goto limited_bad;
+        {
+            PyObject *args[3+(CYTHON_VECTORCALL ? 1 : 0)] = { NULL, py_bytes, order_str };
+            if (!is_unsigned) {
+                kwds = __Pyx_MakeVectorcallBuilderKwds(1);
+                if (!kwds) goto limited_bad;
+                if (__Pyx_VectorcallBuilder_AddArgStr("signed", __Pyx_NewRef(Py_True), kwds, args+3, 0) < 0) goto limited_bad;
+            }
+            result = __Pyx_Object_Vectorcall_CallFromBuilder(from_bytes, args+1, 2 | __Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET, kwds);
+        }
+        limited_bad:
+        Py_XDECREF(kwds);
+        Py_XDECREF(order_str);
+        Py_XDECREF(py_bytes);
+        Py_XDECREF(from_bytes);
+        return result;
+#endif
+    }
+}
+
 /* CIntFromPy */
 static CYTHON_INLINE long __Pyx_PyLong_As_long(PyObject *x) {
 #ifdef __Pyx_HAS_GCC_DIAGNOSTIC
@@ -15353,6 +14354,43 @@ static int __Pyx_check_binary_version(unsigned long ct_version, unsigned long rt
        );
         return PyErr_WarnEx(NULL, message, 1);
     }
+}
+
+/* PyObjectSetAttrStr */
+#if CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value) {
+    PyTypeObject* tp = Py_TYPE(obj);
+    if (likely(tp->tp_setattro))
+        return tp->tp_setattro(obj, attr_name, value);
+    return PyObject_SetAttr(obj, attr_name, value);
+}
+#endif
+
+/* VoidPtrExport */
+static int __Pyx_ExportVoidPtr(PyObject *name, void *p, const char *sig) {
+    PyObject *d;
+    PyObject *cobj = 0;
+    if (__Pyx_PyDict_GetItemRef(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pyx_capi, &d) == -1)
+        goto bad;
+    if (!d) {
+        d = PyDict_New();
+        if (!d)
+            goto bad;
+        if (__Pyx_PyObject_SetAttrStr(__pyx_m, __pyx_mstate_global->__pyx_n_u_pyx_capi, d) < 0)
+            goto bad;
+    }
+    cobj = PyCapsule_New(p, sig, 0);
+    if (!cobj)
+        goto bad;
+    if (PyDict_SetItem(d, name, cobj) < 0)
+        goto bad;
+    Py_DECREF(cobj);
+    Py_DECREF(d);
+    return 0;
+bad:
+    Py_XDECREF(cobj);
+    Py_XDECREF(d);
+    return -1;
 }
 
 /* NewCodeObj */

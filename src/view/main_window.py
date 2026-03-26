@@ -13,8 +13,8 @@ HIGHLIGHT_COLOR = "#00FF00"  # 高亮颜色
 COORD_MARGIN = 30
 BOARD_WIDTH = BOARD_COLS * CELL_SIZE
 BOARD_HEIGHT = BOARD_ROWS * CELL_SIZE
-WINDOW_WIDTH = BOARD_WIDTH + 2 * COORD_MARGIN + 350  # 增加宽度以容纳信息面板
-WINDOW_HEIGHT = max(BOARD_HEIGHT + 2 * COORD_MARGIN, 500)  # 增加高度
+WINDOW_WIDTH = BOARD_WIDTH + 2 * COORD_MARGIN + 200  # 减小宽度，移除残局看板后更紧凑
+WINDOW_HEIGHT = max(BOARD_HEIGHT + 2 * COORD_MARGIN, 500)  # 保持高度
 
 class GameGUI(tk.Tk):
     def __init__(self, model):
@@ -122,13 +122,17 @@ class GameGUI(tk.Tk):
         self.soldier_count_label = tk.Label(right_frame, text="士兵数量: 15", font=("Arial", 10))
         self.soldier_count_label.pack(pady=5, anchor="w")
         
-        # 调试信息文本框 - 采用旧版本的scrolledtext组件
-        debug_label = tk.Label(right_frame, text="调试信息", font=("Arial", 12, "bold"))
+        # 移除原有的残局库顾问面板，保留调试信息
+        debug_label = tk.Label(right_frame, text="引擎搜索调试", font=("Arial", 12, "bold"))
         debug_label.pack(pady=5, anchor="w")
         
-        self.debug_text = scrolledtext.ScrolledText(right_frame, wrap=tk.WORD, width=30, height=25, font=("Courier New", 10))
+        self.debug_text = scrolledtext.ScrolledText(right_frame, wrap=tk.WORD, width=30, height=15, font=("Courier New", 10))
         self.debug_text.pack(fill="both", expand=True, padx=5, pady=5)
         self.debug_text.config(state='disabled')
+
+        # 当前引擎模式状态 (已统一为集成模式)
+        self.engine_status_label = tk.Label(right_frame, text="AI 计算专家 (NNUE+TB)", font=("Arial", 11, "bold"), fg="blue", bd=1, relief="sunken")
+        self.engine_status_label.pack(side="bottom", fill="x", pady=10)
         
     def _create_menu(self):
         """创建菜单栏"""
@@ -458,8 +462,12 @@ class GameGUI(tk.Tk):
             
     def show_winner(self, winner):
         """显示获胜者"""
-        winner_text = "炮方" if winner == CANNON else "兵方"
-        messagebox.showinfo("游戏结束", f"{winner_text} 胜利!")
+        from core.game_logic import DRAW
+        if winner == DRAW:
+            messagebox.showinfo("游戏结束", "双方 握手言和 (三复平局)!")
+        else:
+            winner_text = "炮方" if winner == CANNON else "兵方"
+            messagebox.showinfo("游戏结束", f"{winner_text} 胜利!")
         
     def get_board_position(self, event_x, event_y):
         """将鼠标点击坐标转换为棋盘位置"""
@@ -517,20 +525,23 @@ class GameGUI(tk.Tk):
             color = "#00FF00" if score > 0 else "#FF0000" if score < 0 else "yellow"
             
             # 在棋子上方偏右绘制一个小标签
+            score_text = f"{score:.1f}"
             self.canvas.create_text(
                 x_center + 15, y_center - 15,
-                text=str(int(score)),
+                text=score_text,
                 fill="black", # 描边
                 font=("Arial", 10, "bold"),
                 tags="analysis_overlay"
             )
             self.canvas.create_text(
                  x_center + 14, y_center - 16, # 稍微错位一点
-                 text=str(int(score)),
+                 text=score_text,
                  fill=color,
                  font=("Arial", 10, "bold"),
                  tags="analysis_overlay"
             )
+
+
 
     def run(self):
         """启动GUI事件循环"""

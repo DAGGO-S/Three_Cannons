@@ -6,6 +6,7 @@ class SettingsDialog(tk.Toplevel):
         super().__init__(parent)
         self.title("游戏设置")
         self.result = None
+        self.minsize(450, 400) # 确保窗口足够大以显示所有设置
 
         # 玩家类型设置框架
         players_frame = ttk.LabelFrame(self, text="玩家类型设置")
@@ -21,17 +22,17 @@ class SettingsDialog(tk.Toplevel):
         ttk.Radiobutton(players_frame, text="人类", variable=self.soldier_player_var, value="Human").grid(row=1, column=1, sticky="w")
         ttk.Radiobutton(players_frame, text="AI", variable=self.soldier_player_var, value="AI").grid(row=1, column=2, sticky="w")
         
-        # AI 强度设置框架
-        ai_frame = ttk.LabelFrame(self, text="AI 强度设置")
+        # AI 设置框架
+        ai_frame = ttk.LabelFrame(self, text="AI 设置")
         ai_frame.pack(padx=10, pady=5, fill="x")
-        
-        ttk.Label(ai_frame, text="最大深度 (2-20):").grid(row=0, column=0, sticky="w", padx=5, pady=2)
-        self.depth_var = tk.IntVar(value=int(current_settings["depth"]), master=self)
-        ttk.Spinbox(ai_frame, from_=2, to=20, textvariable=self.depth_var, width=5).grid(row=0, column=1, sticky="w")
+
+        ttk.Label(ai_frame, text="搜索深度:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
+        self.depth_var = tk.IntVar(value=current_settings.get("depth", 8), master=self)
+        ttk.Spinbox(ai_frame, from_=1, to=20, textvariable=self.depth_var, width=5).grid(row=0, column=1, sticky="w", padx=5)
 
         ttk.Label(ai_frame, text="最长思考时间 (秒):").grid(row=0, column=2, sticky="w", padx=5, pady=2)
-        self.time_limit_var = tk.DoubleVar(value=float(current_settings["time_limit"]), master=self)
-        ttk.Spinbox(ai_frame, from_=1, to=300, textvariable=self.time_limit_var, width=5).grid(row=0, column=3, sticky="w")
+        self.time_limit_var = tk.DoubleVar(value=float(current_settings.get("time_limit", 5.0)), master=self)
+        ttk.Spinbox(ai_frame, from_=1, to=300, textvariable=self.time_limit_var, width=5).grid(row=0, column=3, sticky="w", padx=5)
         
         # 性能设置框架
         performance_frame = ttk.LabelFrame(self, text="性能设置")
@@ -40,11 +41,16 @@ class SettingsDialog(tk.Toplevel):
         ttk.Label(performance_frame, text="使用多线程:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
         self.use_threading_var = tk.BooleanVar(value=current_settings.get("use_threading", True), master=self)
         ttk.Checkbutton(performance_frame, variable=self.use_threading_var).grid(row=0, column=1, sticky="w")
-        
-        ttk.Label(performance_frame, text="线程数量:").grid(row=0, column=2, sticky="w", padx=5, pady=2)
-        self.thread_count_var = tk.IntVar(value=current_settings.get("thread_count", 4), master=self)
+
+        ttk.Label(performance_frame, text="线程数量:").grid(row=1, column=0, sticky="w", padx=5, pady=2)
+        self.thread_count_var = tk.IntVar(value=current_settings.get("thread_count", current_settings.get("threads", 4)), master=self)
         thread_spinbox = ttk.Spinbox(performance_frame, from_=1, to=8, textvariable=self.thread_count_var, width=5)
-        thread_spinbox.grid(row=0, column=3, sticky="w")
+        thread_spinbox.grid(row=1, column=1, sticky="w")
+
+        ttk.Label(performance_frame, text="使用残局库 (TB):").grid(row=1, column=2, sticky="w", padx=5, pady=2)
+        self.use_tablebase_var = tk.BooleanVar(value=current_settings.get("use_tablebase", True), master=self)
+        ttk.Checkbutton(performance_frame, variable=self.use_tablebase_var).grid(row=1, column=3, sticky="w")
+        
         # 根据是否使用多线程来启用/禁用线程数量选择
         thread_spinbox.config(state="normal" if self.use_threading_var.get() else "disabled")
         
@@ -71,7 +77,8 @@ class SettingsDialog(tk.Toplevel):
             "depth": self.depth_var.get(),
             "time_limit": self.time_limit_var.get(),
             "use_threading": self.use_threading_var.get(),
-            "thread_count": self.thread_count_var.get()
+            "threads": self.thread_count_var.get(),
+            "use_tablebase": self.use_tablebase_var.get()
         }
         self.destroy()
 

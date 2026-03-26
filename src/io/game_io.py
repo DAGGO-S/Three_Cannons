@@ -205,7 +205,6 @@ def export_as_jsonl(history: List[GameState], winner: int, filepath: str) -> Non
                      与局面进行中否无关，全局内所有局面共享同一値。
     """
     from core.game_logic import CANNON, SOLDIER, DRAW
-    from core.evaluation_logic import evaluate_board
 
     if winner == CANNON:
         outcome = 1.0
@@ -214,15 +213,16 @@ def export_as_jsonl(history: List[GameState], winner: int, filepath: str) -> Non
     else:
         outcome = 0.5
 
+    # 移除了耗时的深度回填（由用户要求禁用，后续离线补全）
+    # print(f"[*] 正在为当前对局执行自动保存 (共 {len(history)} 个局面)...")
     lines = []
     for state in history:
-        eval_result = evaluate_board(state)
-        eval_score = float(eval_result[0] if isinstance(eval_result, tuple) else eval_result)
-
         lines.append(json.dumps({
             "fen": state.to_fen(),
-            "eval": eval_score,
-            "game_outcome": outcome
+            "eval": 0.0,  # 默认不再导出实时分数
+            "game_outcome": outcome,
+            "soldier_count": state.soldier_count,
+            "depth": 0    # 标记为未分析
         }))
 
     with open(filepath, 'a', encoding='utf-8') as f:

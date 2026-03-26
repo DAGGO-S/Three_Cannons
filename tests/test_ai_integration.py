@@ -9,7 +9,8 @@ import threading
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.ai.engine import AIEngine
-from core.game_logic import GameState
+from core.game_logic import GameState, CANNON, SOLDIER
+from core.search_manager import find_best_move_iterative_deepening
 
 class TestAiFullIntegration(unittest.TestCase):
     """

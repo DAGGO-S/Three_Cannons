@@ -1,7 +1,7 @@
 # game_model.py (FINAL, CORRECT, STRATEGICALLY UPGRADED VERSION)
 
 import collections 
-from core.game_logic import GameState, DRAW # 确保导入 DRAW 
+from core.game_logic import GameState, DRAW, CANNON, SOLDIER # 确保导入必要的常量
  
 class GameModel: 
     def __init__(self): 
@@ -28,7 +28,7 @@ class GameModel:
         self.position_counts = collections.Counter() 
         self.position_counts[self.game_state.hash] += 1 
  
-    def make_move(self, start_pos, end_pos) -> bool: 
+    def make_move(self, start_pos, end_pos, ignore_repetition=False) -> bool: 
         """执行走法，并由 GameModel 检查和棋""" 
         if self.is_replay_mode: 
             # 当从复盘分叉时，根据截断后的历史重建计数器 
@@ -51,10 +51,16 @@ class GameModel:
  
         self.position_counts[self.game_state.hash] += 1 
         
-        if self.position_counts[self.game_state.hash] >= 3: 
-            # GameModel 负责设置和棋状态 
-            self.game_state.winner = DRAW 
-
+        if not ignore_repetition and self.position_counts[self.game_state.hash] >= 3: 
+            # 【系统级规则】循环局面(三复平)根据兵力数量判定胜负平
+            sc = self.game_state.soldier_count
+            if sc <= 8:
+                self.game_state.winner = CANNON
+            elif sc == 9:
+                self.game_state.winner = DRAW
+            else:
+                self.game_state.winner = SOLDIER
+            
         if self.game_state.winner != -1:
             from src.io.game_io import auto_save_game_end
             auto_save_game_end(self)
@@ -92,9 +98,15 @@ class GameModel:
             
             self.position_counts[current_state.hash] += 1 
  
-        # 最后，检查加载的最终局面是否是和棋 
+        # 最后，检查加载的最终局面是否是三复局
         if self.position_counts[self.game_state.hash] >= 3: 
-            self.game_state.winner = DRAW 
+            sc = self.game_state.soldier_count
+            if sc <= 8:
+                self.game_state.winner = CANNON
+            elif sc == 9:
+                self.game_state.winner = DRAW
+            else:
+                self.game_state.winner = SOLDIER
  
         self.load_state_from_history(len(self.move_history) - 1) 
  

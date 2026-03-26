@@ -10,7 +10,8 @@ from src.model.game_model import GameModel
 from src.controller.orchestrator import GameOrchestrator
 from src.ai.engine import AIEngine
 from src.model.config import GameConfig
-from core.game_logic import GameState
+from core.game_logic import GameState, CANNON, SOLDIER
+from core.search_manager import find_best_move_iterative_deepening, init_tablebases
 
 
 class TestModeSwitching(unittest.TestCase):

@@ -28,16 +28,17 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.game_logic import GameState, CANNON, SOLDIER, DRAW, EMPTY
 from core.evaluation_logic import evaluate_board
-from core.ai import find_best_move_iterative_deepening, clear_transposition_table
+from core.search_manager import find_best_move_iterative_deepening, find_best_move_parallel, clear_transposition_table
 
 # ── 默认配置（直接在这里改，无需记命令行参数）──────────────────────────────
 CONFIG = {
-    "games":         10000,   # 目标局数
-    "depth_cannon":  6,       # 炮方搜索深度（建议 >= 兵方 以减小先天劣势）
-    "depth_soldier": 6,       # 兵方搜索深度
-    "epsilon":       0.15,    # 随机走棋概率（0=纯 AI，1=纯随机）
-    "output":        "data/selfplay/run1.jsonl",  # 固定输出文件，支持断点续跑
-    "max_moves":     150,     # 单局最大步数，超出按和棋处理
+    "games":         5000,   # 目标局数 (Run4 - 智能探索时代)
+    "depth_cannon":  8,      # 炮方搜索深度
+    "depth_soldier": 8,     # 兵方搜索深度 
+    "temperature":   0.7,    # Softmax 温度系数
+    "use_nnue":      True,   # 开启 NNUE 评估
+    "output":        "data/selfplay/run3.jsonl",
+    "max_moves":     150,
 }
 # ────────────────────────────────────────────────────────────────────────────
 
@@ -80,43 +81,90 @@ def get_all_valid_moves(state: GameState):
     return moves
 
 
-def ai_choose_move(state, depth, epsilon, pos_counts):
+def ai_choose_move(state, depth, tau, pos_counts, game_history=None, num_threads=1):
     all_moves = get_all_valid_moves(state)
     if not all_moves:
-        return None
+        return None, 0.0
 
-    # 强制随机打破重复局面
+    # 1. 强制随机打破重复局面 (保留作为安全垫)
     if pos_counts.get(state.hash, 0) >= 2:
-        return random.choice(all_moves)
+        return random.choice(all_moves), 0.0
 
-    # epsilon 随机
-    if random.random() < epsilon:
-        return random.choice(all_moves)
-
-    # AI 搜索
+    # 2. AI 搜索获取全局统计
+    clear_transposition_table()
     stop_event = threading.Event()
     settings = {
         "depth": depth,
         "time_limit": 60.0,
         "stop_event": stop_event,
         "analysis_mode": False,
+        "num_threads": num_threads,
+        "use_nnue": CONFIG["use_nnue"]
     }
     is_maximizing = (state.current_player == CANNON)
-    move = find_best_move_iterative_deepening(
-        state, settings, is_maximizing, progress_callback=None
-    )
-    return move if move else random.choice(all_moves)
+    
+    # 扩展搜索接口以返回所有合法走法的分值
+    if num_threads > 1:
+        move, score, stats = find_best_move_parallel(
+            state, settings, is_maximizing, progress_callback=None, return_score=True, 
+            game_history=game_history, return_all_stats=True
+        )
+    else:
+        move, score, stats = find_best_move_iterative_deepening(
+            state, settings, is_maximizing, progress_callback=None, return_score=True, 
+            game_history=game_history, return_all_stats=True
+        )
+
+    if not move:
+        return random.choice(all_moves), 0.0
+
+    # 3. Softmax 采样逻辑
+    import numpy as np
+    
+    moves_list = list(stats.keys())
+    scores_list = np.array(list(stats.values()), dtype=np.float64)
+    
+    # 对兵方分值取反，使 Softmax 始终在“好走法”上分布更高
+    if not is_maximizing:
+        scores_list = -scores_list
+
+    # 负分截断 (Pruning): 过滤掉比最高分低 300 点以上的智障走法
+    max_s = np.max(scores_list)
+    mask = scores_list >= (max_s - 300.0)
+    
+    filtered_moves = [moves_list[i] for i in range(len(moves_list)) if mask[i]]
+    filtered_scores = scores_list[mask]
+
+    if not filtered_moves:
+        # 理论上不会发生，保底回归 Greedy
+        return move, score
+
+    # 计算 Softmax
+    # 减去最大值防止指数爆炸
+    exp_scores = np.exp((filtered_scores - max_s) / tau)
+    probs = exp_scores / np.sum(exp_scores)
+
+    # 采样
+    chosen_idx = np.random.choice(len(filtered_moves), p=probs)
+    chosen_move = filtered_moves[chosen_idx]
+    
+    # 如果选中的是最佳走法，直接沿用搜索分；否则返回该变着对应的分值
+    chosen_score = stats[chosen_move]
+    
+    return chosen_move, chosen_score
 
 
-def play_one_game(depth_cannon, depth_soldier, epsilon, max_moves=150):
+def play_one_game(depth_cannon, depth_soldier, tau, max_moves=150, num_threads=1):
     """
     进行一局自对弈。max_moves 超出按和棋处理。
     胜负判定由引擎 GameState._check_winner() 统一负责。
     """
     state = GameState()
     history = [state]
+    game_history = [] # 存储哈希历史，用于透传给搜索内核
     pos_counts = collections.Counter()
     pos_counts[state.hash] += 1
+    game_history.append(state.hash)
 
     for _ in range(max_moves):
         # 如果引擎自然结束
@@ -130,37 +178,64 @@ def play_one_game(depth_cannon, depth_soldier, epsilon, max_moves=150):
 
         # 根据当前行棋方选择深度
         depth = depth_cannon if state.current_player == CANNON else depth_soldier
-        move = ai_choose_move(state, depth, epsilon, pos_counts)
+        move, score = ai_choose_move(state, depth, tau, pos_counts, game_history=game_history, num_threads=num_threads)
         if move is None:
             break
 
+        history.append((state, score))
+        
         start, end = move
         is_capture = state.board[end[0]][end[1]] != EMPTY
         state = state.move_piece(start[0], start[1], end[0], end[1])
-        history.append(state)
 
         if is_capture:
             pos_counts.clear()
+            # 捕获发生后，通常不再视之前的局面为同一个循环（虽然哈希可能相同，但棋子数变了）
         pos_counts[state.hash] += 1
+        game_history.append(state.hash)
 
         if pos_counts[state.hash] >= 3:
-            state.winner = DRAW
+            # 【同步系统级新规】三复局面根据兵力判胜负
+            sc = state.soldier_count
+            if sc <= 8:
+                state.winner = CANNON
+            elif sc == 9:
+                state.winner = DRAW
+            else:
+                state.winner = SOLDIER
             break
 
-    winner = state.winner if state.winner != -1 else DRAW
+    if state.winner == -1:
+        # 【局后裁定】到达最大步数上限，按兵力判胜负和
+        sc = state.soldier_count
+        if sc <= 8:
+            state.winner = CANNON
+        elif sc == 9:
+            state.winner = DRAW
+        else:
+            state.winner = SOLDIER
+
+    winner = state.winner
     return history, winner
 
 
 def export_game_to_jsonl(history, winner, filepath):
     outcome = 1.0 if winner == CANNON else (0.0 if winner == SOLDIER else 0.5)
     lines = []
-    for state in history:
-        res = evaluate_board(state)
-        eval_score = float(res[0] if isinstance(res, tuple) else res)
+    for item in history:
+        # 此时 item 可能是 (state, search_score)
+        if isinstance(item, tuple):
+            state, eval_score = item
+        else:
+            state = item
+            res = evaluate_board(state)
+            eval_score = float(res[0] if isinstance(res, tuple) else res)
+            
         lines.append(json.dumps({
             "fen": state.to_fen(),
             "eval": eval_score,
-            "game_outcome": outcome
+            "game_outcome": outcome,
+            "soldier_count": state.soldier_count
         }))
     with open(filepath, 'a', encoding='utf-8') as f:
         f.write('\n'.join(lines) + '\n')
@@ -184,8 +259,11 @@ def main():
     parser.add_argument('--games',         type=int,   default=CONFIG["games"],         help=f'目标总局数 (默认 {CONFIG["games"]})')
     parser.add_argument('--depth-cannon',  type=int,   default=CONFIG["depth_cannon"],  help=f'炮方搜索深度 (默认 {CONFIG["depth_cannon"]})')
     parser.add_argument('--depth-soldier', type=int,   default=CONFIG["depth_soldier"], help=f'兵方搜索深度 (默认 {CONFIG["depth_soldier"]})')
-    parser.add_argument('--epsilon',       type=float, default=CONFIG["epsilon"],       help=f'随机走棋概率 (默认 {CONFIG["epsilon"]})')
+    parser.add_argument('--tau',           type=float, default=CONFIG["temperature"],   help=f'Softmax 温度系数 (默认 {CONFIG["temperature"]})')
     parser.add_argument('--output',        type=str,   default=CONFIG["output"],        help=f'输出 JSONL 路径 (默认 {CONFIG["output"]})')
+    parser.add_argument('--threads',       type=int,   default=1,                       help='并行线程数 (默认 1)')
+    parser.add_argument('--nnue',          action='store_true', default=CONFIG["use_nnue"], help='是否开启 NNUE 评估 (默认开启)')
+    parser.add_argument('--no-nnue',       action='store_false', dest='nnue',              help='显式关闭 NNUE 评估')
     args = parser.parse_args()
 
     dc = args.depth_cannon
@@ -210,7 +288,10 @@ def main():
         start_game = 1
         cannon_wins = soldier_wins = draws = total_positions = 0
 
-    print(f"[自对弈生成器]  目标={args.games}局  炮深度={dc}  兵深度={ds}  epsilon={args.epsilon}")
+    print(f"[自对弈生成器]  目标={args.games}局  炮深度={dc}  兵深度={ds}  tau={args.tau}  NNUE={args.nnue}")
+    
+    # 将全局配置同步为命令行参数（确保 ai_choose_move 使用正确设置）
+    CONFIG["use_nnue"] = args.nnue
     print(f"[输出文件] {out_path}")
     print("=" * 70)
 
@@ -219,8 +300,9 @@ def main():
     for game_idx in range(start_game, args.games + 1):
         t0 = time.time()
         history, winner = play_one_game(
-            dc, ds, args.epsilon,
-            max_moves=CONFIG["max_moves"]
+            dc, ds, args.tau,
+            max_moves=CONFIG["max_moves"],
+            num_threads=args.threads
         )
         elapsed = time.time() - t0
 

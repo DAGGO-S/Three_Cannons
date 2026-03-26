@@ -1,14 +1,11 @@
-# own_game/core/zobrist_hashing.pyx
+# core/zobrist_hashing.pyx
 
 # Cython imports
 import cython
 from cython cimport Py_ssize_t
 import random
 
-# 定义棋子类型常量
-cdef int SOLDIER = 1
-cdef int CANNON = 2
-cdef int EMPTY = 0
+from core.constants cimport SOLDIER, CANNON, EMPTY
 
 # 定义棋子类型到索引的映射
 cdef dict _PIECE_TO_INDEX = {EMPTY: -1, SOLDIER: 0, CANNON: 1}
@@ -54,7 +51,7 @@ cdef class ZobristHasher:
         
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef unsigned long long c_compute_hash(self, int[25] board_c, int current_player):
+    cdef unsigned long long c_compute_hash(self, int[25] board_c, int current_player) noexcept nogil:
         cdef unsigned long long h = 0
         cdef int i
         for i in range(25):
@@ -69,7 +66,7 @@ cdef class ZobristHasher:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef unsigned long long c_update_hash(self, unsigned long long old_hash, int start_r, int start_c, int end_r, int end_c, int piece_type):
+    cdef unsigned long long c_update_hash(self, unsigned long long old_hash, int start_r, int start_c, int end_r, int end_c, int piece_type) noexcept nogil:
         cdef unsigned long long new_hash = old_hash
         cdef int start_idx = start_r * 5 + start_c
         cdef int end_idx = end_r * 5 + end_c
@@ -82,14 +79,14 @@ cdef class ZobristHasher:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef unsigned long long c_remove_piece_hash(self, unsigned long long old_hash, int r, int c, int piece_type):
+    cdef unsigned long long c_remove_piece_hash(self, unsigned long long old_hash, int r, int c, int piece_type) noexcept nogil:
         cdef int idx = r * 5 + c
         cdef int piece_index = 0 if piece_type == SOLDIER else 1
         return old_hash ^ self.table_c[idx][piece_index]
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef unsigned long long c_switch_turn_hash(self, unsigned long long old_hash):
+    cdef unsigned long long c_switch_turn_hash(self, unsigned long long old_hash) noexcept nogil:
         return old_hash ^ self.turn_key
     
     @cython.boundscheck(False)

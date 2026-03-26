@@ -1,33 +1,25 @@
-# own_game/game_logic.pyx
-# 【Phase3B】GameState 全面重构为 cdef class + C int[25] 数组
-
-# cython: profile=False
-from core.zobrist_hashing cimport ZobristHasher
-from core.zobrist_hashing import get_hasher, PIECE_TO_INDEX
+cimport core.zobrist_hashing as zh
+from core.board_ops cimport c_check_winner, c_gen_moves, c_canonical_hash
+# 导出常量到 Python 层，以兼容旧的 Python 导入 (如 from core.game_logic import DRAW)
+from core.constants import EMPTY, SOLDIER, CANNON, DRAW, NO_WINNER, BOARD_ROWS, BOARD_COLS
 from libc.string cimport memcpy
 
 # Cython imports
 import cython
-from cython cimport Py_ssize_t
-
-# 常量定义
-EMPTY = 0
-SOLDIER = 1
-CODE_CANNON = 2
-CANNON = 2
-DRAW = 3  # 和棋状态
-BOARD_ROWS = 5
-BOARD_COLS = 5
-
-# winner 的整数语义：-1 = None（未结束）
-cdef int NO_WINNER = -1
 
 # 初始棋盘（开局布局，行主序 1D）
 cdef int INITIAL_BOARD[25]
-INITIAL_BOARD = [1,1,1,1,1, 1,1,1,1,1, 1,1,1,1,1, 0,0,0,0,0, 0,2,2,2,0]
 
-# 获取全局哈希器实例，并声明为 C 级类型以实现内联调用
-cdef ZobristHasher hasher = get_hasher()
+def _init_initial_board():
+    global INITIAL_BOARD
+    cdef int i
+    cdef list temp = [1,1,1,1,1, 1,1,1,1,1, 1,1,1,1,1, 0,0,0,0,0, 0,2,2,2,0]
+    for i in range(25):
+        INITIAL_BOARD[i] = temp[i]
+
+_init_initial_board()
+
+# 对称变换表已移至 board_ops.pyx
 
 
 @cython.boundscheck(False)
@@ -38,38 +30,44 @@ cdef class GameState:
     字段声明在 game_logic.pxd 中，方法实现在此处。
     对外接口：
     - state.board          -> tuple-of-tuples（兼容 GUI/model 的只读访问）
-    - state.winner         -> int  (-1=None, 0=DRAW, 1=SOLDIER, 2=CANNON)
+    - state.winner         -> int  (-1=None, 0=CONST_DRAW, 1=CONST_SOLDIER, 2=CONST_CANNON)
     - state.current_player -> int
     - state.soldier_count  -> int
     - state.hash           -> unsigned long long
     """
 
-    def __init__(self, board=None, current_player=CANNON):
-        cdef int r, c, s_count, i, val
-        self.winner = NO_WINNER
+    def __init__(self, board=None, current_player=CONST_CANNON):
+        cdef int r, c, s_count, c_count, i, val
+        self.winner = CONST_NO_WINNER
 
         if board is None:
             # 使用预定义的初始棋盘
             memcpy(self.board_c, INITIAL_BOARD, 25 * sizeof(int))
             self.soldier_count = 15
+            self.cannon_count = 3
         else:
             # 从外部 board（list-of-lists 或 tuple-of-tuples）初始化
             s_count = 0
+            c_count = 0
             for r in range(5):
                 for c in range(5):
                     val = board[r][c]
                     self.board_c[r * 5 + c] = val
-                    if val == SOLDIER:
+                    if val == CONST_SOLDIER:
                         s_count += 1
+                    elif val == CONST_CANNON:
+                        c_count += 1
             self.soldier_count = s_count
+            self.cannon_count = c_count
 
         self.current_player = current_player
 
-        # 计算初始哈希（使用 C 级内联方法，传递 C 数组指针）
-        self.hash = hasher.c_compute_hash(self.board_c, self.current_player)
+        # 计算初始哈希（使用 C 级内联方法）
+        self.hash = zh._hasher.c_compute_hash(self.board_c, self.current_player)
 
-        # 检查胜负
-        self._check_winner()
+        # 检查胜负 (委托到 board_ops)
+        self.winner = c_check_winner(self.board_c, self.soldier_count)
+        self._has_canonical_hash = False
 
     # ------------------------------------------------------------------
     # Python 兼容层：通过 property 把 board_c 以 tuple-of-tuples 暴露出去
@@ -113,20 +111,20 @@ cdef class GameState:
                 r += 1
                 c = 0
             elif char == 'c' or char == 'C':
-                board_2d[r][c] = CANNON
+                board_2d[r][c] = CONST_CANNON
                 c += 1
             elif char == 's' or char == 'S':
-                board_2d[r][c] = SOLDIER
+                board_2d[r][c] = CONST_SOLDIER
                 c += 1
             elif char.isdigit():
                 count = int(char)
                 for i in range(count):
-                    board_2d[r][c] = EMPTY
+                    board_2d[r][c] = CONST_EMPTY
                     c += 1
             else:
                 raise ValueError(f"Invalid FEN character: {char}")
                 
-        cdef int current_player = CANNON if player_str.lower() == 'c' else SOLDIER
+        cdef int current_player = CONST_CANNON if player_str.lower() == 'c' else CONST_SOLDIER
         return cls(board=board_2d, current_player=current_player)
 
     def to_fen(self):
@@ -140,22 +138,22 @@ cdef class GameState:
             empty_count = 0
             for c in range(5):
                 piece = self.board_c[r * 5 + c]
-                if piece == EMPTY:
+                if piece == CONST_EMPTY:
                     empty_count += 1
                 else:
                     if empty_count > 0:
                         row_str += str(empty_count)
                         empty_count = 0
-                    if piece == CANNON:
+                    if piece == CONST_CANNON:
                         row_str += 'c'
-                    elif piece == SOLDIER:
+                    elif piece == CONST_SOLDIER:
                         row_str += 's'
             if empty_count > 0:
                 row_str += str(empty_count)
             fen_rows.append(row_str)
             
         board_part = "/".join(fen_rows)
-        player_part = 'c' if self.current_player == CANNON else 's'
+        player_part = 'c' if self.current_player == CONST_CANNON else 's'
         
         return f"{board_part} {player_part}"
 
@@ -166,25 +164,25 @@ cdef class GameState:
     @cython.wraparound(False)
     def get_valid_moves(self, int r, int c):
         cdef int piece = self.board_c[r * 5 + c]
-        if piece == EMPTY:
+        if piece == CONST_EMPTY:
             return []
 
         cdef list moves = []
         cdef int dr, dc, tr, tc, jump_r, jump_c, target_r, target_c
 
-        if piece == SOLDIER:
+        if piece == CONST_SOLDIER:
             for dr, dc in ((0,1),(0,-1),(1,0),(-1,0)):
                 tr = r + dr
                 tc = c + dc
-                if 0 <= tr < 5 and 0 <= tc < 5 and self.board_c[tr * 5 + tc] == EMPTY:
+                if 0 <= tr < 5 and 0 <= tc < 5 and self.board_c[tr * 5 + tc] == CONST_EMPTY:
                     moves.append((tr, tc))
 
-        elif piece == CANNON:
+        elif piece == CONST_CANNON:
             # 规则1: 普通移动
             for dr, dc in ((0,1),(0,-1),(1,0),(-1,0)):
                 tr = r + dr
                 tc = c + dc
-                if 0 <= tr < 5 and 0 <= tc < 5 and self.board_c[tr * 5 + tc] == EMPTY:
+                if 0 <= tr < 5 and 0 <= tc < 5 and self.board_c[tr * 5 + tc] == CONST_EMPTY:
                     moves.append((tr, tc))
             # 规则2: 隔空吃兵
             for dr, dc in ((0,1),(0,-1),(1,0),(-1,0)):
@@ -194,8 +192,8 @@ cdef class GameState:
                 target_c = c + 2 * dc
                 if (0 <= target_r < 5 and 0 <= target_c < 5 and
                         0 <= jump_r < 5 and 0 <= jump_c < 5 and
-                        self.board_c[jump_r * 5 + jump_c] == EMPTY and
-                        self.board_c[target_r * 5 + target_c] == SOLDIER):
+                        self.board_c[jump_r * 5 + jump_c] == CONST_EMPTY and
+                        self.board_c[target_r * 5 + target_c] == CONST_SOLDIER):
                     moves.append((target_r, target_c))
 
         return moves
@@ -217,17 +215,17 @@ cdef class GameState:
         cdef bint legal = False
 
         # 内联合法性验证（直接 C 级判断，无 Python 列表分配）
-        if piece == SOLDIER:
-            if (abs(dr) + abs(dc) == 1) and captured_piece == EMPTY:
+        if piece == CONST_SOLDIER:
+            if (abs(dr) + abs(dc) == 1) and captured_piece == CONST_EMPTY:
                 legal = True
-        elif piece == CANNON:
-            if (abs(dr) + abs(dc) == 1) and captured_piece == EMPTY:
+        elif piece == CONST_CANNON:
+            if (abs(dr) + abs(dc) == 1) and captured_piece == CONST_EMPTY:
                 legal = True
             elif (abs(dr) == 2 or abs(dc) == 2) and (dr == 0 or dc == 0):
                 jump_r = (start_r + end_r) // 2
                 jump_c = (start_c + end_c) // 2
-                if (self.board_c[jump_r * 5 + jump_c] == EMPTY and
-                        captured_piece == SOLDIER):
+                if (self.board_c[jump_r * 5 + jump_c] == CONST_EMPTY and
+                        captured_piece == CONST_SOLDIER):
                     legal = True
 
         if not legal:
@@ -241,23 +239,23 @@ cdef class GameState:
 
         # 执行移动（两个整数赋值）
         new_state.board_c[end_idx]   = piece
-        new_state.board_c[start_idx] = EMPTY
+        new_state.board_c[start_idx] = CONST_EMPTY
 
         new_state.soldier_count = self.soldier_count
-        if captured_piece == SOLDIER:
+        if captured_piece == CONST_SOLDIER:
             new_state.soldier_count -= 1
 
-        # 增量更新哈希（无 Python 调用的纯 C XOR）
+        # 增量更新哈希（纯 C XOR，无 GIL 依赖）
         cdef unsigned long long h = self.hash
-        h = hasher.c_update_hash(h, start_r, start_c, end_r, end_c, piece)
-        if captured_piece != EMPTY:
-            h = hasher.c_remove_piece_hash(h, end_r, end_c, captured_piece)
-        h = hasher.c_switch_turn_hash(h)
+        h = zh._hasher.c_update_hash(h, start_r, start_c, end_r, end_c, piece)
+        if captured_piece != CONST_EMPTY:
+            h = zh._hasher.c_remove_piece_hash(h, end_r, end_c, captured_piece)
+        h = zh._hasher.c_switch_turn_hash(h)
         new_state.hash = h
 
-        new_state.current_player = SOLDIER if self.current_player == CANNON else CANNON
-        new_state.winner = NO_WINNER
-        new_state._check_winner()
+        new_state.current_player = CONST_SOLDIER if self.current_player == CONST_CANNON else CONST_CANNON
+        new_state.winner = c_check_winner(new_state.board_c, new_state.soldier_count)
+        new_state._has_canonical_hash = False
 
         return new_state
 
@@ -268,198 +266,78 @@ cdef class GameState:
         cdef GameState new_state = GameState.__new__(GameState)
         memcpy(new_state.board_c, self.board_c, 25 * sizeof(int))
         new_state.soldier_count  = self.soldier_count
-        new_state.current_player = SOLDIER if self.current_player == CANNON else CANNON
-        new_state.hash   = hasher.switch_turn_hash(self.hash)
+        new_state.current_player = CONST_SOLDIER if self.current_player == CONST_CANNON else CONST_CANNON
+        new_state.hash   = zh._hasher.c_switch_turn_hash(self.hash)
         new_state.winner = self.winner
         return new_state
 
     # ------------------------------------------------------------------
-    # 对称性支持 (D4 对称群)
+    # 对称性支持 (D4 对称群) - 委托到 board_ops + 缓存
     # ------------------------------------------------------------------
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    def get_canonical_hash(self):
-        """
-        计算状态的规范化哈希值。
-        规范化定义为 8 个对称变换（4个旋转 + 4个镜像）中哈希值的最小值。
-        """
-        cdef unsigned long long min_h = self.hash
-        cdef int[25] sym_board
-        cdef int r, c, i
-        cdef unsigned long long cur_h
-        
-        # 预定义 8 种对称变换的索引映射 (5x5)
-        # 1. 原始: (r, c) -> r*5 + c
-        # 2. 水平翻转: (r, c) -> r*5 + (4-c)
-        # 3. 垂直翻转: (r, c) -> (4-r)*5 + c
-        # 4. 旋转 180: (r, c) -> (4-r)*5 + (4-c)
-        # 5. 转置 (主对角线镜像): (r, c) -> c*5 + r
-        # 6. 副对角线镜像: (r, c) -> (4-c)*5 + (4-r)
-        # 7. 旋转 90 (顺时针): (r, c) -> c*5 + (4-r)
-        # 8. 旋转 270 (顺时针): (r, c) -> (4-c)*5 + r
-        
-        # 对应变换列表
-        cdef int transforms[7][25]
-        for r in range(5):
-            for c in range(5):
-                i = r * 5 + c
-                transforms[0][r*5 + (4-c)] = i # H Flip
-                transforms[1][(4-r)*5 + c] = i # V Flip
-                transforms[2][(4-r)*5 + (4-c)] = i # 180
-                transforms[3][c*5 + r] = i # Transpose
-                transforms[4][(4-c)*5 + (4-r)] = i # Anti-Diagonal Flip
-                transforms[5][c*5 + (4-r)] = i # 90
-                transforms[6][(4-c)*5 + r] = i # 270
-        
-        for k in range(7):
-            for i in range(25):
-                sym_board[i] = self.board_c[transforms[k][i]]
-            cur_h = hasher.c_compute_hash(sym_board, self.current_player)
-            if cur_h < min_h:
-                min_h = cur_h
-                
-        return min_h
+    cpdef unsigned long long get_canonical_hash(self):
+        """计算并缓存规范化哈希值（8 个对称变换中的最小值）。"""
+        if self._has_canonical_hash:
+            return self._cached_canonical_hash
+        cdef unsigned long long h = c_canonical_hash(self.board_c, self.current_player)
+        self._cached_canonical_hash = h
+        self._has_canonical_hash = True
+        return h
 
     # ------------------------------------------------------------------
-    # 胜负判断
+    # 胜负判断 - 委托到 board_ops
     # ------------------------------------------------------------------
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
-    cdef void _check_winner(self):
-        if self.soldier_count == 0:  # 还原为真实规则：兵数量降至0时炮方才获胜
-            self.winner = CANNON
-            return
-
-        # 炮只要有一个相邻空格就不被困
-        cdef int r, c, tr, tc
-        for r in range(5):
-            for c in range(5):
-                if self.board_c[r * 5 + c] == CANNON:
-                    for tr, tc in ((r-1,c),(r+1,c),(r,c-1),(r,c+1)):
-                        if 0 <= tr < 5 and 0 <= tc < 5 and self.board_c[tr * 5 + tc] == EMPTY:
-                            self.winner = NO_WINNER
-                            return
-
-        self.winner = SOLDIER
+    cdef void _check_winner(self) noexcept nogil:
+        self.winner = c_check_winner(self.board_c, self.soldier_count)
 
     # ------------------------------------------------------------------
     # 【Phase 2 重构】纯 C 原生走棋 (零分配返回值)
     # ------------------------------------------------------------------
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef int c_move_piece(self, int start_idx, int end_idx) noexcept:
+    cdef int c_move_piece(self, int start_idx, int end_idx) noexcept nogil:
         cdef int piece = self.board_c[start_idx]
         cdef int captured_piece = self.board_c[end_idx]
-        
+
         self.board_c[end_idx]   = piece
-        self.board_c[start_idx] = EMPTY
-        
-        if captured_piece == SOLDIER:
+        self.board_c[start_idx] = CONST_EMPTY
+
+        if captured_piece == CONST_SOLDIER:
             self.soldier_count -= 1
-            
+
         cdef unsigned long long h = self.hash
-        h = hasher.c_update_hash(h, start_idx // 5, start_idx % 5, end_idx // 5, end_idx % 5, piece)
-        if captured_piece != EMPTY:
-            h = hasher.c_remove_piece_hash(h, end_idx // 5, end_idx % 5, captured_piece)
-        h = hasher.c_switch_turn_hash(h)
+        h = zh._hasher.c_update_hash(h, start_idx // 5, start_idx % 5, end_idx // 5, end_idx % 5, piece)
+        if captured_piece != CONST_EMPTY:
+            h = zh._hasher.c_remove_piece_hash(h, end_idx // 5, end_idx % 5, captured_piece)
+        h = zh._hasher.c_switch_turn_hash(h)
         self.hash = h
-        
-        self.current_player = SOLDIER if self.current_player == CANNON else CANNON
-        self.winner = NO_WINNER
-        self._check_winner()
-        
+
+        self.current_player = CONST_SOLDIER if self.current_player == CONST_CANNON else CONST_CANNON
+        self.winner = c_check_winner(self.board_c, self.soldier_count)
+
         return captured_piece
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void c_unmake_piece(self, int start_idx, int end_idx, int captured_piece, unsigned long long old_hash, int old_winner) noexcept:
+    cdef void c_unmake_piece(self, int start_idx, int end_idx, int captured_piece, unsigned long long old_hash, int old_winner) noexcept nogil:
         cdef int piece = self.board_c[end_idx]
         
         self.board_c[start_idx] = piece
         self.board_c[end_idx]   = captured_piece
         
-        if captured_piece == SOLDIER:
+        if captured_piece == CONST_SOLDIER:
             self.soldier_count += 1
             
         self.hash = old_hash
         self.winner = old_winner
-        self.current_player = SOLDIER if self.current_player == CANNON else CANNON
+        self.current_player = CONST_SOLDIER if self.current_player == CONST_CANNON else CONST_CANNON
 
 # ------------------------------------------------------------------
-# 【Phase 2 重构】纯 C 原生可排序走法生成 (零堆分配)
+# 走法生成：委托到 board_ops.c_gen_moves
 # ------------------------------------------------------------------
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef int c_get_ordered_moves(GameState state, int player_piece, int hash_move, int* out_moves) noexcept:
-    """
-    生成所有合法走法，直接写入预分配的 C 数组 out_moves 中。
-    走法编码规则: move_encoded = (start_idx << 8) | end_idx
-    返回生成的走法总数。排序：hash_move > 吃子 > 安静走子。
-    """
-    cdef int num_moves = 0
-    cdef int captures[64]
-    cdef int num_captures = 0
-    cdef int quiets[64]
-    cdef int num_quiets = 0
-    cdef int i, r, c, start_idx, end_idx, dr, dc, nr, nc, jump_idx
-    cdef int move_encoded
-    
-    # 1. 如果有 hash_move，先放置于首位
-    if hash_move != -1:
-        out_moves[num_moves] = hash_move
-        num_moves += 1
-        
-    for start_idx in range(25):
-        if state.board_c[start_idx] == player_piece:
-            r = start_idx // 5
-            c = start_idx % 5
-            
-            if player_piece == SOLDIER:
-                for dr, dc in [(0,1), (0,-1), (1,0), (-1,0)]:
-                    nr = r + dr
-                    nc = c + dc
-                    if 0 <= nr < 5 and 0 <= nc < 5:
-                        end_idx = nr * 5 + nc
-                        if state.board_c[end_idx] == EMPTY:
-                            move_encoded = (start_idx << 8) | end_idx
-                            if move_encoded == hash_move:
-                                continue
-                            quiets[num_quiets] = move_encoded
-                            num_quiets += 1
-            else: # CANNON
-                for dr, dc in [(0,1), (0,-1), (1,0), (-1,0)]:
-                    nr = r + dr
-                    nc = c + dc
-                    if 0 <= nr < 5 and 0 <= nc < 5:
-                        end_idx = nr * 5 + nc
-                        if state.board_c[end_idx] == EMPTY:
-                            move_encoded = (start_idx << 8) | end_idx
-                            if move_encoded == hash_move:
-                                continue
-                            quiets[num_quiets] = move_encoded
-                            num_quiets += 1
-                            
-                    # 取 Jump 吃子
-                    nr = r + 2*dr
-                    nc = c + 2*dc
-                    if 0 <= nr < 5 and 0 <= nc < 5:
-                        jump_idx = (r + dr) * 5 + (c + dc)
-                        if state.board_c[jump_idx] == EMPTY:
-                            end_idx = nr * 5 + nc
-                            if state.board_c[end_idx] == SOLDIER:
-                                move_encoded = (start_idx << 8) | end_idx
-                                if move_encoded == hash_move:
-                                    continue
-                                captures[num_captures] = move_encoded
-                                num_captures += 1
-                                
-    # 追加 Captures
-    for i in range(num_captures):
-        out_moves[num_moves] = captures[i]
-        num_moves += 1
-    # 追加 Quiets
-    for i in range(num_quiets):
-        out_moves[num_moves] = quiets[i]
-        num_moves += 1
-        
-    return num_moves
+cdef int c_get_ordered_moves(GameState state, int player_piece, int hash_move, int* out_moves) noexcept nogil:
+    """委托到 board_ops.c_gen_moves，保持原有签名不变。"""
+    return c_gen_moves(state.board_c, player_piece, hash_move, out_moves)
